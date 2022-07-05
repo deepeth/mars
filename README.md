@@ -1,4 +1,4 @@
-<p align="center">The platform to explore data from Ethereum</p>
+<p align="center"><b>Mars: The powerful platform to explore data from Ethereum</b></p>
 
 ## Features
 
