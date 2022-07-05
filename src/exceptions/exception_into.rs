@@ -50,3 +50,14 @@ impl From<tracing::dispatcher::SetGlobalDefaultError> for ErrorCode {
         )
     }
 }
+
+impl From<serde_json::Error> for ErrorCode {
+    fn from(error: serde_json::Error) -> Self {
+        ErrorCode::create(
+            1002,
+            format!("{:?}", error),
+            None,
+            Some(ErrorCodeBacktrace::Origin(Arc::new(Backtrace::capture()))),
+        )
+    }
+}
