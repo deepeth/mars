@@ -1,0 +1,10 @@
+# IntelliJ project files
+.idea/*
+
+# visual studio code files
+.vscode
+.dir-locals.el
+.bash_history
+
+# Rust
+target/
