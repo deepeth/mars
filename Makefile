@@ -9,4 +9,7 @@ lint:
 	cargo clippy --workspace --all-targets -- -D warnings
 
 build:
-	cargo build --bin=mars --release
+	bash ./scripts/build/build-release.sh
+
+test:
+	bash ./scripts/ci/ci-run-unit-tests.sh
