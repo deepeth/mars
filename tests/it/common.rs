@@ -20,8 +20,8 @@ pub fn create_config() -> Config {
     let provider_uri = "https://mainnet.infura.io/v3/6e83aaa316ef4a8c947b949364f81619".to_string();
     Config {
         provider_uri,
-        start_block: 50000,
-        end_block: 50000,
+        start_block: 50010,
+        end_block: 50010,
         batch_size: 100,
         max_worker: 4,
     }
