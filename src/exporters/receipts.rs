@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use futures::stream;
+use futures::stream::TryStreamExt;
 use futures::StreamExt;
 use web3::types::H256;
 
@@ -36,15 +37,16 @@ impl ReceiptExporter {
     pub async fn export(&self) -> Result<()> {
         let jobs = self.hashes.chunks(self.ctx.get_batch_size()).len();
         stream::iter(0..jobs)
-            .for_each_concurrent(self.ctx.get_max_worker(), |job| async move {
+            .map(Ok)
+            .try_for_each_concurrent(self.ctx.get_max_worker(), |job| async move {
                 let mut worker = ReceiptWorker::create(&self.ctx);
                 let mut chunks = self.hashes.chunks(self.ctx.get_batch_size());
                 let chunk = chunks.nth(job).unwrap();
 
                 worker.push_batch(chunk.to_vec()).unwrap();
-                let _res = worker.execute().await.unwrap();
+                worker.execute().await?;
+                Ok(())
             })
-            .await;
-        Ok(())
+            .await
     }
 }
