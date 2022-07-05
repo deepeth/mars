@@ -41,10 +41,10 @@ impl ReceiptExporter {
             .try_for_each_concurrent(self.ctx.get_max_worker(), |job| async move {
                 let mut worker = ReceiptWorker::create(&self.ctx);
                 let mut chunks = self.hashes.chunks(self.ctx.get_batch_size());
-                let chunk = chunks.nth(job).unwrap();
-
-                worker.push_batch(chunk.to_vec()).unwrap();
-                worker.execute().await?;
+                if let Some(chunk) = chunks.nth(job) {
+                    worker.push_batch(chunk.to_vec())?;
+                    worker.execute().await?;
+                }
                 Ok(())
             })
             .await

@@ -41,21 +41,21 @@ impl BlockExporter {
             .try_for_each_concurrent(self.ctx.get_max_worker(), |job| async move {
                 let mut block_worker = BlockWorker::create(&self.ctx);
                 let mut chunks = self.numbers.chunks(self.ctx.get_batch_size());
-                let chunk = chunks.nth(job).unwrap();
 
-                block_worker.push_batch(chunk.to_vec()).unwrap();
-                let blocks = block_worker.execute().await.unwrap();
-
-                let mut tx_hashes = vec![];
-                for block in blocks {
-                    for tx in block.transactions {
-                        tx_hashes.push(tx.hash);
+                if let Some(chunk) = chunks.nth(job) {
+                    block_worker.push_batch(chunk.to_vec())?;
+                    let blocks = block_worker.execute().await?;
+                    let mut tx_hashes = vec![];
+                    for block in blocks {
+                        for tx in block.transactions {
+                            tx_hashes.push(tx.hash);
+                        }
                     }
+                    // Receipts.
+                    let receipt_worker = ReceiptExporter::create(&self.ctx, tx_hashes);
+                    receipt_worker.export().await?
                 }
-
-                // Receipts.
-                let receipt_worker = ReceiptExporter::create(&self.ctx, tx_hashes);
-                receipt_worker.export().await
+                Ok(())
             })
             .await
     }
