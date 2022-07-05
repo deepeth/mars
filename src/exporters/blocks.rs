@@ -13,7 +13,8 @@
 // limitations under the License.
 
 use futures::stream;
-use futures::StreamExt;
+use futures::stream::StreamExt;
+use futures::stream::TryStreamExt;
 
 use crate::exceptions::Result;
 use crate::BlockWorker;
@@ -36,7 +37,8 @@ impl BlockExporter {
     pub async fn export(&self) -> Result<()> {
         let jobs = self.numbers.chunks(self.ctx.get_batch_size()).len();
         stream::iter(0..jobs)
-            .for_each_concurrent(self.ctx.get_max_worker(), |job| async move {
+            .map(Ok)
+            .try_for_each_concurrent(self.ctx.get_max_worker(), |job| async move {
                 let mut block_worker = BlockWorker::create(&self.ctx);
                 let mut chunks = self.numbers.chunks(self.ctx.get_batch_size());
                 let chunk = chunks.nth(job).unwrap();
@@ -53,9 +55,8 @@ impl BlockExporter {
 
                 // Receipts.
                 let receipt_worker = ReceiptExporter::create(&self.ctx, tx_hashes);
-                receipt_worker.export().await.unwrap();
+                receipt_worker.export().await
             })
-            .await;
-        Ok(())
+            .await
     }
 }
