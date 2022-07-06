@@ -1,4 +1,4 @@
-<p align="center"><b>Mars: The powerful platform to explore data from Ethereum</b></p>
+<p align="center"><b>Mars: The powerful analysis platform to explore data from Web3(Ethereum-based)</b></p>
 
 ## Features
 
@@ -8,7 +8,7 @@
 
 - __Low Cost__ Store structured-data to AWS S3, Azure Blob.
 
-- __Easy to Use__ Web3.0 visualization and analysis at your Fingertips.
+- __Easy to Use__ Web3 visualization and analysis at your fingertips.
 
 ## How to Use
 
