@@ -30,6 +30,7 @@ pub fn init_tracing() -> Result<TracingStop> {
     let tracer = opentelemetry_jaeger::new_pipeline()
         .with_service_name("shafish")
         .with_agent_endpoint(agent_addr)
+        .with_auto_split_batch(true)
         .install_simple()?;
 
     let stderr_subscriber = tracing_subscriber::fmt::layer().pretty().with_target(true);
