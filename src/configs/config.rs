@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::fs;
+
 use clap::Parser;
 
 use crate::exceptions::Result;
@@ -49,11 +51,28 @@ pub struct Config {
         help = "The maximum number of workers"
     )]
     pub max_worker: usize,
+
+    #[clap(
+        short = 'o',
+        long,
+        value_parser,
+        default_value = "",
+        help = "Exporter directory"
+    )]
+    pub output_dir: String,
 }
 
 impl Config {
     pub fn load() -> Result<Self> {
-        let conf = Self::parse();
+        let mut conf = Self::parse();
+
+        let start = conf.start_block;
+        let end = conf.end_block;
+        if conf.output_dir.is_empty() {
+            conf.output_dir = format!("datas/{}_{}", start, end);
+        }
+        fs::create_dir_all(&conf.output_dir)?;
+
         Ok(conf)
     }
 }
