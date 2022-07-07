@@ -26,9 +26,6 @@ async fn main() -> Result<()> {
     let conf = Config::load()?;
     log::info!("Config: {:?}", conf);
 
-    let start = conf.start_block;
-    let end = conf.end_block;
-
     let ctx = Context::create(&conf);
 
     // Interval progress.
@@ -36,6 +33,8 @@ async fn main() -> Result<()> {
     progress.start();
 
     // Exporter.
+    let start = conf.start_block;
+    let end = conf.end_block;
     let range: Vec<usize> = (start..end + 1).collect();
     let block_exporter = BlockExporter::create(&ctx, range);
     block_exporter.export().await?;

@@ -61,3 +61,14 @@ impl From<serde_json::Error> for ErrorCode {
         )
     }
 }
+
+impl From<std::io::Error> for ErrorCode {
+    fn from(error: std::io::Error) -> Self {
+        ErrorCode::create(
+            1002,
+            format!("{:?}", error),
+            None,
+            Some(ErrorCodeBacktrace::Origin(Arc::new(Backtrace::capture()))),
+        )
+    }
+}

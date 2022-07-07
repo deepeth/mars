@@ -8,3 +8,7 @@
 
 # Rust
 target/
+
+# Test
+_test_output_dir
+datas
