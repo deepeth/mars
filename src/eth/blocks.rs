@@ -18,17 +18,17 @@ use web3::types::BlockNumber;
 use web3::types::Transaction;
 use web3::types::U64;
 
+use crate::contexts::ContextRef;
 use crate::exceptions::Result;
-use crate::workers::ContextRef;
 use crate::ErrorCode;
 
-pub struct BlockWorker {
+pub struct BlockFetcher {
     ctx: ContextRef,
     numbers: Vec<usize>,
 }
 
-impl BlockWorker {
-    pub fn create(ctx: &ContextRef) -> BlockWorker {
+impl BlockFetcher {
+    pub fn create(ctx: &ContextRef) -> BlockFetcher {
         Self {
             ctx: ctx.clone(),
             numbers: vec![],
@@ -49,7 +49,7 @@ impl BlockWorker {
 
     // Get the blocks.
     #[tracing::instrument(level = "info", skip(self))]
-    pub async fn execute(&self) -> Result<Vec<Block<Transaction>>> {
+    pub async fn fetch(&self) -> Result<Vec<Block<Transaction>>> {
         let http = web3::transports::Http::new(self.ctx.get_rpc_url())?;
         let web3 = web3::Web3::new(web3::transports::Batch::new(http));
 

@@ -14,8 +14,8 @@
 
 use std::sync::Arc;
 
-use crate::workers::Progress;
-use crate::Config;
+use crate::configs::Config;
+use crate::contexts::Progress;
 
 #[derive(Clone, Debug)]
 pub struct Context {

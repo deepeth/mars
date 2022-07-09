@@ -13,9 +13,9 @@
 // limitations under the License.
 
 use env_logger::Env;
-use mars::BlockExporter;
-use mars::Config;
-use mars::Context;
+use mars::configs::Config;
+use mars::contexts::Context;
+use mars::exporters::BlockExporter;
 use mars::Result;
 
 #[tokio::main]

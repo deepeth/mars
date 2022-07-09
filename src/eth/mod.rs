@@ -12,22 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use mars::configs::Config;
-use mars::contexts::Context;
-use mars::contexts::ContextRef;
+mod blocks;
+mod receipts;
 
-pub fn create_config() -> Config {
-    let provider_uri = "https://mainnet.infura.io/v3/6e83aaa316ef4a8c947b949364f81619".to_string();
-    Config {
-        provider_uri,
-        start_block: 50010,
-        end_block: 50010,
-        batch_size: 100,
-        max_worker: 4,
-        output_dir: "_test_output_dir".to_string(),
-    }
-}
-
-pub fn create_ctx(conf: &Config) -> ContextRef {
-    Context::create(conf)
-}
+pub use blocks::BlockFetcher;
+pub use receipts::ReceiptFetcher;
