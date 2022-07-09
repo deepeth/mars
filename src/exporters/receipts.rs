@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use futures::stream;
-use futures::stream::TryStreamExt;
-use futures::StreamExt;
 use web3::types::H256;
 
 use crate::contexts::ContextRef;
@@ -35,18 +32,9 @@ impl ReceiptExporter {
     }
 
     pub async fn export(&self) -> Result<()> {
-        let jobs = self.hashes.chunks(self.ctx.get_batch_size()).len();
-        stream::iter(0..jobs)
-            .map(Ok)
-            .try_for_each_concurrent(self.ctx.get_max_worker(), |job| async move {
-                let mut fetcher = ReceiptFetcher::create(&self.ctx);
-                let mut chunks = self.hashes.chunks(self.ctx.get_batch_size());
-                if let Some(chunk) = chunks.nth(job) {
-                    fetcher.push_batch(chunk.to_vec())?;
-                    fetcher.fetch().await?;
-                }
-                Ok(())
-            })
-            .await
+        let mut fetcher = ReceiptFetcher::create(&self.ctx);
+        fetcher.push_batch(self.hashes.to_vec())?;
+        fetcher.fetch().await?;
+        Ok(())
     }
 }
