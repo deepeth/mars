@@ -17,9 +17,9 @@ use futures::stream::TryStreamExt;
 use futures::StreamExt;
 use web3::types::H256;
 
+use crate::contexts::ContextRef;
+use crate::eth::ReceiptFetcher;
 use crate::exceptions::Result;
-use crate::ContextRef;
-use crate::ReceiptWorker;
 
 pub struct ReceiptExporter {
     ctx: ContextRef,
@@ -39,11 +39,11 @@ impl ReceiptExporter {
         stream::iter(0..jobs)
             .map(Ok)
             .try_for_each_concurrent(self.ctx.get_max_worker(), |job| async move {
-                let mut worker = ReceiptWorker::create(&self.ctx);
+                let mut fetcher = ReceiptFetcher::create(&self.ctx);
                 let mut chunks = self.hashes.chunks(self.ctx.get_batch_size());
                 if let Some(chunk) = chunks.nth(job) {
-                    worker.push_batch(chunk.to_vec())?;
-                    worker.execute().await?;
+                    fetcher.push_batch(chunk.to_vec())?;
+                    fetcher.fetch().await?;
                 }
                 Ok(())
             })

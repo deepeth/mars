@@ -15,17 +15,17 @@
 use web3::types::TransactionReceipt;
 use web3::types::H256;
 
+use crate::contexts::ContextRef;
 use crate::exceptions::Result;
-use crate::workers::ContextRef;
 use crate::ErrorCode;
 
-pub struct ReceiptWorker {
+pub struct ReceiptFetcher {
     ctx: ContextRef,
     hashes: Vec<H256>,
 }
 
-impl ReceiptWorker {
-    pub fn create(ctx: &ContextRef) -> ReceiptWorker {
+impl ReceiptFetcher {
+    pub fn create(ctx: &ContextRef) -> ReceiptFetcher {
         Self {
             ctx: ctx.clone(),
             hashes: vec![],
@@ -43,7 +43,7 @@ impl ReceiptWorker {
     }
 
     #[tracing::instrument(level = "info", skip(self))]
-    pub async fn execute(&self) -> Result<Vec<TransactionReceipt>> {
+    pub async fn fetch(&self) -> Result<Vec<TransactionReceipt>> {
         let http = web3::transports::Http::new(self.ctx.get_rpc_url())?;
         let web3 = web3::Web3::new(web3::transports::Batch::new(http));
 

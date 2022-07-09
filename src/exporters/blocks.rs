@@ -16,10 +16,9 @@ use futures::stream;
 use futures::stream::StreamExt;
 use futures::stream::TryStreamExt;
 
+use crate::contexts::ContextRef;
+use crate::eth::BlockFetcher;
 use crate::exceptions::Result;
-use crate::BlockWorker;
-use crate::ContextRef;
-use crate::ReceiptExporter;
 
 pub struct BlockExporter {
     ctx: ContextRef,
@@ -39,21 +38,18 @@ impl BlockExporter {
         stream::iter(0..jobs)
             .map(Ok)
             .try_for_each_concurrent(self.ctx.get_max_worker(), |job| async move {
-                let mut block_worker = BlockWorker::create(&self.ctx);
+                let mut fetcher = BlockFetcher::create(&self.ctx);
                 let mut chunks = self.numbers.chunks(self.ctx.get_batch_size());
 
                 if let Some(chunk) = chunks.nth(job) {
-                    block_worker.push_batch(chunk.to_vec())?;
-                    let blocks = block_worker.execute().await?;
+                    fetcher.push_batch(chunk.to_vec())?;
+                    let blocks = fetcher.fetch().await?;
                     let mut tx_hashes = vec![];
                     for block in blocks {
                         for tx in block.transactions {
                             tx_hashes.push(tx.hash);
                         }
                     }
-                    // Receipts.
-                    let receipt_worker = ReceiptExporter::create(&self.ctx, tx_hashes);
-                    receipt_worker.export().await?
                 }
                 Ok(())
             })

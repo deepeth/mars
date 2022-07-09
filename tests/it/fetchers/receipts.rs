@@ -15,27 +15,39 @@
 use std::io::Write;
 
 use goldenfile::Mint;
-use mars::BlockWorker;
+use mars::eth::BlockFetcher;
+use mars::eth::ReceiptFetcher;
 use mars::Result;
 
 use crate::common::create_config;
 use crate::common::create_ctx;
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-async fn test_blocks_worker() -> Result<()> {
+async fn test_receipt_fetcher() -> Result<()> {
     let mut mint = Mint::new("tests/it/testdata");
-    let mut file = mint.new_goldenfile("blocks.txt").unwrap();
+    let mut file = mint.new_goldenfile("receipts.txt").unwrap();
 
     let conf = create_config();
     let ctx = create_ctx(&conf);
+
+    let mut block_fetcher = BlockFetcher::create(&ctx);
     let range: Vec<usize> = (conf.start_block..conf.end_block + 1).collect();
+    block_fetcher.push_batch(range)?;
 
-    let mut worker = BlockWorker::create(&ctx);
-    worker.push_batch(range)?;
+    let blocks = block_fetcher.fetch().await?;
+    let mut tx_hashes = vec![];
+    for block in blocks {
+        for tx in block.transactions {
+            tx_hashes.push(tx.hash);
+        }
+    }
 
-    let blocks = worker.execute().await?;
-    let blocks_str = serde_json::to_string(&blocks)?;
-    writeln!(file, "{}", blocks_str).unwrap();
+    let mut receipts_fetcher = ReceiptFetcher::create(&ctx);
+    receipts_fetcher.push_batch(tx_hashes)?;
+
+    let receipts = receipts_fetcher.fetch().await?;
+    let receipts_str = serde_json::to_string(&receipts)?;
+    writeln!(file, "{}", receipts_str).unwrap();
 
     Ok(())
 }
