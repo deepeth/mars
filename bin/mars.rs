@@ -15,7 +15,7 @@
 use env_logger::Env;
 use mars::configs::Config;
 use mars::contexts::Context;
-use mars::exporters::BlockExporter;
+use mars::workers::BlockWorker;
 use mars::Result;
 
 #[tokio::main]
@@ -36,8 +36,8 @@ async fn main() -> Result<()> {
     let start = conf.start_block;
     let end = conf.end_block;
     let range: Vec<usize> = (start..end + 1).collect();
-    let block_exporter = BlockExporter::create(&ctx, range);
-    block_exporter.export().await?;
+    let block_worker = BlockWorker::create(&ctx, range);
+    block_worker.execute().await?;
 
     Ok(())
 }
