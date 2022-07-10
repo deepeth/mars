@@ -72,3 +72,14 @@ impl From<std::io::Error> for ErrorCode {
         )
     }
 }
+
+impl From<arrow2::error::Error> for ErrorCode {
+    fn from(error: arrow2::error::Error) -> Self {
+        ErrorCode::create(
+            1002,
+            format!("{:?}", error),
+            None,
+            Some(ErrorCodeBacktrace::Origin(Arc::new(Backtrace::capture()))),
+        )
+    }
+}
