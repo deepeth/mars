@@ -10,6 +10,10 @@
 
 - __Easy to Use__ Web3 visualization and analysis at your fingertips.
 
+## Tools
+
+- __ethetl__ Lets you export Ethereum data into CSV/Parquet/JSON file format and databases, blazing fast.
+
 ## How to Use
 
 ```shell
