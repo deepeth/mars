@@ -16,6 +16,7 @@ test = false
 [dependencies]
 # Workspace dependencies
 common-exceptions = { path = "../common/exceptions" }
+common-formats = { path = "../common/formats" }
 
 arrow2 = { version = "0.12.0", features = ["io_csv"]}
 clap = { version = "3.2.5", features = ["derive", "env"] }

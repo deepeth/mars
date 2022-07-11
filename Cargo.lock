@@ -255,6 +255,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "common-formats"
+version = "0.1.0"
+dependencies = [
+ "arrow2",
+ "common-exceptions",
+]
+
+[[package]]
 name = "common-tracings"
 version = "0.1.0"
 dependencies = [
@@ -490,6 +498,7 @@ dependencies = [
  "arrow2",
  "clap",
  "common-exceptions",
+ "common-formats",
  "env_logger",
  "futures",
  "goldenfile",
