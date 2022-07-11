@@ -15,12 +15,11 @@
 
 use std::env;
 
+use common_exceptions::Result;
 use opentelemetry::global;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::Registry;
-
-use crate::exceptions::Result;
 
 pub fn init_tracing() -> Result<TracingStop> {
     global::set_text_map_propagator(opentelemetry_jaeger::Propagator::new());

@@ -12,22 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use mars::configs::Config;
-use mars::contexts::Context;
-use mars::contexts::ContextRef;
+use common_exceptions::Result;
+use web3::types::H256;
 
-pub fn create_config() -> Config {
-    let provider_uri = "https://mainnet.infura.io/v3/6e83aaa316ef4a8c947b949364f81619".to_string();
-    Config {
-        provider_uri,
-        start_block: 50010,
-        end_block: 50010,
-        batch_size: 100,
-        max_worker: 4,
-        output_dir: "_test_output_dir".to_string(),
-    }
+use crate::contexts::ContextRef;
+use crate::eth::ReceiptFetcher;
+
+pub struct ReceiptExporter {
+    ctx: ContextRef,
+    hashes: Vec<H256>,
 }
 
-pub fn create_ctx(conf: &Config) -> ContextRef {
-    Context::create(conf)
+impl ReceiptExporter {
+    pub fn create(ctx: &ContextRef, hashes: Vec<H256>) -> ReceiptExporter {
+        Self {
+            ctx: ctx.clone(),
+            hashes,
+        }
+    }
+
+    pub async fn export(&self) -> Result<()> {
+        let mut fetcher = ReceiptFetcher::create(&self.ctx);
+        fetcher.push_batch(self.hashes.to_vec())?;
+        fetcher.fetch().await?;
+        Ok(())
+    }
 }

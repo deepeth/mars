@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use common_exceptions::ErrorCode;
+use common_exceptions::Result;
 use web3::types::Block;
 use web3::types::BlockId;
 use web3::types::BlockNumber;
@@ -19,8 +21,6 @@ use web3::types::Transaction;
 use web3::types::U64;
 
 use crate::contexts::ContextRef;
-use crate::exceptions::Result;
-use crate::ErrorCode;
 
 pub struct BlockFetcher {
     ctx: ContextRef,

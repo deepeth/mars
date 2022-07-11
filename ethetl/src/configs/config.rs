@@ -15,8 +15,7 @@
 use std::fs;
 
 use clap::Parser;
-
-use crate::exceptions::Result;
+use common_exceptions::Result;
 
 #[derive(Parser, Debug, Clone)]
 pub struct Config {
