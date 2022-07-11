@@ -48,22 +48,25 @@ impl ReceiptFetcher {
         let web3 = web3::Web3::new(web3::transports::Batch::new(http));
 
         let mut receipts = vec![];
-        let mut callbacks = vec![];
-        for hash in &self.hashes {
-            let receipt = web3.eth().transaction_receipt(*hash);
-            callbacks.push(receipt);
-        }
-        let _ = web3.transport().submit_batch().await?;
 
-        for cb in callbacks {
-            let r = cb.await?;
-            match r {
-                None => return Err(ErrorCode::ExportReceiptError("Cannot get receipt")),
-                Some(v) => {
-                    receipts.push(v);
-                }
+        for chunks in self.hashes.chunks(1000) {
+            let mut callbacks = vec![];
+            for hash in chunks {
+                let receipt = web3.eth().transaction_receipt(*hash);
+                callbacks.push(receipt);
             }
-            self.ctx.get_progress().incr_receipts(1);
+            let _ = web3.transport().submit_batch().await?;
+
+            for cb in callbacks {
+                let r = cb.await?;
+                match r {
+                    None => return Err(ErrorCode::ExportReceiptError("Cannot get receipt")),
+                    Some(v) => {
+                        receipts.push(v);
+                    }
+                }
+                self.ctx.get_progress().incr_receipts(1);
+            }
         }
 
         Ok(receipts)

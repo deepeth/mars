@@ -37,7 +37,7 @@ pub struct Config {
         short = 'b',
         long,
         value_parser,
-        default_value_t = 1000,
+        default_value_t = 10000,
         help = "The number of items to export at a time"
     )]
     pub batch_size: usize,

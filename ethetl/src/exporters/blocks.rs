@@ -16,6 +16,7 @@ use std::fs;
 
 use arrow2::array::Array;
 use arrow2::array::Int64Array;
+use arrow2::array::UInt64Array;
 use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
 use common_exceptions::Result;
@@ -70,6 +71,13 @@ impl BlockExporter {
             "receipts_root",
             "difficulty",
             "total_difficulty",
+            "size",
+            "extra_data",
+            "gas_limit",
+            "gas_used",
+            "timestamp",
+            "transaction_count",
+            "base_fee_per_gas",
         ];
         let mut numbers = Vec::with_capacity(blocks_len);
         let mut hashes = Vec::with_capacity(blocks_len);
@@ -82,6 +90,13 @@ impl BlockExporter {
         let mut receipts_roots = Vec::with_capacity(blocks_len);
         let mut difficulty = Vec::with_capacity(blocks_len);
         let mut total_difficulty = Vec::with_capacity(blocks_len);
+        let mut sizes = Vec::with_capacity(blocks_len);
+        let mut extra_datas = Vec::with_capacity(blocks_len);
+        let mut gas_limits = Vec::with_capacity(blocks_len);
+        let mut gas_useds = Vec::with_capacity(blocks_len);
+        let mut timestamps = Vec::with_capacity(blocks_len);
+        let mut transaction_counts = Vec::with_capacity(blocks_len);
+        let mut base_fee_per_gas = Vec::with_capacity(blocks_len);
 
         for block in &blocks {
             numbers.push(block.number.unwrap().as_u64() as i64);
@@ -95,6 +110,13 @@ impl BlockExporter {
             receipts_roots.push(format!("{:#x}", block.receipts_root));
             difficulty.push(format!("{:#x}", block.difficulty));
             total_difficulty.push(format!("{:#x}", block.total_difficulty.unwrap()));
+            sizes.push(block.size.unwrap().as_u64());
+            extra_datas.push(format!("{:x?}", block.extra_data.0));
+            gas_limits.push(block.gas_limit.as_u64());
+            gas_useds.push(block.gas_used.as_u64());
+            timestamps.push(block.timestamp.as_u64());
+            transaction_counts.push(block.transactions.len() as u64);
+            base_fee_per_gas.push(block.base_fee_per_gas.unwrap().as_u64());
         }
 
         let number_array = Int64Array::from_slice(numbers);
@@ -108,6 +130,13 @@ impl BlockExporter {
         let receipts_root_array = Utf8Array::<i32>::from_slice(receipts_roots);
         let difficulty_array = Utf8Array::<i32>::from_slice(difficulty);
         let total_difficulty_array = Utf8Array::<i32>::from_slice(total_difficulty);
+        let size_array = UInt64Array::from_slice(sizes);
+        let extra_data_array = Utf8Array::<i32>::from_slice(extra_datas);
+        let gas_limit_array = UInt64Array::from_slice(gas_limits);
+        let gas_used_array = UInt64Array::from_slice(gas_useds);
+        let timestamp_array = UInt64Array::from_slice(timestamps);
+        let transaction_count_array = UInt64Array::from_slice(transaction_counts);
+        let base_fee_per_gas_array = UInt64Array::from_slice(base_fee_per_gas);
 
         let column_batch = Chunk::try_new(vec![
             &number_array as &dyn Array,
@@ -121,6 +150,13 @@ impl BlockExporter {
             &receipts_root_array as &dyn Array,
             &difficulty_array as &dyn Array,
             &total_difficulty_array as &dyn Array,
+            &size_array as &dyn Array,
+            &extra_data_array as &dyn Array,
+            &gas_limit_array as &dyn Array,
+            &gas_used_array as &dyn Array,
+            &timestamp_array as &dyn Array,
+            &transaction_count_array as &dyn Array,
+            &base_fee_per_gas_array as &dyn Array,
         ])?;
 
         common_formats::write_csv(&block_path, header, &[column_batch])?;
