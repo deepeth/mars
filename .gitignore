@@ -11,4 +11,5 @@ target/
 
 # Test
 _test_output_dir
+outputs
 datas

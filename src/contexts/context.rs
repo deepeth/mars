@@ -23,6 +23,7 @@ pub struct Context {
     rpc_url: String,
     rpc_batch_size: usize,
     max_worker: usize,
+    output_dir: String,
 }
 pub type ContextRef = Arc<Context>;
 
@@ -34,6 +35,7 @@ impl Context {
             rpc_url: conf.provider_uri.to_string(),
             rpc_batch_size: conf.batch_size,
             max_worker: conf.max_worker,
+            output_dir: conf.output_dir.clone(),
         })
     }
 
@@ -51,5 +53,9 @@ impl Context {
 
     pub fn get_progress(&self) -> Arc<Progress> {
         self.progress.clone()
+    }
+
+    pub fn get_output_dir(&self) -> &str {
+        &self.output_dir
     }
 }
