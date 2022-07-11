@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "common/exceptions",
+    "common/formats",
     "common/tracings",
     "ethetl",
 ]

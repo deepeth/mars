@@ -18,7 +18,6 @@ use arrow2::array::Array;
 use arrow2::array::Int64Array;
 use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
-use arrow2::io::csv::write;
 use common_exceptions::Result;
 
 use crate::contexts::ContextRef;
@@ -69,6 +68,8 @@ impl BlockExporter {
             "transactions_root",
             "state_root",
             "receipts_root",
+            "difficulty",
+            "total_difficulty",
         ];
         let mut numbers = Vec::with_capacity(blocks_len);
         let mut hashes = Vec::with_capacity(blocks_len);
@@ -79,6 +80,8 @@ impl BlockExporter {
         let mut transactions_roots = Vec::with_capacity(blocks_len);
         let mut state_roots = Vec::with_capacity(blocks_len);
         let mut receipts_roots = Vec::with_capacity(blocks_len);
+        let mut difficulty = Vec::with_capacity(blocks_len);
+        let mut total_difficulty = Vec::with_capacity(blocks_len);
 
         for block in &blocks {
             numbers.push(block.number.unwrap().as_u64() as i64);
@@ -90,6 +93,8 @@ impl BlockExporter {
             transactions_roots.push(format!("{:#x}", block.transactions_root));
             state_roots.push(format!("{:#x}", block.state_root));
             receipts_roots.push(format!("{:#x}", block.receipts_root));
+            difficulty.push(format!("{:#x}", block.difficulty));
+            total_difficulty.push(format!("{:#x}", block.total_difficulty.unwrap()));
         }
 
         let number_array = Int64Array::from_slice(numbers);
@@ -101,8 +106,10 @@ impl BlockExporter {
         let transactions_root_array = Utf8Array::<i32>::from_slice(transactions_roots);
         let state_root_array = Utf8Array::<i32>::from_slice(state_roots);
         let receipts_root_array = Utf8Array::<i32>::from_slice(receipts_roots);
+        let difficulty_array = Utf8Array::<i32>::from_slice(difficulty);
+        let total_difficulty_array = Utf8Array::<i32>::from_slice(total_difficulty);
 
-        let batch = Chunk::try_new(vec![
+        let column_batch = Chunk::try_new(vec![
             &number_array as &dyn Array,
             &hash_array as &dyn Array,
             &parent_hash_array as &dyn Array,
@@ -112,25 +119,12 @@ impl BlockExporter {
             &transactions_root_array as &dyn Array,
             &state_root_array as &dyn Array,
             &receipts_root_array as &dyn Array,
+            &difficulty_array as &dyn Array,
+            &total_difficulty_array as &dyn Array,
         ])?;
-        Self::write_batch(&block_path, header, &[batch])?;
 
-        Ok(())
-    }
+        common_formats::write_csv(&block_path, header, &[column_batch])?;
 
-    fn write_batch<A: AsRef<dyn Array>>(
-        path: &str,
-        headers: Vec<&str>,
-        columns: &[Chunk<A>],
-    ) -> Result<()> {
-        let mut writer = std::fs::File::create(path)?;
-
-        let options = write::SerializeOptions::default();
-        write::write_header(&mut writer, headers.as_slice(), &options)?;
-
-        columns
-            .iter()
-            .try_for_each(|batch| write::write_chunk(&mut writer, batch, &options))?;
         Ok(())
     }
 }

@@ -1,0 +1,16 @@
+[package]
+name = "common-formats"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+doctest = false
+test = false
+
+[dependencies]
+# Workspace dependencies
+common-exceptions = { path = "../exceptions" }
+
+arrow2 = { version = "0.12.0", features = ["io_csv"]}
+
+[dev-dependencies]
