@@ -55,30 +55,32 @@ impl BlockFetcher {
 
         let mut blocks = vec![];
 
-        let mut callbacks = vec![];
-        for num in &self.numbers {
-            let block = web3
-                .eth()
-                .block_with_txs(BlockId::Number(BlockNumber::Number(U64::from(*num))));
-            callbacks.push(block);
-        }
-        let _ = web3.transport().submit_batch().await?;
+        for chunks in self.numbers.chunks(1000) {
+            let mut callbacks = vec![];
+            for num in chunks {
+                let block = web3
+                    .eth()
+                    .block_with_txs(BlockId::Number(BlockNumber::Number(U64::from(*num))));
+                callbacks.push(block);
+            }
+            let _ = web3.transport().submit_batch().await?;
 
-        // Get the callback.
-        for cb in callbacks {
-            let r = cb.await?;
-            match r {
-                None => {
-                    return Err(ErrorCode::ExportBlockError(
-                        "Cannot export block, please make sure eth node sync is already",
-                    ));
-                }
-                Some(blk) => {
-                    let len = blk.transactions.len();
-                    blocks.push(blk);
+            // Get the callback.
+            for cb in callbacks {
+                let r = cb.await?;
+                match r {
+                    None => {
+                        return Err(ErrorCode::ExportBlockError(
+                            "Cannot export block, please make sure eth node sync is already",
+                        ));
+                    }
+                    Some(blk) => {
+                        let len = blk.transactions.len();
+                        blocks.push(blk);
 
-                    self.ctx.get_progress().incr_blocks(1);
-                    self.ctx.get_progress().incr_txs(len);
+                        self.ctx.get_progress().incr_blocks(1);
+                        self.ctx.get_progress().incr_txs(len);
+                    }
                 }
             }
         }
