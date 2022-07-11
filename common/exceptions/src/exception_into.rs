@@ -15,8 +15,8 @@
 use std::backtrace::Backtrace;
 use std::sync::Arc;
 
-use crate::exceptions::exception::ErrorCode;
-use crate::exceptions::exception::ErrorCodeBacktrace;
+use crate::ErrorCode;
+use crate::ErrorCodeBacktrace;
 
 impl From<web3::Error> for ErrorCode {
     fn from(error: web3::Error) -> Self {

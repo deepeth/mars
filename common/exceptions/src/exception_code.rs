@@ -17,8 +17,8 @@
 use std::backtrace::Backtrace;
 use std::sync::Arc;
 
-use crate::exceptions::exception::ErrorCode;
-use crate::exceptions::exception::ErrorCodeBacktrace;
+use crate::ErrorCode;
+use crate::ErrorCodeBacktrace;
 
 macro_rules! build_exceptions {
     ($($body:ident($code:expr)),*$(,)*) => {

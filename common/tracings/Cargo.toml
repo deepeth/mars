@@ -1,0 +1,28 @@
+[package]
+name = "common-tracings"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+doctest = false
+test = false
+
+[dependencies]
+# Workspace dependencies
+common-exceptions = { path = "../exceptions" }
+
+futures = "0.3"
+log = "0.4.0"
+paste = "1.0.7"
+serde_json = "1.0.82"
+thiserror = "1.0.31"
+tokio = { version = "1.19.2", features = ["full"] }
+web3 = "0.18.0"
+
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-opentelemetry = "0.17"
+opentelemetry = "0.17"
+opentelemetry-jaeger = "0.16"
+
+[dev-dependencies]

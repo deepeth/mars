@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use common_exceptions::Result;
 use env_logger::Env;
-use mars::configs::Config;
-use mars::contexts::Context;
-use mars::workers::BlockWorker;
-use mars::Result;
+use ethetl::configs::Config;
+use ethetl::contexts::Context;
+use ethetl::workers::BlockWorker;
 
 #[tokio::main]
 async fn main() -> Result<()> {

@@ -14,15 +14,10 @@
 
 #![feature(backtrace)]
 
-mod exceptions;
-mod tracings;
+mod exception;
+mod exception_code;
+mod exception_into;
 
-pub mod configs;
-pub mod contexts;
-pub mod eth;
-pub mod exporters;
-pub mod workers;
-
-pub use exceptions::ErrorCode;
-pub use exceptions::Result;
-pub use tracings::init_tracing;
+pub use exception::ErrorCode;
+pub use exception::ErrorCodeBacktrace;
+pub use exception::Result;

@@ -239,6 +239,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "common-exceptions"
+version = "0.1.0"
+dependencies = [
+ "arrow2",
+ "futures",
+ "log",
+ "opentelemetry",
+ "paste",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "web3",
+]
+
+[[package]]
+name = "common-tracings"
+version = "0.1.0"
+dependencies = [
+ "common-exceptions",
+ "futures",
+ "log",
+ "opentelemetry",
+ "opentelemetry-jaeger",
+ "paste",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "tracing-opentelemetry",
+ "tracing-subscriber",
+ "web3",
+]
+
+[[package]]
 name = "console"
 version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -449,6 +484,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "ethetl"
+version = "0.1.0"
+dependencies = [
+ "arrow2",
+ "clap",
+ "common-exceptions",
+ "env_logger",
+ "futures",
+ "goldenfile",
+ "log",
+ "opentelemetry",
+ "paste",
+ "percentage-rs",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "web3",
+]
+
+[[package]]
 name = "fastrand"
 version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -621,12 +677,6 @@ dependencies = [
  "libc",
  "wasi",
 ]
-
-[[package]]
-name = "glob"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b919933a397b79c37e33b77bb2aa3dc8eb6e165ad809e58ff75bc7db2e34574"
 
 [[package]]
 name = "goldenfile"
@@ -1007,30 +1057,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "abb12e687cfb44aa40f41fc3978ef76448f9b6038cad6aef4259d3c095a2382e"
 dependencies = [
  "cfg-if",
-]
-
-[[package]]
-name = "mars"
-version = "0.1.0"
-dependencies = [
- "arrow2",
- "clap",
- "env_logger",
- "futures",
- "glob",
- "goldenfile",
- "log",
- "opentelemetry",
- "opentelemetry-jaeger",
- "paste",
- "percentage-rs",
- "serde_json",
- "thiserror",
- "tokio",
- "tracing",
- "tracing-opentelemetry",
- "tracing-subscriber",
- "web3",
 ]
 
 [[package]]

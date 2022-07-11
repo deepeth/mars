@@ -14,10 +14,10 @@
 
 use std::io::Write;
 
+use common_exceptions::Result;
+use ethetl::eth::BlockFetcher;
+use ethetl::eth::ReceiptFetcher;
 use goldenfile::Mint;
-use mars::eth::BlockFetcher;
-use mars::eth::ReceiptFetcher;
-use mars::Result;
 
 use crate::common::create_config;
 use crate::common::create_ctx;

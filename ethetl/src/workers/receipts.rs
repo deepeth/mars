@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use common_exceptions::Result;
 use futures::stream;
 use futures::stream::TryStreamExt;
 use futures::StreamExt;
 use web3::types::H256;
 
 use crate::contexts::ContextRef;
-use crate::exceptions::Result;
 use crate::exporters::ReceiptExporter;
 
 pub struct ReceiptWorker {

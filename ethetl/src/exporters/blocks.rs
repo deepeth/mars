@@ -19,10 +19,10 @@ use arrow2::array::Int64Array;
 use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
 use arrow2::io::csv::write;
+use common_exceptions::Result;
 
 use crate::contexts::ContextRef;
 use crate::eth::BlockFetcher;
-use crate::exceptions::Result;
 
 pub struct BlockExporter {
     ctx: ContextRef,

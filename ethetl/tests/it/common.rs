@@ -12,9 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod exception;
-mod exception_code;
-mod exception_into;
+use ethetl::configs::Config;
+use ethetl::contexts::Context;
+use ethetl::contexts::ContextRef;
 
-pub use exception::ErrorCode;
-pub use exception::Result;
+pub fn create_config() -> Config {
+    let provider_uri = "https://mainnet.infura.io/v3/6e83aaa316ef4a8c947b949364f81619".to_string();
+    Config {
+        provider_uri,
+        start_block: 50010,
+        end_block: 50010,
+        batch_size: 100,
+        max_worker: 4,
+        output_dir: "_test_output_dir".to_string(),
+    }
+}
+
+pub fn create_ctx(conf: &Config) -> ContextRef {
+    Context::create(conf)
+}
