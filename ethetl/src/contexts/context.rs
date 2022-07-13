@@ -21,7 +21,7 @@ use crate::contexts::Progress;
 pub struct Context {
     progress: Arc<Progress>,
     rpc_url: String,
-    rpc_batch_size: usize,
+    batch_size: usize,
     max_worker: usize,
     output_dir: String,
 }
@@ -33,7 +33,7 @@ impl Context {
         Arc::new(Context {
             progress: Progress::create(all),
             rpc_url: conf.provider_uri.to_string(),
-            rpc_batch_size: conf.batch_size,
+            batch_size: conf.batch_size,
             max_worker: conf.max_worker,
             output_dir: conf.output_dir.clone(),
         })
@@ -44,7 +44,7 @@ impl Context {
     }
 
     pub fn get_batch_size(&self) -> usize {
-        self.rpc_batch_size
+        self.batch_size
     }
 
     pub fn get_max_worker(&self) -> usize {
