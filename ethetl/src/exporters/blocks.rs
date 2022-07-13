@@ -20,6 +20,8 @@ use arrow2::array::UInt64Array;
 use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
 use common_exceptions::Result;
+use web3::types::Block;
+use web3::types::Transaction;
 
 use crate::contexts::ContextRef;
 use crate::eth::BlockFetcher;
@@ -47,17 +49,14 @@ impl BlockExporter {
         let mut fetcher = BlockFetcher::create(&self.ctx);
         fetcher.push_batch(self.numbers.to_vec())?;
         let blocks = fetcher.fetch().await?;
-        let blocks_len = blocks.len();
-        let mut tx_hashes = vec![];
-        for block in &blocks {
-            for tx in &block.transactions {
-                tx_hashes.push(tx.hash);
-            }
-        }
+        self.export_blocks(&blocks).await?;
+        self.export_txs(&blocks).await?;
 
-        let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), self.start, self.end);
-        fs::create_dir_all(&dir)?;
-        let block_path = format!("{}/blocks.csv", dir);
+        Ok(())
+    }
+
+    pub async fn export_blocks(&self, blocks: &[Block<Transaction>]) -> Result<()> {
+        let blocks_len = blocks.len();
 
         let header = vec![
             "number",
@@ -79,64 +78,64 @@ impl BlockExporter {
             "transaction_count",
             "base_fee_per_gas",
         ];
-        let mut numbers = Vec::with_capacity(blocks_len);
-        let mut hashes = Vec::with_capacity(blocks_len);
-        let mut parent_hashes = Vec::with_capacity(blocks_len);
-        let mut nonces = Vec::with_capacity(blocks_len);
-        let mut sha3_uncles = Vec::with_capacity(blocks_len);
-        let mut logs_blooms = Vec::with_capacity(blocks_len);
-        let mut transactions_roots = Vec::with_capacity(blocks_len);
-        let mut state_roots = Vec::with_capacity(blocks_len);
-        let mut receipts_roots = Vec::with_capacity(blocks_len);
-        let mut difficulty = Vec::with_capacity(blocks_len);
-        let mut total_difficulty = Vec::with_capacity(blocks_len);
-        let mut sizes = Vec::with_capacity(blocks_len);
-        let mut extra_datas = Vec::with_capacity(blocks_len);
-        let mut gas_limits = Vec::with_capacity(blocks_len);
-        let mut gas_useds = Vec::with_capacity(blocks_len);
-        let mut timestamps = Vec::with_capacity(blocks_len);
-        let mut transaction_counts = Vec::with_capacity(blocks_len);
-        let mut base_fee_per_gas = Vec::with_capacity(blocks_len);
+        let mut number_vec = Vec::with_capacity(blocks_len);
+        let mut hash_vec = Vec::with_capacity(blocks_len);
+        let mut parent_hash_vec = Vec::with_capacity(blocks_len);
+        let mut nonce_vec = Vec::with_capacity(blocks_len);
+        let mut sha3_uncle_vec = Vec::with_capacity(blocks_len);
+        let mut logs_bloom_vec = Vec::with_capacity(blocks_len);
+        let mut transactions_root_vec = Vec::with_capacity(blocks_len);
+        let mut state_root_vec = Vec::with_capacity(blocks_len);
+        let mut receipts_root_vec = Vec::with_capacity(blocks_len);
+        let mut difficulty_vec = Vec::with_capacity(blocks_len);
+        let mut total_difficulty_vec = Vec::with_capacity(blocks_len);
+        let mut size_vec = Vec::with_capacity(blocks_len);
+        let mut extra_data_vec = Vec::with_capacity(blocks_len);
+        let mut gas_limit_vec = Vec::with_capacity(blocks_len);
+        let mut gas_used_vec = Vec::with_capacity(blocks_len);
+        let mut timestamp_vec = Vec::with_capacity(blocks_len);
+        let mut transaction_count_vec = Vec::with_capacity(blocks_len);
+        let mut base_fee_per_gas_vec = Vec::with_capacity(blocks_len);
 
-        for block in &blocks {
-            numbers.push(block.number.unwrap().as_u64() as i64);
-            hashes.push(format!("{:#x}", block.hash.unwrap()));
-            parent_hashes.push(format!("{:#x}", block.parent_hash));
-            nonces.push(format!("{:#x}", block.nonce.unwrap()));
-            sha3_uncles.push(format!("{:#x}", block.uncles_hash));
-            logs_blooms.push(format!("{:#x}", block.logs_bloom.unwrap()));
-            transactions_roots.push(format!("{:#x}", block.transactions_root));
-            state_roots.push(format!("{:#x}", block.state_root));
-            receipts_roots.push(format!("{:#x}", block.receipts_root));
-            difficulty.push(format!("{:#x}", block.difficulty));
-            total_difficulty.push(format!("{:#x}", block.total_difficulty.unwrap()));
-            sizes.push(block.size.unwrap().as_u64());
-            extra_datas.push(format!("{:x?}", block.extra_data.0));
-            gas_limits.push(block.gas_limit.as_u64());
-            gas_useds.push(block.gas_used.as_u64());
-            timestamps.push(block.timestamp.as_u64());
-            transaction_counts.push(block.transactions.len() as u64);
-            base_fee_per_gas.push(block.base_fee_per_gas.unwrap().as_u64());
+        for block in blocks {
+            number_vec.push(block.number.unwrap().as_u64() as i64);
+            hash_vec.push(format!("{:#x}", block.hash.unwrap()));
+            parent_hash_vec.push(format!("{:#x}", block.parent_hash));
+            nonce_vec.push(format!("{:#x}", block.nonce.unwrap()));
+            sha3_uncle_vec.push(format!("{:#x}", block.uncles_hash));
+            logs_bloom_vec.push(format!("{:#x}", block.logs_bloom.unwrap()));
+            transactions_root_vec.push(format!("{:#x}", block.transactions_root));
+            state_root_vec.push(format!("{:#x}", block.state_root));
+            receipts_root_vec.push(format!("{:#x}", block.receipts_root));
+            difficulty_vec.push(format!("{:#x}", block.difficulty));
+            total_difficulty_vec.push(format!("{:#x}", block.total_difficulty.unwrap()));
+            size_vec.push(block.size.unwrap().as_u64());
+            extra_data_vec.push(format!("{:x?}", block.extra_data.0));
+            gas_limit_vec.push(block.gas_limit.as_u64());
+            gas_used_vec.push(block.gas_used.as_u64());
+            timestamp_vec.push(block.timestamp.as_u64());
+            transaction_count_vec.push(block.transactions.len() as u64);
+            base_fee_per_gas_vec.push(block.base_fee_per_gas.unwrap().as_u64());
         }
 
-        let number_array = Int64Array::from_slice(numbers);
-        let hash_array = Utf8Array::<i32>::from_slice(hashes);
-        let parent_hash_array = Utf8Array::<i32>::from_slice(parent_hashes);
-        let nonce_array = Utf8Array::<i32>::from_slice(nonces);
-        let sha3_uncle_array = Utf8Array::<i32>::from_slice(sha3_uncles);
-        let log_bloom_array = Utf8Array::<i32>::from_slice(logs_blooms);
-        let transactions_root_array = Utf8Array::<i32>::from_slice(transactions_roots);
-        let state_root_array = Utf8Array::<i32>::from_slice(state_roots);
-        let receipts_root_array = Utf8Array::<i32>::from_slice(receipts_roots);
-        let difficulty_array = Utf8Array::<i32>::from_slice(difficulty);
-        let total_difficulty_array = Utf8Array::<i32>::from_slice(total_difficulty);
-        let size_array = UInt64Array::from_slice(sizes);
-        let extra_data_array = Utf8Array::<i32>::from_slice(extra_datas);
-        let gas_limit_array = UInt64Array::from_slice(gas_limits);
-        let gas_used_array = UInt64Array::from_slice(gas_useds);
-        let timestamp_array = UInt64Array::from_slice(timestamps);
-        let transaction_count_array = UInt64Array::from_slice(transaction_counts);
-        let base_fee_per_gas_array = UInt64Array::from_slice(base_fee_per_gas);
+        let number_array = Int64Array::from_slice(number_vec);
+        let hash_array = Utf8Array::<i32>::from_slice(hash_vec);
+        let parent_hash_array = Utf8Array::<i32>::from_slice(parent_hash_vec);
+        let nonce_array = Utf8Array::<i32>::from_slice(nonce_vec);
+        let sha3_uncle_array = Utf8Array::<i32>::from_slice(sha3_uncle_vec);
+        let log_bloom_array = Utf8Array::<i32>::from_slice(logs_bloom_vec);
+        let transactions_root_array = Utf8Array::<i32>::from_slice(transactions_root_vec);
+        let state_root_array = Utf8Array::<i32>::from_slice(state_root_vec);
+        let receipts_root_array = Utf8Array::<i32>::from_slice(receipts_root_vec);
+        let difficulty_array = Utf8Array::<i32>::from_slice(difficulty_vec);
+        let total_difficulty_array = Utf8Array::<i32>::from_slice(total_difficulty_vec);
+        let size_array = UInt64Array::from_slice(size_vec);
+        let extra_data_array = Utf8Array::<i32>::from_slice(extra_data_vec);
+        let gas_limit_array = UInt64Array::from_slice(gas_limit_vec);
+        let gas_used_array = UInt64Array::from_slice(gas_used_vec);
+        let timestamp_array = UInt64Array::from_slice(timestamp_vec);
+        let transaction_count_array = UInt64Array::from_slice(transaction_count_vec);
+        let base_fee_per_gas_array = UInt64Array::from_slice(base_fee_per_gas_vec);
 
         let column_batch = Chunk::try_new(vec![
             &number_array as &dyn Array,
@@ -159,8 +158,84 @@ impl BlockExporter {
             &base_fee_per_gas_array as &dyn Array,
         ])?;
 
-        common_formats::write_csv(&block_path, header, &[column_batch])?;
+        let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), self.start, self.end);
+        fs::create_dir_all(&dir)?;
+        let block_path = format!("{}/blocks.csv", dir);
+        common_formats::write_csv(&block_path, header, &[column_batch])
+    }
 
-        Ok(())
+    pub async fn export_txs(&self, blocks: &[Block<Transaction>]) -> Result<()> {
+        let header = vec![
+            "hash",
+            "nonce",
+            "block_hash",
+            "block_number",
+            "transaction_index",
+            "form_address",
+            "to_address",
+            "value",
+            "gas",
+            "gas_price",
+            "input",
+        ];
+
+        let mut hash_vec = vec![];
+        let mut nonce_vec = vec![];
+        let mut block_hash_vec = vec![];
+        let mut block_number_vec = vec![];
+        let mut transaction_index_vec = vec![];
+        let mut from_address_vec = vec![];
+        let mut to_address_vec = vec![];
+        let mut value_vec = vec![];
+        let mut gas_vec = vec![];
+        let mut gas_price_vec = vec![];
+        let mut input_vec = vec![];
+
+        for block in blocks {
+            for tx in &block.transactions {
+                hash_vec.push(format!("{:#x}", tx.hash));
+                nonce_vec.push(format!("{:}", tx.nonce));
+                block_hash_vec.push(format!("{:#x}", block.hash.unwrap()));
+                block_number_vec.push(block.number.unwrap().as_u64() as i64);
+                transaction_index_vec.push(tx.transaction_index.unwrap().as_u64());
+                from_address_vec.push(format!("{:#x}", tx.from.unwrap()));
+                to_address_vec.push(format!("{:#x}", tx.to.unwrap()));
+                value_vec.push(format!("{:}", tx.value));
+                gas_vec.push(format!("{:}", tx.gas));
+                gas_price_vec.push(format!("{:}", tx.gas_price.unwrap()));
+                input_vec.push(format!("{:x?}", tx.input.0));
+            }
+        }
+
+        let hash_array = Utf8Array::<i32>::from_slice(hash_vec);
+        let nonce_array = Utf8Array::<i32>::from_slice(nonce_vec);
+        let block_hash_array = Utf8Array::<i32>::from_slice(block_hash_vec);
+        let block_number_array = Int64Array::from_slice(block_number_vec);
+        let transaction_index_array = UInt64Array::from_slice(transaction_index_vec);
+        let from_address_array = Utf8Array::<i32>::from_slice(from_address_vec);
+        let to_address_array = Utf8Array::<i32>::from_slice(to_address_vec);
+        let value_array = Utf8Array::<i32>::from_slice(value_vec);
+        let gas_array = Utf8Array::<i32>::from_slice(gas_vec);
+        let gas_price_array = Utf8Array::<i32>::from_slice(gas_price_vec);
+        let input_array = Utf8Array::<i32>::from_slice(input_vec);
+
+        let column_batch = Chunk::try_new(vec![
+            &hash_array as &dyn Array,
+            &nonce_array as &dyn Array,
+            &block_hash_array as &dyn Array,
+            &block_number_array as &dyn Array,
+            &transaction_index_array as &dyn Array,
+            &from_address_array as &dyn Array,
+            &to_address_array as &dyn Array,
+            &value_array as &dyn Array,
+            &gas_array as &dyn Array,
+            &gas_price_array as &dyn Array,
+            &input_array as &dyn Array,
+        ])?;
+
+        let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), self.start, self.end);
+        fs::create_dir_all(&dir)?;
+        let tx_path = format!("{}/transactions.csv", dir);
+        common_formats::write_csv(&tx_path, header, &[column_batch])
     }
 }
