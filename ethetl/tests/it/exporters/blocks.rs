@@ -21,7 +21,7 @@ use crate::common::create_config;
 use crate::common::create_ctx;
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-async fn test_blocks_exporters() -> Result<()> {
+async fn test_blocks_csv_exporters() -> Result<()> {
     let mut conf = create_config();
     conf.start_block = 15138828;
     conf.end_block = 15138852;
@@ -39,6 +39,32 @@ async fn test_blocks_exporters() -> Result<()> {
     goldenfile::differs::text_diff(
         Path::new("tests/it/testdata/transactions_15138828_15138852.csv"),
         Path::new("_test_output_dir/15138828_15138852/transactions.csv"),
+    );
+
+    Ok(())
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+async fn test_blocks_parquet_exporters() -> Result<()> {
+    let mut conf = create_config();
+    conf.start_block = 15138828;
+    conf.end_block = 15138852;
+    conf.output_format = "parquet".to_string();
+
+    let ctx = create_ctx(&conf);
+
+    let range: Vec<usize> = (conf.start_block..conf.end_block + 1).collect();
+    let exporter = BlockExporter::create(&ctx, range);
+    exporter.export().await?;
+
+    goldenfile::differs::binary_diff(
+        Path::new("tests/it/testdata/blocks_15138828_15138852.parquet"),
+        Path::new("_test_output_dir/15138828_15138852/blocks.parquet"),
+    );
+
+    goldenfile::differs::binary_diff(
+        Path::new("tests/it/testdata/transactions_15138828_15138852.parquet"),
+        Path::new("_test_output_dir/15138828_15138852/transactions.parquet"),
     );
 
     Ok(())

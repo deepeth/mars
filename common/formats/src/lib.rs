@@ -13,5 +13,7 @@
 // limitations under the License.
 
 mod csv;
+mod parquet;
 
 pub use csv::write_csv;
+pub use parquet::write_parquet;

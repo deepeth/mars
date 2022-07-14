@@ -25,6 +25,7 @@ pub fn create_config() -> Config {
         batch_size: 100,
         max_worker: 4,
         output_dir: "_test_output_dir".to_string(),
+        output_format: "csv".to_string(),
     }
 }
 

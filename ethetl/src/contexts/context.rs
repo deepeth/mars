@@ -24,6 +24,7 @@ pub struct Context {
     batch_size: usize,
     max_worker: usize,
     output_dir: String,
+    output_format: String,
 }
 pub type ContextRef = Arc<Context>;
 
@@ -36,6 +37,7 @@ impl Context {
             batch_size: conf.batch_size,
             max_worker: conf.max_worker,
             output_dir: conf.output_dir.clone(),
+            output_format: conf.output_format.clone(),
         })
     }
 
@@ -57,5 +59,9 @@ impl Context {
 
     pub fn get_output_dir(&self) -> &str {
         &self.output_dir
+    }
+
+    pub fn get_output_format(&self) -> &str {
+        &self.output_format
     }
 }
