@@ -187,8 +187,6 @@ impl BlockExporter {
         let header = vec![
             "hash",
             "nonce",
-            "block_hash",
-            "block_number",
             "transaction_index",
             "form_address",
             "to_address",
@@ -196,16 +194,16 @@ impl BlockExporter {
             "gas",
             "gas_price",
             "input",
-            "block_timestamp",
             "max_fee_per_gas",
             "max_priority_fee_per_gas",
             "transaction_type",
+            "block_hash",
+            "block_number",
+            "block_timestamp",
         ];
 
         let mut hash_vec = vec![];
         let mut nonce_vec = vec![];
-        let mut block_hash_vec = vec![];
-        let mut block_number_vec = vec![];
         let mut transaction_index_vec = vec![];
         let mut from_address_vec = vec![];
         let mut to_address_vec = vec![];
@@ -213,17 +211,17 @@ impl BlockExporter {
         let mut gas_vec = vec![];
         let mut gas_price_vec = vec![];
         let mut input_vec = vec![];
-        let mut block_timestamp_vec = vec![];
         let mut max_fee_per_gas_vec = vec![];
         let mut max_priority_fee_per_gas_vec = vec![];
         let mut transaction_type_vec = vec![];
+        let mut block_hash_vec = vec![];
+        let mut block_number_vec = vec![];
+        let mut block_timestamp_vec = vec![];
 
         for block in blocks {
             for tx in &block.transactions {
                 hash_vec.push(format!("{:#x}", tx.hash));
                 nonce_vec.push(format!("{:}", tx.nonce));
-                block_hash_vec.push(format!("{:#x}", block.hash.unwrap_or_else(H256::zero)));
-                block_number_vec.push(block.number.unwrap_or_else(U64::zero).as_u64());
                 transaction_index_vec.push(tx.transaction_index.unwrap_or_else(U64::zero).as_u64());
                 from_address_vec.push(format!("{:#x}", tx.from.unwrap_or_else(Address::zero)));
                 to_address_vec.push(format!("{:#x}", tx.to.unwrap_or_else(Address::zero)));
@@ -238,7 +236,6 @@ impl BlockExporter {
                         .map(|x| format!("{:02x}", x))
                         .collect::<String>()
                 ));
-                block_timestamp_vec.push(block.timestamp.as_u64());
                 max_fee_per_gas_vec.push(tx.max_fee_per_gas.unwrap_or_else(U256::zero).as_u64());
                 max_priority_fee_per_gas_vec.push(
                     tx.max_priority_fee_per_gas
@@ -246,13 +243,14 @@ impl BlockExporter {
                         .as_u64(),
                 );
                 transaction_type_vec.push(tx.transaction_type.unwrap_or_else(U64::zero).as_u64());
+                block_hash_vec.push(format!("{:#x}", block.hash.unwrap_or_else(H256::zero)));
+                block_number_vec.push(block.number.unwrap_or_else(U64::zero).as_u64());
+                block_timestamp_vec.push(block.timestamp.as_u64());
             }
         }
 
         let hash_array = Utf8Array::<i32>::from_slice(hash_vec);
         let nonce_array = Utf8Array::<i32>::from_slice(nonce_vec);
-        let block_hash_array = Utf8Array::<i32>::from_slice(block_hash_vec);
-        let block_number_array = UInt64Array::from_slice(block_number_vec);
         let transaction_index_array = UInt64Array::from_slice(transaction_index_vec);
         let from_address_array = Utf8Array::<i32>::from_slice(from_address_vec);
         let to_address_array = Utf8Array::<i32>::from_slice(to_address_vec);
@@ -260,16 +258,16 @@ impl BlockExporter {
         let gas_array = Utf8Array::<i32>::from_slice(gas_vec);
         let gas_price_array = Utf8Array::<i32>::from_slice(gas_price_vec);
         let input_array = Utf8Array::<i32>::from_slice(input_vec);
-        let block_timestamp_array = UInt64Array::from_slice(block_timestamp_vec);
         let max_fee_per_gas_array = UInt64Array::from_slice(max_fee_per_gas_vec);
         let max_priority_fee_per_gas_array = UInt64Array::from_slice(max_priority_fee_per_gas_vec);
         let transaction_type_array = UInt64Array::from_slice(transaction_type_vec);
+        let block_hash_array = Utf8Array::<i32>::from_slice(block_hash_vec);
+        let block_number_array = UInt64Array::from_slice(block_number_vec);
+        let block_timestamp_array = UInt64Array::from_slice(block_timestamp_vec);
 
         let column_batch = Chunk::try_new(vec![
             &hash_array as &dyn Array,
             &nonce_array as &dyn Array,
-            &block_hash_array as &dyn Array,
-            &block_number_array as &dyn Array,
             &transaction_index_array as &dyn Array,
             &from_address_array as &dyn Array,
             &to_address_array as &dyn Array,
@@ -277,10 +275,12 @@ impl BlockExporter {
             &gas_array as &dyn Array,
             &gas_price_array as &dyn Array,
             &input_array as &dyn Array,
-            &block_timestamp_array as &dyn Array,
             &max_fee_per_gas_array as &dyn Array,
             &max_priority_fee_per_gas_array as &dyn Array,
             &transaction_type_array as &dyn Array,
+            &block_hash_array as &dyn Array,
+            &block_number_array as &dyn Array,
+            &block_timestamp_array as &dyn Array,
         ])?;
 
         let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), self.start, self.end);
