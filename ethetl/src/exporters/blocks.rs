@@ -19,6 +19,7 @@ use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
+use common_exceptions::ErrorCode;
 use common_exceptions::Result;
 use web3::ethabi::Address;
 use web3::types::Block;
@@ -219,8 +220,20 @@ impl BlockExporter {
 
         let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), self.start, self.end);
         fs::create_dir_all(&dir)?;
-        let block_path = format!("{}/blocks.csv", dir);
-        common_formats::write_csv(&block_path, schema, columns)
+
+        match self.ctx.get_output_format().to_lowercase().as_str() {
+            "csv" => {
+                let block_path = format!("{}/blocks.csv", dir);
+                common_formats::write_csv(&block_path, schema, columns)
+            }
+            "parquet" => {
+                let block_path = format!("{}/blocks.parquet", dir);
+                common_formats::write_parquet(&block_path, schema, columns)
+            }
+            _ => Err(ErrorCode::Invalid(
+                "Unsupported format, must be one of [csv, parquet]",
+            )),
+        }
     }
 
     pub async fn export_txs(&self, blocks: &[Block<Transaction>]) -> Result<()> {
@@ -365,7 +378,18 @@ impl BlockExporter {
 
         let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), self.start, self.end);
         fs::create_dir_all(&dir)?;
-        let tx_path = format!("{}/transactions.csv", dir);
-        common_formats::write_csv(&tx_path, schema, columns)
+        match self.ctx.get_output_format().to_lowercase().as_str() {
+            "csv" => {
+                let tx_path = format!("{}/transactions.csv", dir);
+                common_formats::write_csv(&tx_path, schema, columns)
+            }
+            "parquet" => {
+                let tx_path = format!("{}/transactions.parquet", dir);
+                common_formats::write_parquet(&tx_path, schema, columns)
+            }
+            _ => Err(ErrorCode::Invalid(
+                "Unsupported format, must be one of [csv, parquet]",
+            )),
+        }
     }
 }

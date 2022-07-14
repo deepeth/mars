@@ -11,6 +11,6 @@ test = false
 # Workspace dependencies
 common-exceptions = { path = "../exceptions" }
 
-arrow2 = { version = "0.12.0", features = ["io_csv"]}
+arrow2 = { version = "0.12.0", features = ["io_csv", "io_parquet", "io_parquet_compression"]}
 
 [dev-dependencies]

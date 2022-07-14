@@ -59,6 +59,15 @@ pub struct Config {
         help = "Exporter directory"
     )]
     pub output_dir: String,
+
+    #[clap(
+        short = 'f',
+        long,
+        value_parser,
+        default_value = "csv",
+        help = "Exporter Format(csv|parquet)"
+    )]
+    pub output_format: String,
 }
 
 impl Config {
