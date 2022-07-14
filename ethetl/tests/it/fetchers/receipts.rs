@@ -25,7 +25,7 @@ use crate::common::create_ctx;
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn test_receipt_fetcher() -> Result<()> {
     let mut mint = Mint::new("tests/it/testdata");
-    let mut file = mint.new_goldenfile("receipts.txt").unwrap();
+    let mut file = mint.new_goldenfile("receipts_50010_50010.txt").unwrap();
 
     let conf = create_config();
     let ctx = create_ctx(&conf);

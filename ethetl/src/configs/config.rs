@@ -55,7 +55,7 @@ pub struct Config {
         short = 'o',
         long,
         value_parser,
-        default_value = "",
+        default_value = ".datas",
         help = "Exporter directory"
     )]
     pub output_dir: String,
