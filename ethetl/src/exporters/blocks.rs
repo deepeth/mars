@@ -121,7 +121,15 @@ impl BlockExporter {
                 block.total_difficulty.unwrap_or_else(U256::zero)
             ));
             size_vec.push(block.size.unwrap_or_else(U256::zero).as_u64());
-            extra_data_vec.push(format!("{:x?}", block.extra_data.0));
+            extra_data_vec.push(format!(
+                "0x{}",
+                block
+                    .extra_data
+                    .0
+                    .iter()
+                    .map(|x| format!("{:02x}", x))
+                    .collect::<String>()
+            ));
             gas_limit_vec.push(block.gas_limit.as_u64());
             gas_used_vec.push(block.gas_used.as_u64());
             timestamp_vec.push(block.timestamp.as_u64());
@@ -222,7 +230,14 @@ impl BlockExporter {
                 value_vec.push(format!("{:}", tx.value));
                 gas_vec.push(format!("{:}", tx.gas));
                 gas_price_vec.push(format!("{:}", tx.gas_price.unwrap_or_else(U256::zero)));
-                input_vec.push(format!("{:x?}", tx.input.0));
+                input_vec.push(format!(
+                    "0x{}",
+                    tx.input
+                        .0
+                        .iter()
+                        .map(|x| format!("{:02x}", x))
+                        .collect::<String>()
+                ));
                 block_timestamp_vec.push(block.timestamp.as_u64());
                 max_fee_per_gas_vec.push(tx.max_fee_per_gas.unwrap_or_else(U256::zero).as_u64());
                 max_priority_fee_per_gas_vec.push(
