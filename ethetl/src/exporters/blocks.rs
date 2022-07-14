@@ -14,10 +14,11 @@
 
 use std::fs;
 
-use arrow2::array::Array;
 use arrow2::array::UInt64Array;
 use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
+use arrow2::datatypes::Field;
+use arrow2::datatypes::Schema;
 use common_exceptions::Result;
 use web3::ethabi::Address;
 use web3::types::Block;
@@ -63,31 +64,11 @@ impl BlockExporter {
     pub async fn export_blocks(&self, blocks: &[Block<Transaction>]) -> Result<()> {
         let blocks_len = blocks.len();
 
-        let header = vec![
-            "number",
-            "hash",
-            "parent_hash",
-            "nonce",
-            "sha3_uncles",
-            "logs_bloom",
-            "transactions_root",
-            "state_root",
-            "receipts_root",
-            "difficulty",
-            "total_difficulty",
-            "size",
-            "extra_data",
-            "gas_limit",
-            "gas_used",
-            "timestamp",
-            "transaction_count",
-            "base_fee_per_gas",
-        ];
         let mut number_vec = Vec::with_capacity(blocks_len);
         let mut hash_vec = Vec::with_capacity(blocks_len);
         let mut parent_hash_vec = Vec::with_capacity(blocks_len);
         let mut nonce_vec = Vec::with_capacity(blocks_len);
-        let mut sha3_uncle_vec = Vec::with_capacity(blocks_len);
+        let mut sha3_uncles_vec = Vec::with_capacity(blocks_len);
         let mut logs_bloom_vec = Vec::with_capacity(blocks_len);
         let mut transactions_root_vec = Vec::with_capacity(blocks_len);
         let mut state_root_vec = Vec::with_capacity(blocks_len);
@@ -107,7 +88,7 @@ impl BlockExporter {
             hash_vec.push(format!("{:#x}", block.hash.unwrap_or_else(H256::zero)));
             parent_hash_vec.push(format!("{:#x}", block.parent_hash));
             nonce_vec.push(format!("{:#x}", block.nonce.unwrap_or_else(H64::zero)));
-            sha3_uncle_vec.push(format!("{:#x}", block.uncles_hash));
+            sha3_uncles_vec.push(format!("{:#x}", block.uncles_hash));
             logs_bloom_vec.push(format!(
                 "{:#x}",
                 block.logs_bloom.unwrap_or_else(H2048::zero)
@@ -141,8 +122,8 @@ impl BlockExporter {
         let hash_array = Utf8Array::<i32>::from_slice(hash_vec);
         let parent_hash_array = Utf8Array::<i32>::from_slice(parent_hash_vec);
         let nonce_array = Utf8Array::<i32>::from_slice(nonce_vec);
-        let sha3_uncle_array = Utf8Array::<i32>::from_slice(sha3_uncle_vec);
-        let log_bloom_array = Utf8Array::<i32>::from_slice(logs_bloom_vec);
+        let sha3_uncles_array = Utf8Array::<i32>::from_slice(sha3_uncles_vec);
+        let logs_bloom_array = Utf8Array::<i32>::from_slice(logs_bloom_vec);
         let transactions_root_array = Utf8Array::<i32>::from_slice(transactions_root_vec);
         let state_root_array = Utf8Array::<i32>::from_slice(state_root_vec);
         let receipts_root_array = Utf8Array::<i32>::from_slice(receipts_root_vec);
@@ -156,52 +137,93 @@ impl BlockExporter {
         let transaction_count_array = UInt64Array::from_slice(transaction_count_vec);
         let base_fee_per_gas_array = UInt64Array::from_slice(base_fee_per_gas_vec);
 
-        let column_batch = Chunk::try_new(vec![
-            &number_array as &dyn Array,
-            &hash_array as &dyn Array,
-            &parent_hash_array as &dyn Array,
-            &nonce_array as &dyn Array,
-            &sha3_uncle_array as &dyn Array,
-            &log_bloom_array as &dyn Array,
-            &transactions_root_array as &dyn Array,
-            &state_root_array as &dyn Array,
-            &receipts_root_array as &dyn Array,
-            &difficulty_array as &dyn Array,
-            &total_difficulty_array as &dyn Array,
-            &size_array as &dyn Array,
-            &extra_data_array as &dyn Array,
-            &gas_limit_array as &dyn Array,
-            &gas_used_array as &dyn Array,
-            &timestamp_array as &dyn Array,
-            &transaction_count_array as &dyn Array,
-            &base_fee_per_gas_array as &dyn Array,
+        let number_field = Field::new("number", number_array.data_type().clone(), true);
+        let hash_field = Field::new("hash", hash_array.data_type().clone(), true);
+        let parent_hash_field =
+            Field::new("parent_hash", parent_hash_array.data_type().clone(), true);
+        let nonce_field = Field::new("nonce", nonce_array.data_type().clone(), true);
+        let sha3_uncles_field =
+            Field::new("sha3_uncles", sha3_uncles_array.data_type().clone(), true);
+        let logs_bloom_field = Field::new("logs_bloom", logs_bloom_array.data_type().clone(), true);
+        let transactions_root_field = Field::new(
+            "transactions_root",
+            transactions_root_array.data_type().clone(),
+            true,
+        );
+        let state_root_field = Field::new("state_root", state_root_array.data_type().clone(), true);
+        let receipts_root_field =
+            Field::new("receipts_root", state_root_array.data_type().clone(), true);
+        let difficulty_field = Field::new("difficulty", difficulty_array.data_type().clone(), true);
+        let total_difficulty_field = Field::new(
+            "total_difficulty",
+            total_difficulty_array.data_type().clone(),
+            true,
+        );
+        let size_field = Field::new("size", size_array.data_type().clone(), true);
+        let extra_data_field = Field::new("extra_data", extra_data_array.data_type().clone(), true);
+        let gas_limit_field = Field::new("gas_limit", gas_limit_array.data_type().clone(), true);
+        let gas_used_field = Field::new("gas_used", gas_used_array.data_type().clone(), true);
+        let timestamp_field = Field::new("timestamp", timestamp_array.data_type().clone(), true);
+        let transaction_count_field = Field::new(
+            "transaction_count",
+            transaction_count_array.data_type().clone(),
+            true,
+        );
+        let base_fee_per_gas_array_field = Field::new(
+            "base_fee_per_gas",
+            base_fee_per_gas_array.data_type().clone(),
+            true,
+        );
+
+        let schema = Schema::from(vec![
+            number_field,
+            hash_field,
+            parent_hash_field,
+            nonce_field,
+            sha3_uncles_field,
+            logs_bloom_field,
+            transactions_root_field,
+            state_root_field,
+            receipts_root_field,
+            difficulty_field,
+            total_difficulty_field,
+            size_field,
+            extra_data_field,
+            gas_limit_field,
+            gas_used_field,
+            timestamp_field,
+            transaction_count_field,
+            base_fee_per_gas_array_field,
+        ]);
+
+        let columns = Chunk::try_new(vec![
+            number_array.boxed(),
+            hash_array.boxed(),
+            parent_hash_array.boxed(),
+            nonce_array.boxed(),
+            sha3_uncles_array.boxed(),
+            logs_bloom_array.boxed(),
+            transactions_root_array.boxed(),
+            state_root_array.boxed(),
+            receipts_root_array.boxed(),
+            difficulty_array.boxed(),
+            total_difficulty_array.boxed(),
+            size_array.boxed(),
+            extra_data_array.boxed(),
+            gas_limit_array.boxed(),
+            gas_used_array.boxed(),
+            timestamp_array.boxed(),
+            transaction_count_array.boxed(),
+            base_fee_per_gas_array.boxed(),
         ])?;
 
         let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), self.start, self.end);
         fs::create_dir_all(&dir)?;
         let block_path = format!("{}/blocks.csv", dir);
-        common_formats::write_csv(&block_path, header, &[column_batch])
+        common_formats::write_csv(&block_path, schema, columns)
     }
 
     pub async fn export_txs(&self, blocks: &[Block<Transaction>]) -> Result<()> {
-        let header = vec![
-            "hash",
-            "nonce",
-            "transaction_index",
-            "form_address",
-            "to_address",
-            "value",
-            "gas",
-            "gas_price",
-            "input",
-            "max_fee_per_gas",
-            "max_priority_fee_per_gas",
-            "transaction_type",
-            "block_hash",
-            "block_number",
-            "block_timestamp",
-        ];
-
         let mut hash_vec = vec![];
         let mut nonce_vec = vec![];
         let mut transaction_index_vec = vec![];
@@ -249,6 +271,7 @@ impl BlockExporter {
             }
         }
 
+        // Array.
         let hash_array = Utf8Array::<i32>::from_slice(hash_vec);
         let nonce_array = Utf8Array::<i32>::from_slice(nonce_vec);
         let transaction_index_array = UInt64Array::from_slice(transaction_index_vec);
@@ -265,27 +288,84 @@ impl BlockExporter {
         let block_number_array = UInt64Array::from_slice(block_number_vec);
         let block_timestamp_array = UInt64Array::from_slice(block_timestamp_vec);
 
-        let column_batch = Chunk::try_new(vec![
-            &hash_array as &dyn Array,
-            &nonce_array as &dyn Array,
-            &transaction_index_array as &dyn Array,
-            &from_address_array as &dyn Array,
-            &to_address_array as &dyn Array,
-            &value_array as &dyn Array,
-            &gas_array as &dyn Array,
-            &gas_price_array as &dyn Array,
-            &input_array as &dyn Array,
-            &max_fee_per_gas_array as &dyn Array,
-            &max_priority_fee_per_gas_array as &dyn Array,
-            &transaction_type_array as &dyn Array,
-            &block_hash_array as &dyn Array,
-            &block_number_array as &dyn Array,
-            &block_timestamp_array as &dyn Array,
+        // Field.
+        let hash_field = Field::new("hash", hash_array.data_type().clone(), true);
+        let nonce_field = Field::new("nonce", nonce_array.data_type().clone(), true);
+        let transaction_index_field = Field::new(
+            "transaction_index",
+            transaction_index_array.data_type().clone(),
+            true,
+        );
+        let from_address_field =
+            Field::new("from_address", from_address_array.data_type().clone(), true);
+        let to_address_field = Field::new("to_address", to_address_array.data_type().clone(), true);
+        let value_field = Field::new("value", value_array.data_type().clone(), true);
+        let gas_field = Field::new("gas", gas_array.data_type().clone(), true);
+        let gas_price_field = Field::new("gas_price", gas_price_array.data_type().clone(), true);
+        let input_field = Field::new("input", input_array.data_type().clone(), true);
+        let max_fee_per_gas_field = Field::new(
+            "max_fee_per_gas",
+            max_fee_per_gas_array.data_type().clone(),
+            true,
+        );
+        let max_priority_fee_per_gas_field = Field::new(
+            "max_priority_fee_per_gas",
+            max_priority_fee_per_gas_array.data_type().clone(),
+            true,
+        );
+        let transaction_type_field = Field::new(
+            "transaction_type",
+            transaction_type_array.data_type().clone(),
+            true,
+        );
+        let block_hash_field = Field::new("block_hash", block_hash_array.data_type().clone(), true);
+        let block_number_field =
+            Field::new("block_number", block_number_array.data_type().clone(), true);
+        let block_timestamp_field = Field::new(
+            "block_timestamp",
+            block_timestamp_array.data_type().clone(),
+            true,
+        );
+
+        let schema = Schema::from(vec![
+            hash_field,
+            nonce_field,
+            transaction_index_field,
+            from_address_field,
+            to_address_field,
+            value_field,
+            gas_field,
+            gas_price_field,
+            input_field,
+            max_fee_per_gas_field,
+            max_priority_fee_per_gas_field,
+            transaction_type_field,
+            block_hash_field,
+            block_number_field,
+            block_timestamp_field,
+        ]);
+
+        let columns = Chunk::try_new(vec![
+            hash_array.boxed(),
+            nonce_array.boxed(),
+            transaction_index_array.boxed(),
+            from_address_array.boxed(),
+            to_address_array.boxed(),
+            value_array.boxed(),
+            gas_array.boxed(),
+            gas_price_array.boxed(),
+            input_array.boxed(),
+            max_fee_per_gas_array.boxed(),
+            max_priority_fee_per_gas_array.boxed(),
+            transaction_type_array.boxed(),
+            block_hash_array.boxed(),
+            block_number_array.boxed(),
+            block_timestamp_array.boxed(),
         ])?;
 
         let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), self.start, self.end);
         fs::create_dir_all(&dir)?;
         let tx_path = format!("{}/transactions.csv", dir);
-        common_formats::write_csv(&tx_path, header, &[column_batch])
+        common_formats::write_csv(&tx_path, schema, columns)
     }
 }

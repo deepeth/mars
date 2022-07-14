@@ -15,21 +15,20 @@
 
 use arrow2::array::Array;
 use arrow2::chunk::Chunk;
+use arrow2::datatypes::Schema;
 use arrow2::io::csv::write;
 use common_exceptions::Result;
 
-pub fn write_csv<A: AsRef<dyn Array>>(
-    path: &str,
-    headers: Vec<&str>,
-    columns: &[Chunk<A>],
-) -> Result<()> {
+pub fn write_csv(path: &str, schema: Schema, columns: Chunk<Box<dyn Array>>) -> Result<()> {
     let mut writer = std::fs::File::create(path)?;
+    let headers = schema
+        .fields
+        .iter()
+        .map(|f| f.name.clone())
+        .collect::<Vec<String>>();
 
     let options = write::SerializeOptions::default();
     write::write_header(&mut writer, headers.as_slice(), &options)?;
-
-    columns
-        .iter()
-        .try_for_each(|batch| write::write_chunk(&mut writer, batch, &options))?;
+    write::write_chunk(&mut writer, &columns, &options)?;
     Ok(())
 }
