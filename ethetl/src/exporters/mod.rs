@@ -15,5 +15,34 @@
 mod blocks;
 mod receipts;
 
+use arrow2::array::Array;
+use arrow2::chunk::Chunk;
+use arrow2::datatypes::Schema;
 pub use blocks::BlockExporter;
+use common_exceptions::ErrorCode;
+use common_exceptions::Result;
 pub use receipts::ReceiptExporter;
+
+use crate::contexts::ContextRef;
+
+pub fn write_file(
+    ctx: &ContextRef,
+    path: &str,
+    schema: Schema,
+    columns: Chunk<Box<dyn Array>>,
+) -> Result<()> {
+    match ctx.get_output_format().to_lowercase().as_str() {
+        "csv" => {
+            let path = format!("{}.csv", path);
+            common_formats::write_csv(&path, schema, columns)
+        }
+        "parquet" => {
+            let path = format!("{}.parquet", path);
+            common_formats::write_parquet(&path, schema, columns)
+        }
+        v => Err(ErrorCode::Invalid(format!(
+            "Unsupported format, must be one of [csv, parquet], got: {}",
+            v
+        ))),
+    }
+}

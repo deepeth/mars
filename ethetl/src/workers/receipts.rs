@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::fs::File;
+use std::io::BufRead;
+use std::io::BufReader;
+use std::str::FromStr;
+
 use common_exceptions::Result;
 use futures::stream;
 use futures::stream::TryStreamExt;
@@ -23,26 +28,39 @@ use crate::exporters::ReceiptExporter;
 
 pub struct ReceiptWorker {
     ctx: ContextRef,
-    hashes: Vec<H256>,
+    block_numbers: Vec<usize>,
 }
 
 impl ReceiptWorker {
-    pub fn create(ctx: &ContextRef, hashes: Vec<H256>) -> Self {
+    pub fn create(ctx: &ContextRef, block_numbers: Vec<usize>) -> Self {
         Self {
             ctx: ctx.clone(),
-            hashes,
+            block_numbers,
         }
     }
 
     pub async fn execute(&self) -> Result<()> {
-        let jobs = self.hashes.chunks(self.ctx.get_batch_size()).len();
+        let jobs = self.block_numbers.chunks(self.ctx.get_batch_size()).len();
         stream::iter(0..jobs)
             .map(Ok)
             .try_for_each_concurrent(self.ctx.get_max_worker(), |job| async move {
-                let mut chunks = self.hashes.chunks(self.ctx.get_batch_size());
+                let mut chunks = self.block_numbers.chunks(self.ctx.get_batch_size());
+
                 if let Some(chunk) = chunks.nth(job) {
-                    let export = ReceiptExporter::create(&self.ctx, chunk.to_vec());
-                    export.export().await?;
+                    let start = chunk[0];
+                    let end = chunk[chunk.len() - 1];
+                    let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), start, end);
+                    let path = format!("{}/.transaction_hashes.txt", dir);
+
+                    let mut tx_hashes = vec![];
+                    let file = File::open(path)?;
+                    let buffered = BufReader::new(file);
+                    for line in buffered.lines() {
+                        let line_str = &line?;
+                        tx_hashes.push(H256::from_str(line_str).unwrap());
+                    }
+                    let exporter = ReceiptExporter::create(&self.ctx, &dir, tx_hashes);
+                    exporter.export().await?;
                 }
                 Ok(())
             })

@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::fs::File;
+use std::io::Write;
+
 use arrow2::array::UInt64Array;
 use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
-use common_exceptions::ErrorCode;
 use common_exceptions::Result;
 use web3::ethabi::Address;
 use web3::types::Block;
@@ -30,6 +32,7 @@ use web3::types::U64;
 
 use crate::contexts::ContextRef;
 use crate::eth::BlockFetcher;
+use crate::exporters::write_file;
 
 pub struct BlockExporter {
     ctx: ContextRef,
@@ -212,19 +215,8 @@ impl BlockExporter {
             base_fee_per_gas_array.boxed(),
         ])?;
 
-        match self.ctx.get_output_format().to_lowercase().as_str() {
-            "csv" => {
-                let block_path = format!("{}/blocks.csv", self.dir);
-                common_formats::write_csv(&block_path, schema, columns)
-            }
-            "parquet" => {
-                let block_path = format!("{}/blocks.parquet", self.dir);
-                common_formats::write_parquet(&block_path, schema, columns)
-            }
-            _ => Err(ErrorCode::Invalid(
-                "Unsupported format, must be one of [csv, parquet]",
-            )),
-        }
+        let block_path = format!("{}/blocks", self.dir);
+        write_file(&self.ctx, &block_path, schema, columns)
     }
 
     pub async fn export_txs(&self, blocks: &[Block<Transaction>]) -> Result<()> {
@@ -367,33 +359,18 @@ impl BlockExporter {
             block_timestamp_array.boxed(),
         ])?;
 
-        match self.ctx.get_output_format().to_lowercase().as_str() {
-            "csv" => {
-                let tx_path = format!("{}/transactions.csv", self.dir);
-                common_formats::write_csv(&tx_path, schema, columns)?;
-            }
-            "parquet" => {
-                self.export_tx_hash(&hash_vec).await?;
-                let tx_path = format!("{}/transactions.parquet", self.dir);
-                common_formats::write_parquet(&tx_path, schema, columns)?;
-            }
-            _ => {
-                return Err(ErrorCode::Invalid(
-                    "Unsupported format, must be one of [csv, parquet]",
-                ))
-            }
-        }
+        let tx_path = format!("{}/transactions", self.dir);
+        write_file(&self.ctx, &tx_path, schema, columns)?;
         self.export_tx_hash(&hash_vec).await
     }
 
     pub async fn export_tx_hash(&self, tx_hashes: &[String]) -> Result<()> {
-        let tx_hash_path = format!("{}/transaction_hashes.csv", self.dir);
-
-        let tx_hash_array = Utf8Array::<i32>::from_slice(tx_hashes);
-        let tx_hash_field = Field::new("tx_hash", tx_hash_array.data_type().clone(), true);
-
-        let schema = Schema::from(vec![tx_hash_field]);
-        let columns = Chunk::try_new(vec![tx_hash_array.boxed()])?;
-        common_formats::write_csv(&tx_hash_path, schema, columns)
+        let tx_hash_path = format!("{}/.transaction_hashes.txt", self.dir);
+        let mut file = File::create(tx_hash_path)?;
+        for hash in tx_hashes {
+            writeln!(file, "{}", hash)?;
+        }
+        file.flush()?;
+        Ok(())
     }
 }
