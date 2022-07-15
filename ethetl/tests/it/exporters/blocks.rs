@@ -41,13 +41,18 @@ async fn test_blocks_csv_exporters() -> Result<()> {
     exporter.export().await?;
 
     goldenfile::differs::text_diff(
-        Path::new("tests/it/testdata/blocks_15138828_15138852.csv"),
+        Path::new("tests/it/testdata/15138828_15138852/blocks.csv"),
         Path::new("_test_output_dir/15138828_15138852/blocks.csv"),
     );
 
     goldenfile::differs::text_diff(
-        Path::new("tests/it/testdata/transactions_15138828_15138852.csv"),
+        Path::new("tests/it/testdata/15138828_15138852/transactions.csv"),
         Path::new("_test_output_dir/15138828_15138852/transactions.csv"),
+    );
+
+    goldenfile::differs::text_diff(
+        Path::new("tests/it/testdata/15138828_15138852/.transaction_hashes.txt"),
+        Path::new("_test_output_dir/15138828_15138852/.transaction_hashes.txt"),
     );
 
     Ok(())
@@ -75,12 +80,12 @@ async fn test_blocks_parquet_exporters() -> Result<()> {
     exporter.export().await?;
 
     goldenfile::differs::binary_diff(
-        Path::new("tests/it/testdata/blocks_15138828_15138852.parquet"),
+        Path::new("tests/it/testdata/15138828_15138852/blocks.parquet"),
         Path::new("_test_output_dir/15138828_15138852/blocks.parquet"),
     );
 
     goldenfile::differs::binary_diff(
-        Path::new("tests/it/testdata/transactions_15138828_15138852.parquet"),
+        Path::new("tests/it/testdata/15138828_15138852/transactions.parquet"),
         Path::new("_test_output_dir/15138828_15138852/transactions.parquet"),
     );
 
