@@ -13,20 +13,35 @@
 // limitations under the License.
 
 use std::fs;
+use std::fs::File;
+use std::io::BufRead;
+use std::io::BufReader;
 use std::path::Path;
+use std::str::FromStr;
 
 use common_exceptions::Result;
-use ethetl::exporters::BlockExporter;
+use ethetl::exporters::ReceiptExporter;
+use web3::types::H256;
 
 use crate::common::create_config;
 use crate::common::create_ctx;
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-async fn test_blocks_exporters() -> Result<()> {
+async fn test_receipts_exporters() -> Result<()> {
     let mut conf = create_config();
     conf.start_block = 15138828;
     conf.end_block = 15138852;
     let ctx = create_ctx(&conf);
+
+    let path = "tests/it/testdata/15138828_15138852/.transaction_hashes.txt";
+    let file = File::open(path)?;
+    let buffered = BufReader::new(file);
+
+    let mut tx_hashes = vec![];
+    for line in buffered.lines() {
+        let line_str = &line?;
+        tx_hashes.push(H256::from_str(line_str).unwrap());
+    }
 
     let dir = format!(
         "{}/{}_{}",
@@ -36,45 +51,27 @@ async fn test_blocks_exporters() -> Result<()> {
     );
     fs::create_dir_all(&dir)?;
 
-    let range: Vec<usize> = (conf.start_block..conf.end_block + 1).collect();
-
     // CSV.
     {
-        let exporter = BlockExporter::create(&ctx, &dir, range.to_vec());
+        let exporter = ReceiptExporter::create(&ctx, &dir, tx_hashes.to_vec());
         exporter.export().await?;
 
         goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/15138828_15138852/blocks.csv"),
-            Path::new("_test_output_dir/15138828_15138852/blocks.csv"),
-        );
-
-        goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/15138828_15138852/transactions.csv"),
-            Path::new("_test_output_dir/15138828_15138852/transactions.csv"),
-        );
-
-        goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/15138828_15138852/.transaction_hashes.txt"),
-            Path::new("_test_output_dir/15138828_15138852/.transaction_hashes.txt"),
+            Path::new("tests/it/testdata/15138828_15138852/receipts.csv"),
+            Path::new("_test_output_dir/15138828_15138852/receipts.csv"),
         );
     }
 
-    // Parquet.
+    // Parquet
     {
         conf.output_format = "parquet".to_string();
-        let exporter = BlockExporter::create(&ctx, &dir, range);
+        let exporter = ReceiptExporter::create(&ctx, &dir, tx_hashes);
         exporter.export().await?;
 
         goldenfile::differs::binary_diff(
-            Path::new("tests/it/testdata/15138828_15138852/blocks.parquet"),
-            Path::new("_test_output_dir/15138828_15138852/blocks.parquet"),
-        );
-
-        goldenfile::differs::binary_diff(
-            Path::new("tests/it/testdata/15138828_15138852/transactions.parquet"),
-            Path::new("_test_output_dir/15138828_15138852/transactions.parquet"),
+            Path::new("tests/it/testdata/15138828_15138852/receipts.parquet"),
+            Path::new("_test_output_dir/15138828_15138852/receipts.parquet"),
         );
     }
-
     Ok(())
 }

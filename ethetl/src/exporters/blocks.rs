@@ -244,8 +244,8 @@ impl BlockExporter {
                 from_address_vec.push(format!("{:#x}", tx.from.unwrap_or_else(Address::zero)));
                 to_address_vec.push(format!("{:#x}", tx.to.unwrap_or_else(Address::zero)));
                 value_vec.push(format!("{:}", tx.value));
-                gas_vec.push(format!("{:}", tx.gas));
-                gas_price_vec.push(format!("{:}", tx.gas_price.unwrap_or_else(U256::zero)));
+                gas_vec.push(tx.gas.as_u64());
+                gas_price_vec.push(tx.gas_price.unwrap_or_else(U256::zero).as_u64());
                 input_vec.push(format!(
                     "0x{}",
                     tx.input
@@ -274,8 +274,8 @@ impl BlockExporter {
         let from_address_array = Utf8Array::<i32>::from_slice(from_address_vec);
         let to_address_array = Utf8Array::<i32>::from_slice(to_address_vec);
         let value_array = Utf8Array::<i32>::from_slice(value_vec);
-        let gas_array = Utf8Array::<i32>::from_slice(gas_vec);
-        let gas_price_array = Utf8Array::<i32>::from_slice(gas_price_vec);
+        let gas_array = UInt64Array::from_slice(gas_vec);
+        let gas_price_array = UInt64Array::from_slice(gas_price_vec);
         let input_array = Utf8Array::<i32>::from_slice(input_vec);
         let max_fee_per_gas_array = UInt64Array::from_slice(max_fee_per_gas_vec);
         let max_priority_fee_per_gas_array = UInt64Array::from_slice(max_priority_fee_per_gas_vec);

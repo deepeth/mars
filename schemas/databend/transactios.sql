@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS transactions (
     hash STRING,
-    nonce BIGINT,
+    nonce STRING,
     transaction_index BIGINT,
     from_address STRING,
     to_address STRING,
