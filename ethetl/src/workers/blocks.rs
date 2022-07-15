@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::fs;
+
 use common_exceptions::Result;
 use futures::stream;
 use futures::stream::StreamExt;
@@ -22,26 +24,32 @@ use crate::exporters::BlockExporter;
 
 pub struct BlockWorker {
     ctx: ContextRef,
-    numbers: Vec<usize>,
+    block_numbers: Vec<usize>,
 }
 
 impl BlockWorker {
-    pub fn create(ctx: &ContextRef, numbers: Vec<usize>) -> Self {
+    pub fn create(ctx: &ContextRef, block_numbers: Vec<usize>) -> Self {
         Self {
             ctx: ctx.clone(),
-            numbers,
+            block_numbers,
         }
     }
 
     pub async fn execute(&self) -> Result<()> {
-        let jobs = self.numbers.chunks(self.ctx.get_batch_size()).len();
+        let jobs = self.block_numbers.chunks(self.ctx.get_batch_size()).len();
         stream::iter(0..jobs)
             .map(Ok)
             .try_for_each_concurrent(self.ctx.get_max_worker(), |job| async move {
-                let mut chunks = self.numbers.chunks(self.ctx.get_batch_size());
+                let mut chunks = self.block_numbers.chunks(self.ctx.get_batch_size());
 
                 if let Some(chunk) = chunks.nth(job) {
-                    let export = BlockExporter::create(&self.ctx, chunk.to_vec());
+                    // Create chunk dir.
+                    let start = chunk[0];
+                    let end = chunk[chunk.len() - 1];
+                    let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), start, end);
+                    fs::create_dir_all(&dir)?;
+
+                    let export = BlockExporter::create(&self.ctx, &dir, chunk.to_vec());
                     export.export().await?;
                 }
                 Ok(())

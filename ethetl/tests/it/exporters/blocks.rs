@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::fs;
 use std::path::Path;
 
 use common_exceptions::Result;
@@ -27,8 +28,16 @@ async fn test_blocks_csv_exporters() -> Result<()> {
     conf.end_block = 15138852;
     let ctx = create_ctx(&conf);
 
+    let dir = format!(
+        "{}/{}_{}",
+        ctx.get_output_dir(),
+        conf.start_block,
+        conf.end_block
+    );
+    fs::create_dir_all(&dir)?;
+
     let range: Vec<usize> = (conf.start_block..conf.end_block + 1).collect();
-    let exporter = BlockExporter::create(&ctx, range);
+    let exporter = BlockExporter::create(&ctx, &dir, range);
     exporter.export().await?;
 
     goldenfile::differs::text_diff(
@@ -53,8 +62,16 @@ async fn test_blocks_parquet_exporters() -> Result<()> {
 
     let ctx = create_ctx(&conf);
 
+    let dir = format!(
+        "{}/{}_{}",
+        ctx.get_output_dir(),
+        conf.start_block,
+        conf.end_block
+    );
+    fs::create_dir_all(&dir)?;
+
     let range: Vec<usize> = (conf.start_block..conf.end_block + 1).collect();
-    let exporter = BlockExporter::create(&ctx, range);
+    let exporter = BlockExporter::create(&ctx, &dir, range);
     exporter.export().await?;
 
     goldenfile::differs::binary_diff(
