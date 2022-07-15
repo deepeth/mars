@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::fs;
+
 use common_exceptions::Result;
 use futures::stream;
 use futures::stream::StreamExt;
@@ -41,7 +43,13 @@ impl BlockWorker {
                 let mut chunks = self.numbers.chunks(self.ctx.get_batch_size());
 
                 if let Some(chunk) = chunks.nth(job) {
-                    let export = BlockExporter::create(&self.ctx, chunk.to_vec());
+                    // Create chunk dir.
+                    let start = chunk[0];
+                    let end = chunk[chunk.len() - 1];
+                    let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), start, end);
+                    fs::create_dir_all(&dir)?;
+
+                    let export = BlockExporter::create(&self.ctx, &dir, chunk.to_vec());
                     export.export().await?;
                 }
                 Ok(())

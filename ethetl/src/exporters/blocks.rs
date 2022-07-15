@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::fs;
-
 use arrow2::array::UInt64Array;
 use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
@@ -35,19 +33,15 @@ use crate::eth::BlockFetcher;
 
 pub struct BlockExporter {
     ctx: ContextRef,
-    start: usize,
-    end: usize,
+    dir: String,
     numbers: Vec<usize>,
 }
 
 impl BlockExporter {
-    pub fn create(ctx: &ContextRef, numbers: Vec<usize>) -> BlockExporter {
-        let start = numbers[0];
-        let end = numbers[numbers.len() - 1];
+    pub fn create(ctx: &ContextRef, dir: &str, numbers: Vec<usize>) -> BlockExporter {
         Self {
             ctx: ctx.clone(),
-            start,
-            end,
+            dir: dir.to_string(),
             numbers,
         }
     }
@@ -218,16 +212,13 @@ impl BlockExporter {
             base_fee_per_gas_array.boxed(),
         ])?;
 
-        let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), self.start, self.end);
-        fs::create_dir_all(&dir)?;
-
         match self.ctx.get_output_format().to_lowercase().as_str() {
             "csv" => {
-                let block_path = format!("{}/blocks.csv", dir);
+                let block_path = format!("{}/blocks.csv", self.dir);
                 common_formats::write_csv(&block_path, schema, columns)
             }
             "parquet" => {
-                let block_path = format!("{}/blocks.parquet", dir);
+                let block_path = format!("{}/blocks.parquet", self.dir);
                 common_formats::write_parquet(&block_path, schema, columns)
             }
             _ => Err(ErrorCode::Invalid(
@@ -285,7 +276,7 @@ impl BlockExporter {
         }
 
         // Array.
-        let hash_array = Utf8Array::<i32>::from_slice(hash_vec);
+        let hash_array = Utf8Array::<i32>::from_slice(&hash_vec);
         let nonce_array = Utf8Array::<i32>::from_slice(nonce_vec);
         let transaction_index_array = UInt64Array::from_slice(transaction_index_vec);
         let from_address_array = Utf8Array::<i32>::from_slice(from_address_vec);
@@ -376,20 +367,33 @@ impl BlockExporter {
             block_timestamp_array.boxed(),
         ])?;
 
-        let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), self.start, self.end);
-        fs::create_dir_all(&dir)?;
         match self.ctx.get_output_format().to_lowercase().as_str() {
             "csv" => {
-                let tx_path = format!("{}/transactions.csv", dir);
-                common_formats::write_csv(&tx_path, schema, columns)
+                let tx_path = format!("{}/transactions.csv", self.dir);
+                common_formats::write_csv(&tx_path, schema, columns)?;
             }
             "parquet" => {
-                let tx_path = format!("{}/transactions.parquet", dir);
-                common_formats::write_parquet(&tx_path, schema, columns)
+                self.export_tx_hash(&hash_vec).await?;
+                let tx_path = format!("{}/transactions.parquet", self.dir);
+                common_formats::write_parquet(&tx_path, schema, columns)?;
             }
-            _ => Err(ErrorCode::Invalid(
-                "Unsupported format, must be one of [csv, parquet]",
-            )),
+            _ => {
+                return Err(ErrorCode::Invalid(
+                    "Unsupported format, must be one of [csv, parquet]",
+                ))
+            }
         }
+        self.export_tx_hash(&hash_vec).await
+    }
+
+    pub async fn export_tx_hash(&self, tx_hashes: &[String]) -> Result<()> {
+        let tx_hash_path = format!("{}/transaction_hashes.csv", self.dir);
+
+        let tx_hash_array = Utf8Array::<i32>::from_slice(tx_hashes);
+        let tx_hash_field = Field::new("tx_hash", tx_hash_array.data_type().clone(), true);
+
+        let schema = Schema::from(vec![tx_hash_field]);
+        let columns = Chunk::try_new(vec![tx_hash_array.boxed()])?;
+        common_formats::write_csv(&tx_hash_path, schema, columns)
     }
 }
