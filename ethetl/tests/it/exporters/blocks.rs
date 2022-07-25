@@ -22,6 +22,7 @@ use crate::common::create_config;
 use crate::common::create_ctx;
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[ignore]
 async fn test_blocks_exporters() -> Result<()> {
     let mut conf = create_config();
     conf.start_block = 15138828;

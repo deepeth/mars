@@ -15,19 +15,16 @@
 use std::fs;
 
 use common_exceptions::Result;
-use futures::stream;
-use futures::stream::StreamExt;
-use futures::stream::TryStreamExt;
 
 use crate::contexts::ContextRef;
 use crate::exporters::BlockExporter;
 
-pub struct BlockWorker {
+pub struct Pipeline {
     ctx: ContextRef,
     block_numbers: Vec<usize>,
 }
 
-impl BlockWorker {
+impl Pipeline {
     pub fn create(ctx: &ContextRef, block_numbers: Vec<usize>) -> Self {
         Self {
             ctx: ctx.clone(),
@@ -36,24 +33,13 @@ impl BlockWorker {
     }
 
     pub async fn execute(&self) -> Result<()> {
-        let jobs = self.block_numbers.chunks(self.ctx.get_batch_size()).len();
-        stream::iter(0..jobs)
-            .map(Ok)
-            .try_for_each_concurrent(self.ctx.get_max_worker(), |job| async move {
-                let mut chunks = self.block_numbers.chunks(self.ctx.get_batch_size());
+        // Create chunk dir.
+        let start = self.block_numbers[0];
+        let end = self.block_numbers[self.block_numbers.len() - 1];
+        let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), start, end);
+        fs::create_dir_all(&dir)?;
 
-                if let Some(chunk) = chunks.nth(job) {
-                    // Create chunk dir.
-                    let start = chunk[0];
-                    let end = chunk[chunk.len() - 1];
-                    let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), start, end);
-                    fs::create_dir_all(&dir)?;
-
-                    let export = BlockExporter::create(&self.ctx, &dir, chunk.to_vec());
-                    export.export().await?;
-                }
-                Ok(())
-            })
-            .await
+        let export = BlockExporter::create(&self.ctx, &dir, self.block_numbers.to_vec());
+        export.export().await
     }
 }
