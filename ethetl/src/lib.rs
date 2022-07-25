@@ -14,8 +14,9 @@
 
 #![feature(backtrace)]
 
+extern crate core;
+
 pub mod configs;
 pub mod contexts;
 pub mod eth;
 pub mod exporters;
-pub mod workers;

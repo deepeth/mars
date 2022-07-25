@@ -13,7 +13,9 @@
 // limitations under the License.
 
 mod blocks;
+mod pipeline;
 mod receipts;
+mod worker;
 
 use arrow2::array::Array;
 use arrow2::chunk::Chunk;
@@ -21,7 +23,9 @@ use arrow2::datatypes::Schema;
 pub use blocks::BlockExporter;
 use common_exceptions::ErrorCode;
 use common_exceptions::Result;
+pub use pipeline::Pipeline;
 pub use receipts::ReceiptExporter;
+pub use worker::Worker;
 
 use crate::contexts::ContextRef;
 

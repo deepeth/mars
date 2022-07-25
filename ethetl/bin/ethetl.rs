@@ -16,8 +16,7 @@ use common_exceptions::Result;
 use env_logger::Env;
 use ethetl::configs::Config;
 use ethetl::contexts::Context;
-use ethetl::workers::BlockWorker;
-use ethetl::workers::ReceiptWorker;
+use ethetl::exporters::Worker;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -38,13 +37,9 @@ async fn main() -> Result<()> {
     let end = conf.end_block;
     let range: Vec<usize> = (start..end + 1).collect();
 
-    // Block worker.
-    let block_worker = BlockWorker::create(&ctx, range.clone());
-    block_worker.execute().await?;
-
-    // Receipt worker.
-    let receipt_worker = ReceiptWorker::create(&ctx, range);
-    receipt_worker.execute().await?;
+    // Worker.
+    let worker = Worker::create(&ctx, range);
+    worker.start().await?;
 
     Ok(())
 }

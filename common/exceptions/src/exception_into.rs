@@ -83,3 +83,14 @@ impl From<arrow2::error::Error> for ErrorCode {
         )
     }
 }
+
+impl From<tokio::task::JoinError> for ErrorCode {
+    fn from(error: tokio::task::JoinError) -> Self {
+        ErrorCode::create(
+            1002,
+            format!("{:?}", error),
+            None,
+            Some(ErrorCodeBacktrace::Origin(Arc::new(Backtrace::capture()))),
+        )
+    }
+}
