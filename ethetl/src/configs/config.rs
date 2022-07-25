@@ -51,6 +51,9 @@ pub struct Config {
     )]
     pub max_worker: usize,
 
+    #[clap(long, value_parser, default_value_t = 100)]
+    pub web3_batch_size: usize,
+
     #[clap(
         short = 'o',
         long,

@@ -49,7 +49,7 @@ impl ReceiptFetcher {
 
         let mut receipts = vec![];
 
-        for chunks in self.hashes.chunks(1000) {
+        for chunks in self.hashes.chunks(self.ctx.get_web3_batch_size()) {
             let mut callbacks = vec![];
             for hash in chunks {
                 let receipt = web3.eth().transaction_receipt(*hash);

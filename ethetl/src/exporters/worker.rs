@@ -45,10 +45,12 @@ impl Worker {
             let ctx = self.ctx.clone();
             let queue = queue.clone();
             if !queue.is_empty() {
-                let range = queue.pop().await;
                 futures.push(tokio::spawn(async move {
-                    let pipeline = Pipeline::create(&ctx, range);
-                    pipeline.execute().await.unwrap();
+                    while !queue.is_empty() {
+                        let range = queue.pop().await;
+                        let pipeline = Pipeline::create(&ctx, range);
+                        pipeline.execute().await.unwrap();
+                    }
                 }));
             }
         }
