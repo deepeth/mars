@@ -39,7 +39,10 @@ impl Pipeline {
         let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), start, end);
         fs::create_dir_all(&dir)?;
 
+        log::info!("Block[{} - {}] worker start", start, end);
         let export = BlockExporter::create(&self.ctx, &dir, self.block_numbers.to_vec());
-        export.export().await
+        let res = export.export().await;
+        log::info!("Block[{} - {}] worker end", start, end);
+        res
     }
 }

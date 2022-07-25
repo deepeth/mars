@@ -9,6 +9,7 @@ test = false
 
 [dependencies]
 arrow2 = { version = "0.12.0", features = ["io_csv"]}
+backoff = { version = "0.4.0", features = ["futures", "tokio"] }
 futures = "0.3"
 log = "0.4.0"
 paste = "1.0.7"

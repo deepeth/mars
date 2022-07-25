@@ -14,6 +14,7 @@
 
 use common_exceptions::ErrorCode;
 use common_exceptions::Result;
+use common_exceptions::Retryable;
 use web3::types::TransactionReceipt;
 use web3::types::H256;
 
@@ -42,8 +43,24 @@ impl ReceiptFetcher {
         Ok(())
     }
 
-    #[tracing::instrument(level = "info", skip(self))]
     pub async fn fetch(&self) -> Result<Vec<TransactionReceipt>> {
+        let notify = |e, duration| {
+            log::info!(
+                "Fetch receipts error at duration {:?}, error:{:?}",
+                duration,
+                e
+            )
+        };
+        let op = || async {
+            let res = self.fetch_with_no_retry().await?;
+            Ok(res)
+        };
+
+        op.retry_with_notify(notify).await
+    }
+
+    #[tracing::instrument(level = "info", skip(self))]
+    async fn fetch_with_no_retry(&self) -> Result<Vec<TransactionReceipt>> {
         let http = web3::transports::Http::new(self.ctx.get_rpc_url())?;
         let web3 = web3::Web3::new(web3::transports::Batch::new(http));
 

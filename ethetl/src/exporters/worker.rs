@@ -49,7 +49,13 @@ impl Worker {
                     while !queue.is_empty() {
                         let range = queue.pop().await;
                         let pipeline = Pipeline::create(&ctx, range);
-                        pipeline.execute().await.unwrap();
+                        let res = pipeline.execute().await;
+                        match res {
+                            Ok(_) => {}
+                            Err(e) => {
+                                log::error!("Pipeline execute error:{:?}", e)
+                            }
+                        }
                     }
                 }));
             }
