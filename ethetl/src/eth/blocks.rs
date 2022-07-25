@@ -14,6 +14,7 @@
 
 use common_exceptions::ErrorCode;
 use common_exceptions::Result;
+use common_exceptions::Retryable;
 use web3::types::Block;
 use web3::types::BlockId;
 use web3::types::BlockNumber;
@@ -47,9 +48,25 @@ impl BlockFetcher {
         Ok(())
     }
 
+    pub async fn fetch(&self) -> Result<Vec<Block<Transaction>>> {
+        let notify = |e, duration| {
+            log::info!(
+                "Fetch blocks error at duration {:?}, error:{:?}",
+                duration,
+                e
+            )
+        };
+        let op = || async {
+            let res = self.fetch_with_no_retry().await?;
+            Ok(res)
+        };
+
+        op.retry_with_notify(notify).await
+    }
+
     // Get the blocks.
     #[tracing::instrument(level = "info", skip(self))]
-    pub async fn fetch(&self) -> Result<Vec<Block<Transaction>>> {
+    async fn fetch_with_no_retry(&self) -> Result<Vec<Block<Transaction>>> {
         let http = web3::transports::Http::new(self.ctx.get_rpc_url())?;
         let web3 = web3::Web3::new(web3::transports::Batch::new(http));
 

@@ -17,7 +17,9 @@
 mod exception;
 mod exception_code;
 mod exception_into;
+mod retry;
 
 pub use exception::ErrorCode;
 pub use exception::ErrorCodeBacktrace;
 pub use exception::Result;
+pub use retry::Retryable;
