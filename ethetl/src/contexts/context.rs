@@ -23,6 +23,7 @@ pub struct Context {
     rpc_url: String,
     batch_size: usize,
     max_worker: usize,
+    web3_batch_size: usize,
     output_dir: String,
     output_format: String,
 }
@@ -36,6 +37,7 @@ impl Context {
             rpc_url: conf.provider_uri.to_string(),
             batch_size: conf.batch_size,
             max_worker: conf.max_worker,
+            web3_batch_size: conf.web3_batch_size,
             output_dir: conf.output_dir.clone(),
             output_format: conf.output_format.clone(),
         })
@@ -51,6 +53,10 @@ impl Context {
 
     pub fn get_max_worker(&self) -> usize {
         self.max_worker
+    }
+
+    pub fn get_web3_batch_size(&self) -> usize {
+        self.web3_batch_size
     }
 
     pub fn get_progress(&self) -> Arc<Progress> {

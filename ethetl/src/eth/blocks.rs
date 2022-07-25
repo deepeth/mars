@@ -55,7 +55,7 @@ impl BlockFetcher {
 
         let mut blocks = vec![];
 
-        for chunks in self.numbers.chunks(1000) {
+        for chunks in self.numbers.chunks(self.ctx.get_web3_batch_size()) {
             let mut callbacks = vec![];
             for num in chunks {
                 let block = web3

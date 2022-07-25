@@ -24,6 +24,7 @@ pub fn create_config() -> Config {
         end_block: 50010,
         batch_size: 100,
         max_worker: 4,
+        web3_batch_size: 50,
         output_dir: "_test_output_dir".to_string(),
         output_format: "csv".to_string(),
     }
