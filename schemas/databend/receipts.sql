@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS receipts (
     transaction_hash STRING,
-    transaction_index BIGINT,
+    transaction_index BIGINT UNSIGNED,
     block_hash STRING,
-    block_number BIGINT,
-    cumulative_gas_used BIGINT,
-    gas_used BIGINT,
+    block_number BIGINT UNSIGNED,
+    cumulative_gas_used BIGINT UNSIGNED,
+    gas_used BIGINT UNSIGNED,
     contract_address STRING,
     root STRING,
-    status BIGINT,
-    effective_gas_price BIGINT
+    status BIGINT UNSIGNED,
+    effective_gas_price BIGINT UNSIGNED
 );

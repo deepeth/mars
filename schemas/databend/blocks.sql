@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS blocks
 (
-    number            BIGINT,
+    number            BIGINT UNSIGNED,
     hash              STRING,
     parent_hash       STRING,
     nonce             STRING,
@@ -11,11 +11,11 @@ CREATE TABLE IF NOT EXISTS blocks
     receipts_root     STRING,
     difficulty        STRING,
     total_difficulty  STRING,
-    size              BIGINT,
+    size              BIGINT UNSIGNED,
     extra_data        STRING,
-    gas_limit         BIGINT,
-    gas_used          BIGINT,
-    timestamp         BIGINT,
-    transaction_count BIGINT,
-    base_fee_per_gas  BIGINT
+    gas_limit         BIGINT UNSIGNED,
+    gas_used          BIGINT UNSIGNED,
+    timestamp         BIGINT UNSIGNED,
+    transaction_count BIGINT UNSIGNED,
+    base_fee_per_gas  BIGINT UNSIGNED
 );
