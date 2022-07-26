@@ -34,14 +34,17 @@ pub fn write_file(
     path: &str,
     schema: Schema,
     columns: Chunk<Box<dyn Array>>,
+    msg: &str,
 ) -> Result<()> {
     match ctx.get_output_format().to_lowercase().as_str() {
         "csv" => {
             let path = format!("{}.csv", path);
+            log::info!("Write {} to {}", msg, path);
             common_formats::write_csv(&path, schema, columns)
         }
         "parquet" => {
             let path = format!("{}.parquet", path);
+            log::info!("Write {} to {}", msg, path);
             common_formats::write_parquet(&path, schema, columns)
         }
         v => Err(ErrorCode::Invalid(format!(

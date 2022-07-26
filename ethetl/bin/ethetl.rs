@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use common_exceptions::Result;
+use env_logger::Builder;
 use env_logger::Env;
 use ethetl::configs::Config;
 use ethetl::contexts::Context;
@@ -21,7 +22,7 @@ use ethetl::exporters::Worker;
 #[tokio::main]
 async fn main() -> Result<()> {
     let env = Env::default().filter_or("RUST_LOG", "info");
-    env_logger::init_from_env(env);
+    Builder::from_env(env).format_target(false).init();
 
     let conf = Config::load()?;
     log::info!("Config: {:?}", conf);

@@ -19,15 +19,22 @@
 ```shell
 $ make build
 
-time ./target/release/ethetl --start-block 50000 --end-block 100005 --provider-uri http://127.0.0.1:8848 --max-worker 16
-[2022-07-05T07:14:41Z INFO  mars] Config: Config { provider_uri: "http://127.0.0.1:8848", start_block: 50000, end_block: 100005, batch_size: 1000, max_worker: 16 }
-[2022-07-05T07:14:43Z INFO  mars::workers::progress] 11500 blocks processed, 4464 transactions processed, 0 receipts processed. Progress is 22%
-[2022-07-05T07:14:45Z INFO  mars::workers::progress] 21000 blocks processed, 7732 transactions processed, 5631 receipts processed. Progress is 41%
-[2022-07-05T07:14:47Z INFO  mars::workers::progress] 31000 blocks processed, 15699 transactions processed, 10389 receipts processed. Progress is 61%
-[2022-07-05T07:14:49Z INFO  mars::workers::progress] 44000 blocks processed, 22021 transactions processed, 17280 receipts processed. Progress is 87%
-[2022-07-05T07:14:51Z INFO  mars::workers::progress] 50006 blocks processed, 25100 transactions processed, 25100 receipts processed. Progress is 100%
+./target/release/ethetl -s 3000000 -e 3099999 -p http://192.168.191.66:8848  -o /tmp/datas/ -w 16 -f parquet
+[2022-07-26T06:59:35Z INFO ] Config: Config { provider_uri: "http://192.168.191.66:8848", start_block: 3000000, end_block: 3099999, batch_size: 10000, max_worker: 16, web3_batch_size: 1000, output_dir: "/tmp/datas/", output_format: "parquet" }
+[2022-07-26T06:59:41Z INFO ] 8590 blocks processed, 62662 transactions processed, 0 receipts processed. Progress is 8%
+[2022-07-26T06:59:43Z INFO ] 10000 blocks processed, 77326 transactions processed, 0 receipts processed. Progress is 10%
+[2022-07-26T06:59:45Z INFO ] 17000 blocks processed, 128311 transactions processed, 0 receipts processed. Progress is 17%
+[2022-07-26T06:59:47Z INFO ] 21000 blocks processed, 164659 transactions processed, 0 receipts processed. Progress is 21%
+[2022-07-26T06:59:49Z INFO ] 26000 blocks processed, 201764 transactions processed, 0 receipts processed. Progress is 26%
+[2022-07-26T06:59:51Z INFO ] 29000 blocks processed, 222384 transactions processed, 0 receipts processed. Progress is 29%
+[2022-07-26T06:59:53Z INFO ] 37000 blocks processed, 274097 transactions processed, 0 receipts processed. Progress is 37%
+[2022-07-26T06:59:55Z INFO ] 41000 blocks processed, 307932 transactions processed, 0 receipts processed. Progress is 41%
+[2022-07-26T06:59:57Z INFO ] 44000 blocks processed, 332340 transactions processed, 0 receipts processed. Progress is 44%
+... ...
 
-real	0m9.605s
+ls /tmp/datas/
+3000000_3009999  3020000_3029999  3040000_3049999  3060000_3069999  3080000_3089999  3100000_3100000  3110000_3119999  3130000_3139999  3150000_3159999
+3010000_3019999  3030000_3039999  3050000_3059999  3070000_3079999  3090000_3099999  3100000_3109999  3120000_3129999  3140000_3149999  3160000_3169999
 ```
 
 ## License

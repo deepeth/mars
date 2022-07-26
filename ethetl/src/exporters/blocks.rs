@@ -13,7 +13,10 @@
 // limitations under the License.
 
 use std::fs::File;
+use std::io::BufRead;
+use std::io::BufReader;
 use std::io::Write;
+use std::str::FromStr;
 
 use arrow2::array::UInt64Array;
 use arrow2::array::Utf8Array;
@@ -33,6 +36,7 @@ use web3::types::U64;
 use crate::contexts::ContextRef;
 use crate::eth::BlockFetcher;
 use crate::exporters::write_file;
+use crate::exporters::ReceiptExporter;
 
 pub struct BlockExporter {
     ctx: ContextRef,
@@ -55,6 +59,7 @@ impl BlockExporter {
         let blocks = fetcher.fetch().await?;
         self.export_blocks(&blocks).await?;
         self.export_txs(&blocks).await?;
+        self.export_tx_receipts().await?;
 
         Ok(())
     }
@@ -216,7 +221,7 @@ impl BlockExporter {
         ])?;
 
         let block_path = format!("{}/blocks", self.dir);
-        write_file(&self.ctx, &block_path, schema, columns)
+        write_file(&self.ctx, &block_path, schema, columns, "blocks")
     }
 
     pub async fn export_txs(&self, blocks: &[Block<Transaction>]) -> Result<()> {
@@ -360,7 +365,7 @@ impl BlockExporter {
         ])?;
 
         let tx_path = format!("{}/transactions", self.dir);
-        write_file(&self.ctx, &tx_path, schema, columns)?;
+        write_file(&self.ctx, &tx_path, schema, columns, "transactions")?;
         self.export_tx_hash(&hash_vec).await
     }
 
@@ -371,6 +376,21 @@ impl BlockExporter {
             writeln!(file, "{}", hash)?;
         }
         file.flush()?;
+        Ok(())
+    }
+
+    pub async fn export_tx_receipts(&self) -> Result<()> {
+        let path = format!("{}/.transaction_hashes.txt", self.dir);
+
+        let mut tx_hashes = vec![];
+        let file = File::open(path)?;
+        let buffered = BufReader::new(file);
+        for line in buffered.lines() {
+            let line_str = &line?;
+            tx_hashes.push(H256::from_str(line_str).unwrap());
+        }
+        let exporter = ReceiptExporter::create(&self.ctx, &self.dir, tx_hashes);
+        exporter.export().await?;
         Ok(())
     }
 }
