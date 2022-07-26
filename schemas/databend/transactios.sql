@@ -1,17 +1,17 @@
 CREATE TABLE IF NOT EXISTS transactions (
     hash STRING,
     nonce STRING,
-    transaction_index BIGINT,
+    transaction_index BIGINT UNSIGNED,
     from_address STRING,
     to_address STRING,
     value STRING,
-    gas BIGINT,
-    gas_price BIGINT,
+    gas BIGINT UNSIGNED,
+    gas_price BIGINT UNSIGNED,
     input STRING,
-    max_fee_per_gas BIGINT,
-    max_priority_fee_per_gas BIGINT,
-    transaction_type BIGINT,
+    max_fee_per_gas BIGINT UNSIGNED,
+    max_priority_fee_per_gas BIGINT UNSIGNED,
+    transaction_type BIGINT UNSIGNED,
     block_hash STRING,
-    block_number BIGINT,
-    block_timestamp BIGINT
+    block_number BIGINT UNSIGNED,
+    block_timestamp BIGINT UNSIGNED
 );
