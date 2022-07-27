@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use common_configs::EthConfig;
+use common_configs::ExportConfig;
 use ethetl::contexts::Context;
 use ethetl::contexts::ContextRef;
 
@@ -20,14 +21,16 @@ pub fn create_config() -> EthConfig {
     let provider_uri = "https://mainnet.infura.io/v3/6e83aaa316ef4a8c947b949364f81619".to_string();
 
     EthConfig {
-        provider_uri,
-        start_block: 50010,
-        end_block: 50010,
-        batch_size: 100,
-        max_worker: 4,
-        web3_batch_size: 50,
-        output_dir: "_test_output_dir".to_string(),
-        output_format: "csv".to_string(),
+        export: ExportConfig {
+            provider_uri,
+            start_block: 50010,
+            end_block: 50010,
+            batch_size: 100,
+            max_worker: 4,
+            web3_batch_size: 50,
+            output_dir: "_test_output_dir".to_string(),
+            output_format: "csv".to_string(),
+        },
         ..Default::default()
     }
 }

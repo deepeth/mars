@@ -30,12 +30,12 @@ async fn main() -> Result<()> {
     log::info!("Config: {:?}", conf);
 
     // Create data dir.
-    let start = conf.start_block;
-    let end = conf.end_block;
-    if conf.output_dir.is_empty() {
-        conf.output_dir = format!("datas/{}_{}", start, end);
+    let start = conf.export.start_block;
+    let end = conf.export.end_block;
+    if conf.export.output_dir.is_empty() {
+        conf.export.output_dir = format!("datas/{}_{}", start, end);
     }
-    fs::create_dir_all(&conf.output_dir)?;
+    fs::create_dir_all(&conf.export.output_dir)?;
 
     let ctx = Context::create(&conf);
 
@@ -44,8 +44,8 @@ async fn main() -> Result<()> {
     progress.start();
 
     // Exporter.
-    let start = conf.start_block;
-    let end = conf.end_block;
+    let start = conf.export.start_block;
+    let end = conf.export.end_block;
     let range: Vec<usize> = (start..end + 1).collect();
 
     // Worker.

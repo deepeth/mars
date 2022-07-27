@@ -28,10 +28,7 @@ use crate::LogConfig;
 use crate::StorageConfig;
 
 #[derive(Parser, Debug, Default, Clone, Serialize, Deserialize)]
-pub struct EthConfig {
-    #[clap(long, short = 'c', default_value_t)]
-    pub config_file: String,
-
+pub struct ExportConfig {
     #[clap(
         short = 'p',
         long,
@@ -84,12 +81,21 @@ pub struct EthConfig {
         help = "Exporter Format(csv|parquet)"
     )]
     pub output_format: String,
+}
 
+#[derive(Parser, Debug, Default, Clone, Serialize, Deserialize)]
+pub struct EthConfig {
     #[clap(flatten)]
     pub log: LogConfig,
 
     #[clap(flatten)]
+    pub export: ExportConfig,
+
+    #[clap(flatten)]
     pub storage: StorageConfig,
+
+    #[clap(long, short = 'c', default_value_t)]
+    pub config_file: String,
 }
 
 impl EthConfig {

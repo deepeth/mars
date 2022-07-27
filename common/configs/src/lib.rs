@@ -17,5 +17,6 @@ mod log;
 mod storage;
 
 pub use eth::EthConfig;
+pub use eth::ExportConfig;
 pub use log::LogConfig;
 pub use storage::StorageConfig;

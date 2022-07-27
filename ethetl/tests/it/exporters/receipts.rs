@@ -30,8 +30,8 @@ use crate::common::create_ctx;
 #[ignore]
 async fn test_receipts_exporters() -> Result<()> {
     let mut conf = create_config();
-    conf.start_block = 15138828;
-    conf.end_block = 15138852;
+    conf.export.start_block = 15138828;
+    conf.export.end_block = 15138852;
     let ctx = create_ctx(&conf);
 
     let path = "tests/it/testdata/15138828_15138852/.transaction_hashes.txt";
@@ -47,8 +47,8 @@ async fn test_receipts_exporters() -> Result<()> {
     let dir = format!(
         "{}/{}_{}",
         ctx.get_output_dir(),
-        conf.start_block,
-        conf.end_block
+        conf.export.start_block,
+        conf.export.end_block
     );
     fs::create_dir_all(&dir)?;
 
@@ -65,7 +65,7 @@ async fn test_receipts_exporters() -> Result<()> {
 
     // Parquet
     {
-        conf.output_format = "parquet".to_string();
+        conf.export.output_format = "parquet".to_string();
         let exporter = ReceiptExporter::create(&ctx, &dir, tx_hashes);
         exporter.export().await?;
 
