@@ -25,19 +25,19 @@ use crate::common::create_ctx;
 #[ignore]
 async fn test_blocks_exporters() -> Result<()> {
     let mut conf = create_config();
-    conf.start_block = 15138828;
-    conf.end_block = 15138852;
+    conf.export.start_block = 15138828;
+    conf.export.end_block = 15138852;
     let ctx = create_ctx(&conf);
 
     let dir = format!(
         "{}/{}_{}",
         ctx.get_output_dir(),
-        conf.start_block,
-        conf.end_block
+        conf.export.start_block,
+        conf.export.end_block
     );
     fs::create_dir_all(&dir)?;
 
-    let range: Vec<usize> = (conf.start_block..conf.end_block + 1).collect();
+    let range: Vec<usize> = (conf.export.start_block..conf.export.end_block + 1).collect();
 
     // CSV.
     {
@@ -62,7 +62,7 @@ async fn test_blocks_exporters() -> Result<()> {
 
     // Parquet.
     {
-        conf.output_format = "parquet".to_string();
+        conf.export.output_format = "parquet".to_string();
         let exporter = BlockExporter::create(&ctx, &dir, range);
         exporter.export().await?;
 

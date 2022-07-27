@@ -11,7 +11,19 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// Copy from https://github.com/Sherlock-Holo/ddns/blob/master/src/trace.rs
 
-mod config;
+use clap::Parser;
+use serde::Deserialize;
+use serde::Serialize;
 
-pub use config::Config;
+#[derive(Parser, Debug, Default, Clone, Serialize, Deserialize)]
+pub struct LogConfig {
+    /// Log level <DEBUG|INFO|ERROR>
+    #[clap(long = "log-level", default_value = "INFO")]
+    pub level: String,
+
+    /// Log file dir
+    #[clap(long = "log-dir", default_value = "./.mars/logs")]
+    pub dir: String,
+}

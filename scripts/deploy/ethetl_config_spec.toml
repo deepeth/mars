@@ -1,0 +1,52 @@
+# Usage:
+# ethetl -c ethetl_config_spec.toml
+
+[log]
+level = "ERROR"
+dir = "./.mars/logs"
+
+[export]
+# Start block.
+start_block = 0
+
+# End block.
+end_block = 100
+
+# The URI of the web3 provider e.g. https://127.0.0.1:8845
+provider_uri = "https://127.0.0.1:8845"
+
+# The number of items to export at a time.
+batch_size = 10000
+
+# The maximum number of workers.
+max_worker = 4
+
+# Exporter directory.
+output_dir = ".datas"
+
+# Exporter Format(csv|parquet).
+output_format = "parquet"
+
+# Storage config.
+[storage]
+# fs | s3 | azblob
+type = "fs"
+
+# Set a local folder to store your data.
+# Comment out this block if you're NOT using local file system as storage.
+[storage.fs]
+data_path = "./.mars/ethetl"
+
+# To use S3-compatible object storage, uncomment this block and set your values.
+# [storage.s3]
+# bucket = "<your-bucket-name>"
+# endpoint_url = "<your-endpoint>"
+# access_key_id = "<your-key-id>"
+# secret_access_key = "<your-account-key>"
+
+# To use Azure Blob storage, uncomment this block and set your values.
+# [storage.azblob]
+# endpoint_url = "https://<your-storage-account-name>.blob.core.windows.net"
+# container = "<your-azure-storage-container-name>"
+# account_name = "<your-storage-account-name>"
+# account_key = "<your-account-key>"

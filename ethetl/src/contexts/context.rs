@@ -14,7 +14,8 @@
 
 use std::sync::Arc;
 
-use crate::configs::Config;
+use common_configs::EthConfig;
+
 use crate::contexts::Progress;
 
 #[derive(Clone, Debug)]
@@ -30,16 +31,16 @@ pub struct Context {
 pub type ContextRef = Arc<Context>;
 
 impl Context {
-    pub fn create(conf: &Config) -> Arc<Context> {
-        let all = conf.end_block - conf.start_block + 1;
+    pub fn create(conf: &EthConfig) -> Arc<Context> {
+        let all = conf.export.end_block - conf.export.start_block + 1;
         Arc::new(Context {
             progress: Progress::create(all),
-            rpc_url: conf.provider_uri.to_string(),
-            batch_size: conf.batch_size,
-            max_worker: conf.max_worker,
-            web3_batch_size: conf.web3_batch_size,
-            output_dir: conf.output_dir.clone(),
-            output_format: conf.output_format.clone(),
+            rpc_url: conf.export.provider_uri.to_string(),
+            batch_size: conf.export.batch_size,
+            max_worker: conf.export.max_worker,
+            web3_batch_size: conf.export.web3_batch_size,
+            output_dir: conf.export.output_dir.clone(),
+            output_format: conf.export.output_format.clone(),
         })
     }
 

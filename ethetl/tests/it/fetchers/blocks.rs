@@ -28,7 +28,7 @@ async fn test_blocks_fetcher() -> Result<()> {
 
     let conf = create_config();
     let ctx = create_ctx(&conf);
-    let range: Vec<usize> = (conf.start_block..conf.end_block + 1).collect();
+    let range: Vec<usize> = (conf.export.start_block..conf.export.end_block + 1).collect();
 
     let mut fetcher = BlockFetcher::create(&ctx);
     fetcher.push_batch(range)?;

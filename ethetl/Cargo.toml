@@ -15,6 +15,7 @@ test = false
 
 [dependencies]
 # Workspace dependencies
+common-configs = { path = "../common/configs" }
 common-exceptions = { path = "../common/exceptions" }
 common-formats = { path = "../common/formats" }
 

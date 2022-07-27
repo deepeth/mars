@@ -31,7 +31,7 @@ async fn test_receipt_fetcher() -> Result<()> {
     let ctx = create_ctx(&conf);
 
     let mut block_fetcher = BlockFetcher::create(&ctx);
-    let range: Vec<usize> = (conf.start_block..conf.end_block + 1).collect();
+    let range: Vec<usize> = (conf.export.start_block..conf.export.end_block + 1).collect();
     block_fetcher.push_batch(range)?;
 
     let blocks = block_fetcher.fetch().await?;
