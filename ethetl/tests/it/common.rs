@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ethetl::configs::Config;
+use common_configs::EthConfig;
 use ethetl::contexts::Context;
 use ethetl::contexts::ContextRef;
 
-pub fn create_config() -> Config {
+pub fn create_config() -> EthConfig {
     let provider_uri = "https://mainnet.infura.io/v3/6e83aaa316ef4a8c947b949364f81619".to_string();
-    Config {
+
+    EthConfig {
         provider_uri,
         start_block: 50010,
         end_block: 50010,
@@ -27,9 +28,10 @@ pub fn create_config() -> Config {
         web3_batch_size: 50,
         output_dir: "_test_output_dir".to_string(),
         output_format: "csv".to_string(),
+        ..Default::default()
     }
 }
 
-pub fn create_ctx(conf: &Config) -> ContextRef {
+pub fn create_ctx(conf: &EthConfig) -> ContextRef {
     Context::create(conf)
 }

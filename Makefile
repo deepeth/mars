@@ -13,3 +13,6 @@ build:
 
 test:
 	bash ./scripts/ci/ci-run-unit-tests.sh
+
+clean:
+	cargo clean

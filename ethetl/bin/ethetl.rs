@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::fs;
+
+use common_configs::EthConfig;
 use common_exceptions::Result;
 use env_logger::Builder;
 use env_logger::Env;
-use ethetl::configs::Config;
 use ethetl::contexts::Context;
 use ethetl::exporters::Worker;
 
@@ -24,8 +26,16 @@ async fn main() -> Result<()> {
     let env = Env::default().filter_or("RUST_LOG", "info");
     Builder::from_env(env).format_target(false).init();
 
-    let conf = Config::load()?;
+    let mut conf = EthConfig::load()?;
     log::info!("Config: {:?}", conf);
+
+    // Create data dir.
+    let start = conf.start_block;
+    let end = conf.end_block;
+    if conf.output_dir.is_empty() {
+        conf.output_dir = format!("datas/{}_{}", start, end);
+    }
+    fs::create_dir_all(&conf.output_dir)?;
 
     let ctx = Context::create(&conf);
 

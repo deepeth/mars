@@ -42,6 +42,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.58"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bb07d2053ccdbe10e2af2995a2f116c1330396493dc1269f6a91d0ae82e19704"
+
+[[package]]
 name = "array-init-cursor"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -349,9 +355,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "common-configs"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "common-exceptions",
+ "serde",
+ "serfig",
+]
+
+[[package]]
 name = "common-exceptions"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "arrow2",
  "backoff",
  "futures",
@@ -637,6 +654,7 @@ version = "0.1.0"
 dependencies = [
  "arrow2",
  "clap",
+ "common-configs",
  "common-exceptions",
  "common-formats",
  "deadqueue",
@@ -1905,6 +1923,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde-bridge"
+version = "0.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5f68e451f87e0f0a51c565c907017f033ecce23a1aef9eb3faee0dfd6e578d84"
+dependencies = [
+ "anyhow",
+ "indexmap",
+ "serde",
+]
+
+[[package]]
+name = "serde-env"
+version = "0.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4e03cfb2aa71df46bc21892a343552041c8712e97ace1a535e7f7e6eabeca6c0"
+dependencies = [
+ "anyhow",
+ "log",
+ "serde",
+]
+
+[[package]]
 name = "serde_derive"
 version = "1.0.137"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1936,6 +1976,21 @@ dependencies = [
  "itoa 1.0.2",
  "ryu",
  "serde",
+]
+
+[[package]]
+name = "serfig"
+version = "0.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "782e2265bd0b75de9d0934d412ced9b790b1290f59c9ac2e56b859d69d210f18"
+dependencies = [
+ "anyhow",
+ "indexmap",
+ "log",
+ "serde",
+ "serde-bridge",
+ "serde-env",
+ "toml",
 ]
 
 [[package]]

@@ -14,7 +14,8 @@
 
 use std::sync::Arc;
 
-use crate::configs::Config;
+use common_configs::EthConfig;
+
 use crate::contexts::Progress;
 
 #[derive(Clone, Debug)]
@@ -30,7 +31,7 @@ pub struct Context {
 pub type ContextRef = Arc<Context>;
 
 impl Context {
-    pub fn create(conf: &Config) -> Arc<Context> {
+    pub fn create(conf: &EthConfig) -> Arc<Context> {
         let all = conf.end_block - conf.start_block + 1;
         Arc::new(Context {
             progress: Progress::create(all),

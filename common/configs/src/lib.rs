@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod config;
+mod eth;
+mod log;
+mod storage;
 
-pub use config::Config;
+pub use eth::EthConfig;
+pub use log::LogConfig;
+pub use storage::StorageConfig;

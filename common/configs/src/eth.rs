@@ -11,14 +11,27 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// Copy from https://github.com/Sherlock-Holo/ddns/blob/master/src/trace.rs
 
-use std::fs;
+use std::env;
 
 use clap::Parser;
 use common_exceptions::Result;
+use serde::Deserialize;
+use serde::Serialize;
+use serfig::collectors::from_env;
+use serfig::collectors::from_file;
+use serfig::collectors::from_self;
+use serfig::parsers::Toml;
 
-#[derive(Parser, Debug, Clone)]
-pub struct Config {
+use crate::LogConfig;
+use crate::StorageConfig;
+
+#[derive(Parser, Debug, Default, Clone, Serialize, Deserialize)]
+pub struct EthConfig {
+    #[clap(long, short = 'c', default_value_t)]
+    pub config_file: String,
+
     #[clap(
         short = 'p',
         long,
@@ -71,19 +84,42 @@ pub struct Config {
         help = "Exporter Format(csv|parquet)"
     )]
     pub output_format: String,
+
+    #[clap(flatten)]
+    pub log: LogConfig,
+
+    #[clap(flatten)]
+    pub storage: StorageConfig,
 }
 
-impl Config {
+impl EthConfig {
+    /// Load will load config from file, env and args.
+    ///
+    /// - Load from file as default.
+    /// - Load from env, will override config from file.
+    /// - Load from args as finally override
     pub fn load() -> Result<Self> {
-        let mut conf = Self::parse();
+        let arg_conf = Self::parse();
+        let mut builder: serfig::Builder<Self> = serfig::Builder::default();
 
-        let start = conf.start_block;
-        let end = conf.end_block;
-        if conf.output_dir.is_empty() {
-            conf.output_dir = format!("datas/{}_{}", start, end);
+        // Load from config file first.
+        {
+            let config_file = if !arg_conf.config_file.is_empty() {
+                arg_conf.config_file.clone()
+            } else if let Ok(path) = env::var("CONFIG_FILE") {
+                path
+            } else {
+                "".to_string()
+            };
+
+            builder = builder.collect(from_file(Toml, &config_file));
         }
-        fs::create_dir_all(&conf.output_dir)?;
 
-        Ok(conf)
+        // Then, load from env.
+        builder = builder.collect(from_env());
+
+        // Finally, load from args.
+        builder = builder.collect(from_self(arg_conf));
+        Ok(builder.build()?)
     }
 }
