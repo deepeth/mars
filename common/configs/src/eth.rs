@@ -33,14 +33,27 @@ pub struct ExportConfig {
         short = 'p',
         long,
         value_parser,
+        default_value = "https://127.0.0.1:8845",
         help = "The URI of the web3 provider e.g. https://127.0.0.1:8845"
     )]
     pub provider_uri: String,
 
-    #[clap(short = 's', long, value_parser, help = "Start block")]
+    #[clap(
+        short = 's',
+        long,
+        value_parser,
+        default_value_t = 0,
+        help = "Start block"
+    )]
     pub start_block: usize,
 
-    #[clap(short = 'e', long, value_parser, help = "End block")]
+    #[clap(
+        short = 'e',
+        long,
+        value_parser,
+        default_value_t = 10000,
+        help = "End block"
+    )]
     pub end_block: usize,
 
     #[clap(

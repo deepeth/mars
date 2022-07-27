@@ -21,7 +21,8 @@ use serde::Serialize;
 
 #[derive(Parser, Debug, Default, Clone, Serialize, Deserialize)]
 pub struct StorageConfig {
-    #[clap(long = "storage-type", default_value = "fs")]
+    #[clap(long, default_value = "fs")]
+    #[serde(rename = "type", alias = "storage_type")]
     pub storage_type: String,
 
     // Fs storage backend config.
