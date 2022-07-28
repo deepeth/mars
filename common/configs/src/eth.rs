@@ -28,13 +28,14 @@ use crate::LogConfig;
 use crate::StorageConfig;
 
 #[derive(Parser, Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct ExportConfig {
     #[clap(
         short = 'p',
         long,
         value_parser,
         default_value_t,
-        default_value = "127.0.0.1:8845",
+        default_value = "https://127.0.0.1:8845",
         help = "The URI of the web3 provider e.g. https://127.0.0.1:8845"
     )]
     pub provider_uri: String,

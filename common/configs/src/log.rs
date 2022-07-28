@@ -18,6 +18,7 @@ use serde::Deserialize;
 use serde::Serialize;
 
 #[derive(Parser, Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct LogConfig {
     /// Log level <DEBUG|INFO|ERROR>
     #[clap(long = "log-level", default_value = "INFO")]
