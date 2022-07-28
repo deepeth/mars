@@ -13,7 +13,8 @@ start_block = 0
 end_block = 100
 
 # The URI of the web3 provider e.g. https://127.0.0.1:8845
-provider_uri = "https://127.0.0.1:8845"
+#provider_uri = "https://127.0.0.1:8845"
+provider_uri = "http://192.168.191.66:8848"
 
 # The number of items to export at a time.
 batch_size = 10000

@@ -36,7 +36,7 @@ impl Pipeline {
         // Create chunk dir.
         let start = self.block_numbers[0];
         let end = self.block_numbers[self.block_numbers.len() - 1];
-        let dir = format!("{}{}_{}", self.ctx.get_output_dir(), start, end);
+        let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), start, end);
         fs::create_dir_all(&dir)?;
 
         let export = BlockExporter::create(&self.ctx, &dir, self.block_numbers.to_vec());
