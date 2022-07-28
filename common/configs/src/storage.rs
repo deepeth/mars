@@ -19,7 +19,8 @@ use clap::Parser;
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(Parser, Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Parser, Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct StorageConfig {
     #[clap(long, default_value = "fs")]
     #[serde(rename = "type", alias = "storage_type")]
@@ -38,14 +39,35 @@ pub struct StorageConfig {
     pub azblob: AzblobStorageConfig,
 }
 
-#[derive(Parser, Debug, Default, Clone, Serialize, Deserialize)]
+impl Default for StorageConfig {
+    fn default() -> Self {
+        StorageConfig {
+            storage_type: "fs".to_string(),
+            fs: Default::default(),
+            s3: Default::default(),
+            azblob: Default::default(),
+        }
+    }
+}
+
+#[derive(Parser, Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct FsStorageConfig {
     /// fs storage backend data path
     #[clap(long = "storage-fs-data-path", default_value = "_data")]
     pub data_path: String,
 }
 
-#[derive(Parser, Default, Clone, Serialize, Deserialize)]
+impl Default for FsStorageConfig {
+    fn default() -> Self {
+        FsStorageConfig {
+            data_path: "_data".to_string(),
+        }
+    }
+}
+
+#[derive(Parser, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct S3StorageConfig {
     /// Region for S3 storage
     #[clap(long = "storage-s3-region", default_value_t)]
@@ -75,6 +97,19 @@ pub struct S3StorageConfig {
     pub root: String,
 }
 
+impl Default for S3StorageConfig {
+    fn default() -> Self {
+        S3StorageConfig {
+            region: "".to_string(),
+            endpoint_url: "https://s3.amazonaws.com".to_string(),
+            access_key_id: "".to_string(),
+            secret_access_key: "".to_string(),
+            bucket: "".to_string(),
+            root: "".to_string(),
+        }
+    }
+}
+
 impl fmt::Debug for S3StorageConfig {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.debug_struct("S3StorageConfig")
@@ -91,7 +126,8 @@ impl fmt::Debug for S3StorageConfig {
     }
 }
 
-#[derive(Parser, Default, Clone, Serialize, Deserialize)]
+#[derive(Parser, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct AzblobStorageConfig {
     /// Account for Azblob
     #[clap(long = "storage-azblob-account-name", default_value_t)]
@@ -113,6 +149,18 @@ pub struct AzblobStorageConfig {
     /// Clap doesn't allow us to use root directly.
     #[clap(long = "storage-azblob-root", default_value_t)]
     pub azblob_root: String,
+}
+
+impl Default for AzblobStorageConfig {
+    fn default() -> Self {
+        AzblobStorageConfig {
+            account_name: "".to_string(),
+            account_key: "".to_string(),
+            container: "".to_string(),
+            azblob_endpoint_url: "".to_string(),
+            azblob_root: "".to_string(),
+        }
+    }
 }
 
 impl fmt::Debug for AzblobStorageConfig {

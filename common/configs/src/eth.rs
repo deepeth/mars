@@ -27,12 +27,14 @@ use serfig::parsers::Toml;
 use crate::LogConfig;
 use crate::StorageConfig;
 
-#[derive(Parser, Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Parser, Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct ExportConfig {
     #[clap(
         short = 'p',
         long,
         value_parser,
+        default_value_t,
         default_value = "https://127.0.0.1:8845",
         help = "The URI of the web3 provider e.g. https://127.0.0.1:8845"
     )]
@@ -81,7 +83,7 @@ pub struct ExportConfig {
         short = 'o',
         long,
         value_parser,
-        default_value = ".datas",
+        default_value = "_datas",
         help = "Exporter directory"
     )]
     pub output_dir: String,
@@ -96,7 +98,23 @@ pub struct ExportConfig {
     pub output_format: String,
 }
 
-#[derive(Parser, Debug, Default, Clone, Serialize, Deserialize)]
+impl Default for ExportConfig {
+    fn default() -> Self {
+        ExportConfig {
+            provider_uri: "https://127.0.0.1:8845".to_string(),
+            start_block: 0,
+            end_block: 10000,
+            batch_size: 10000,
+            max_worker: 4,
+            web3_batch_size: 1000,
+            output_dir: "_datas".to_string(),
+            output_format: "csv".to_string(),
+        }
+    }
+}
+
+#[derive(Parser, Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct EthConfig {
     #[clap(flatten)]
     pub log: LogConfig,
@@ -109,6 +127,17 @@ pub struct EthConfig {
 
     #[clap(long, short = 'c', default_value_t)]
     pub config_file: String,
+}
+
+impl Default for EthConfig {
+    fn default() -> Self {
+        EthConfig {
+            log: Default::default(),
+            export: Default::default(),
+            storage: Default::default(),
+            config_file: "".to_string(),
+        }
+    }
 }
 
 impl EthConfig {

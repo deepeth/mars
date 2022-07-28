@@ -3,7 +3,7 @@
 
 [log]
 level = "ERROR"
-dir = "./.mars/logs"
+dir = "_logs"
 
 [export]
 # Start block.
@@ -13,7 +13,8 @@ start_block = 0
 end_block = 100
 
 # The URI of the web3 provider e.g. https://127.0.0.1:8845
-provider_uri = "https://127.0.0.1:8845"
+#provider_uri = "https://127.0.0.1:8845"
+provider_uri = "http://192.168.191.66:8848"
 
 # The number of items to export at a time.
 batch_size = 10000
@@ -22,7 +23,7 @@ batch_size = 10000
 max_worker = 4
 
 # Exporter directory.
-output_dir = ".datas"
+output_dir = "_datas"
 
 # Exporter Format(csv|parquet).
 output_format = "parquet"
@@ -35,17 +36,17 @@ type = "fs"
 # Set a local folder to store your data.
 # Comment out this block if you're NOT using local file system as storage.
 [storage.fs]
-data_path = "./.mars/ethetl"
+data_path = "_datas/"
 
 # To use S3-compatible object storage, uncomment this block and set your values.
-# [storage.s3]
+#[storage.s3]
 # bucket = "<your-bucket-name>"
 # endpoint_url = "<your-endpoint>"
 # access_key_id = "<your-key-id>"
 # secret_access_key = "<your-account-key>"
 
 # To use Azure Blob storage, uncomment this block and set your values.
-# [storage.azblob]
+#[storage.azblob]
 # endpoint_url = "https://<your-storage-account-name>.blob.core.windows.net"
 # container = "<your-azure-storage-container-name>"
 # account_name = "<your-storage-account-name>"

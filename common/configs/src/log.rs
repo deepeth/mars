@@ -17,13 +17,23 @@ use clap::Parser;
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(Parser, Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Parser, Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct LogConfig {
     /// Log level <DEBUG|INFO|ERROR>
     #[clap(long = "log-level", default_value = "INFO")]
     pub level: String,
 
     /// Log file dir
-    #[clap(long = "log-dir", default_value = "./.mars/logs")]
+    #[clap(long = "log-dir", default_value = "_logs")]
     pub dir: String,
+}
+
+impl Default for LogConfig {
+    fn default() -> Self {
+        LogConfig {
+            level: "INFO".to_string(),
+            dir: "_logs".to_string(),
+        }
+    }
 }
