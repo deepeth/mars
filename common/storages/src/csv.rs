@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use std::io::Cursor;
+use std::sync::Arc;
 
 use arrow2::array::Array;
 use arrow2::chunk::Chunk;
@@ -22,7 +23,7 @@ use common_exceptions::Result;
 use opendal::Operator;
 
 pub async fn write_csv(
-    op: Operator,
+    op: Arc<Operator>,
     path: &str,
     schema: Schema,
     columns: Chunk<Box<dyn Array>>,

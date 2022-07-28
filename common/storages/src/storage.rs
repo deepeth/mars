@@ -25,7 +25,7 @@ use opendal::services::fs;
 use opendal::services::s3;
 use opendal::Operator;
 
-pub async fn init_storage(conf: EthConfig) -> Result<Operator> {
+pub async fn init_storage(conf: &EthConfig) -> Result<Operator> {
     match conf.storage.storage_type.as_str() {
         "fs" => init_fs_operator(&conf.storage.fs).await,
         "s3" => init_s3_operator(&conf.storage.s3).await,

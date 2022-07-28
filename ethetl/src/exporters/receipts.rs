@@ -155,6 +155,6 @@ impl ReceiptExporter {
         ])?;
 
         let receipt_path = format!("{}/receipts", self.dir);
-        write_file(&self.ctx, &receipt_path, schema, columns, "receipts")
+        write_file(&self.ctx, &receipt_path, schema, columns, "receipts").await
     }
 }

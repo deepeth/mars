@@ -221,7 +221,7 @@ impl BlockExporter {
         ])?;
 
         let block_path = format!("{}/blocks", self.dir);
-        write_file(&self.ctx, &block_path, schema, columns, "blocks")
+        write_file(&self.ctx, &block_path, schema, columns, "blocks").await
     }
 
     pub async fn export_txs(&self, blocks: &[Block<Transaction>]) -> Result<()> {
@@ -365,7 +365,7 @@ impl BlockExporter {
         ])?;
 
         let tx_path = format!("{}/transactions", self.dir);
-        write_file(&self.ctx, &tx_path, schema, columns, "transactions")?;
+        write_file(&self.ctx, &tx_path, schema, columns, "transactions").await?;
         self.export_tx_hash(&hash_vec).await
     }
 

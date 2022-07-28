@@ -37,7 +37,7 @@ async fn main() -> Result<()> {
     }
     fs::create_dir_all(&conf.export.output_dir)?;
 
-    let ctx = Context::create(&conf);
+    let ctx = Context::create(&conf).await;
 
     // Interval progress.
     let progress = ctx.get_progress();

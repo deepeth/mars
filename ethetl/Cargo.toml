@@ -18,6 +18,7 @@ test = false
 common-configs = { path = "../common/configs" }
 common-exceptions = { path = "../common/exceptions" }
 common-formats = { path = "../common/formats" }
+common-storages = { path = "../common/storages" }
 
 arrow2 = { version = "0.12.0", features = ["io_csv"]}
 clap = { version = "3.2.5", features = ["derive", "env"] }
@@ -25,6 +26,7 @@ deadqueue = "0.2.3"
 env_logger = "0.9.0"
 futures = "0.3"
 log = "0.4.0"
+opendal = { version = "0.11.3", features = ["retry", "compress"] }
 paste = "1.0.7"
 percentage-rs = "0.1.6"
 serde_json = "1.0.82"

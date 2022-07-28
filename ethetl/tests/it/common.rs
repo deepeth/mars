@@ -35,6 +35,6 @@ pub fn create_config() -> EthConfig {
     }
 }
 
-pub fn create_ctx(conf: &EthConfig) -> ContextRef {
-    Context::create(conf)
+pub async fn create_ctx(conf: &EthConfig) -> ContextRef {
+    Context::create(conf).await
 }

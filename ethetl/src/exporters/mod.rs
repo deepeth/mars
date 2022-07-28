@@ -23,13 +23,14 @@ use arrow2::datatypes::Schema;
 pub use blocks::BlockExporter;
 use common_exceptions::ErrorCode;
 use common_exceptions::Result;
+use common_storages::write_csv;
 pub use pipeline::Pipeline;
 pub use receipts::ReceiptExporter;
 pub use worker::Worker;
 
 use crate::contexts::ContextRef;
 
-pub fn write_file(
+pub async fn write_file(
     ctx: &ContextRef,
     path: &str,
     schema: Schema,
@@ -40,7 +41,7 @@ pub fn write_file(
         "csv" => {
             let path = format!("{}.csv", path);
             log::info!("Write {} to {}", msg, path);
-            common_formats::write_csv(&path, schema, columns)
+            write_csv(ctx.get_storage(), &path, schema, columns).await
         }
         "parquet" => {
             let path = format!("{}.parquet", path);
