@@ -113,7 +113,8 @@ impl Default for ExportConfig {
     }
 }
 
-#[derive(Parser, Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Parser, Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct EthConfig {
     #[clap(flatten)]
     pub log: LogConfig,
@@ -126,6 +127,17 @@ pub struct EthConfig {
 
     #[clap(long, short = 'c', default_value_t)]
     pub config_file: String,
+}
+
+impl Default for EthConfig {
+    fn default() -> Self {
+        EthConfig {
+            log: Default::default(),
+            export: Default::default(),
+            storage: Default::default(),
+            config_file: "".to_string(),
+        }
+    }
 }
 
 impl EthConfig {
