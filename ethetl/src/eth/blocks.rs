@@ -50,7 +50,7 @@ impl BlockFetcher {
 
     pub async fn fetch(&self) -> Result<Vec<Block<Transaction>>> {
         let notify = |e, duration| {
-            log::info!(
+            log::warn!(
                 "Fetch blocks error at duration {:?}, error:{:?}",
                 duration,
                 e

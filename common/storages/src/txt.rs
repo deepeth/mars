@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod csv;
-mod parquet;
-mod storage;
-mod txt;
+use std::sync::Arc;
 
-pub use csv::write_csv;
-pub use parquet::write_parquet;
-pub use storage::init_storage;
-pub use txt::write_txt;
+use common_exceptions::Result;
+use opendal::Operator;
+
+pub async fn write_txt(op: Arc<Operator>, path: &str, bytes: &[u8]) -> Result<()> {
+    op.object(path).write(bytes).await?;
+    Ok(())
+}

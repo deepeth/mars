@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
+use std::io::Cursor;
 use std::io::Write;
 use std::str::FromStr;
 
@@ -57,9 +57,14 @@ impl BlockExporter {
         let mut fetcher = BlockFetcher::create(&self.ctx);
         fetcher.push_batch(self.numbers.to_vec())?;
         let blocks = fetcher.fetch().await?;
-        self.export_blocks(&blocks).await?;
-        self.export_txs(&blocks).await?;
-        self.export_tx_receipts().await?;
+
+        self.write_begin_file().await?;
+        {
+            self.export_blocks(&blocks).await?;
+            self.export_txs(&blocks).await?;
+            self.export_tx_receipts().await?;
+        }
+        self.write_commit_file().await?;
 
         Ok(())
     }
@@ -366,31 +371,59 @@ impl BlockExporter {
 
         let tx_path = format!("{}/transactions", self.dir);
         write_file(&self.ctx, &tx_path, schema, columns, "transactions").await?;
-        self.export_tx_hash(&hash_vec).await
-    }
-
-    pub async fn export_tx_hash(&self, tx_hashes: &[String]) -> Result<()> {
-        let tx_hash_path = format!("{}/.transaction_hashes.txt", self.dir);
-        let mut file = File::create(tx_hash_path)?;
-        for hash in tx_hashes {
-            writeln!(file, "{}", hash)?;
-        }
-        file.flush()?;
-        Ok(())
+        self.write_tx_hash_file(&hash_vec).await
     }
 
     pub async fn export_tx_receipts(&self) -> Result<()> {
-        let path = format!("{}/.transaction_hashes.txt", self.dir);
-
-        let mut tx_hashes = vec![];
-        let file = File::open(path)?;
-        let buffered = BufReader::new(file);
-        for line in buffered.lines() {
-            let line_str = &line?;
-            tx_hashes.push(H256::from_str(line_str).unwrap());
-        }
+        let tx_hashes = self.read_tx_hash_file().await?;
         let exporter = ReceiptExporter::create(&self.ctx, &self.dir, tx_hashes);
         exporter.export().await?;
         Ok(())
+    }
+
+    pub async fn read_tx_hash_file(&self) -> Result<Vec<H256>> {
+        let mut tx_hashes = vec![];
+        let path = format!("{}/_transaction_hashes.txt", self.dir);
+
+        let meta = self.ctx.get_storage().object(&path).metadata().await?;
+        if meta.content_length() > 0 {
+            let content = self.ctx.get_storage().object(&path).read().await?;
+            let cursor = Cursor::new(content);
+            let buffered = BufReader::new(cursor);
+
+            for line in buffered.lines() {
+                let line_str = &line?;
+                tx_hashes.push(H256::from_str(line_str).unwrap());
+            }
+        }
+        Ok(tx_hashes)
+    }
+
+    pub async fn write_tx_hash_file(&self, tx_hashes: &[String]) -> Result<()> {
+        let path = format!("{}/_transaction_hashes.txt", self.dir);
+        let mut cursor = Cursor::new(Vec::new());
+        for hash in tx_hashes {
+            writeln!(cursor, "{}", hash)?;
+        }
+        cursor.flush()?;
+
+        log::info!("Write {}", path);
+        common_storages::write_txt(self.ctx.get_storage(), &path, cursor.get_ref().as_slice()).await
+    }
+
+    pub async fn write_begin_file(&self) -> Result<()> {
+        let path = format!("{}/_begin.txt", self.dir);
+        let mut cursor = Cursor::new(Vec::new());
+        writeln!(cursor, "begin")?;
+        cursor.flush()?;
+        common_storages::write_txt(self.ctx.get_storage(), &path, cursor.get_ref().as_slice()).await
+    }
+
+    pub async fn write_commit_file(&self) -> Result<()> {
+        let path = format!("{}/_commit.txt", self.dir);
+        let mut cursor = Cursor::new(Vec::new());
+        writeln!(cursor, "commit")?;
+        cursor.flush()?;
+        common_storages::write_txt(self.ctx.get_storage(), &path, cursor.get_ref().as_slice()).await
     }
 }
