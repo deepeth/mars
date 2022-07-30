@@ -17,7 +17,6 @@ test = false
 # Workspace dependencies
 common-configs = { path = "../common/configs" }
 common-exceptions = { path = "../common/exceptions" }
-common-formats = { path = "../common/formats" }
 common-storages = { path = "../common/storages" }
 
 arrow2 = { version = "0.12.0", features = ["io_csv"]}

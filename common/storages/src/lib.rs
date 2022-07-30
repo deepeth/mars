@@ -13,7 +13,9 @@
 // limitations under the License.
 
 mod csv;
+mod parquet;
 mod storage;
 
 pub use csv::write_csv;
+pub use parquet::write_parquet;
 pub use storage::init_storage;

@@ -13,7 +13,8 @@
 // limitations under the License.
 // Copy from https://github.com/Sherlock-Holo/ddns/blob/master/src/trace.rs
 
-use std::fs::File;
+use std::io::Cursor;
+use std::sync::Arc;
 
 use arrow2::array::Array;
 use arrow2::chunk::Chunk;
@@ -26,8 +27,14 @@ use arrow2::io::parquet::write::RowGroupIterator;
 use arrow2::io::parquet::write::Version;
 use arrow2::io::parquet::write::WriteOptions;
 use common_exceptions::Result;
+use opendal::Operator;
 
-pub fn write_parquet(path: &str, schema: Schema, columns: Chunk<Box<dyn Array>>) -> Result<()> {
+pub async fn write_parquet(
+    op: Arc<Operator>,
+    path: &str,
+    schema: Schema,
+    columns: Chunk<Box<dyn Array>>,
+) -> Result<()> {
     let options = WriteOptions {
         write_statistics: true,
         compression: CompressionOptions::Snappy,
@@ -43,14 +50,16 @@ pub fn write_parquet(path: &str, schema: Schema, columns: Chunk<Box<dyn Array>>)
         .collect();
     let row_groups = RowGroupIterator::try_new(iter.into_iter(), &schema, options, encodings)?;
 
-    // Create a new empty file
-    let file = File::create(path)?;
-
-    let mut writer = FileWriter::try_new(file, schema, options)?;
+    let cursor = Cursor::new(Vec::new());
+    let mut writer = FileWriter::try_new(cursor, schema, options)?;
 
     for group in row_groups {
         writer.write(group?)?;
     }
     let _size = writer.end(None)?;
+
+    op.object(path)
+        .write(writer.into_inner().get_ref().as_slice())
+        .await?;
     Ok(())
 }

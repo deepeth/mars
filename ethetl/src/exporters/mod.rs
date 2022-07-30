@@ -23,7 +23,6 @@ use arrow2::datatypes::Schema;
 pub use blocks::BlockExporter;
 use common_exceptions::ErrorCode;
 use common_exceptions::Result;
-use common_storages::write_csv;
 pub use pipeline::Pipeline;
 pub use receipts::ReceiptExporter;
 pub use worker::Worker;
@@ -41,12 +40,12 @@ pub async fn write_file(
         "csv" => {
             let path = format!("{}.csv", path);
             log::info!("Write {} to {}", msg, path);
-            write_csv(ctx.get_storage(), &path, schema, columns).await
+            common_storages::write_csv(ctx.get_storage(), &path, schema, columns).await
         }
         "parquet" => {
             let path = format!("{}.parquet", path);
             log::info!("Write {} to {}", msg, path);
-            common_formats::write_parquet(&path, schema, columns)
+            common_storages::write_parquet(ctx.get_storage(), &path, schema, columns).await
         }
         v => Err(ErrorCode::Invalid(format!(
             "Unsupported format, must be one of [csv, parquet], got: {}",

@@ -28,7 +28,7 @@ pub async fn write_csv(
     schema: Schema,
     columns: Chunk<Box<dyn Array>>,
 ) -> Result<()> {
-    let mut c = Cursor::new(Vec::new());
+    let mut cursor = Cursor::new(Vec::new());
     let headers = schema
         .fields
         .iter()
@@ -36,9 +36,9 @@ pub async fn write_csv(
         .collect::<Vec<String>>();
 
     let options = write::SerializeOptions::default();
-    write::write_header(&mut c, headers.as_slice(), &options)?;
-    write::write_chunk(&mut c, &columns, &options)?;
+    write::write_header(&mut cursor, headers.as_slice(), &options)?;
+    write::write_chunk(&mut cursor, &columns, &options)?;
 
-    op.object(path).write(c.get_ref().as_slice()).await?;
+    op.object(path).write(cursor.get_ref().as_slice()).await?;
     Ok(())
 }
