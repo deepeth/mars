@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod eth;
-mod log;
-mod storage;
+use std::sync::Arc;
 
-pub use eth::EthConfig;
-pub use eth::ExportConfig;
-pub use log::LogConfig;
-pub use storage::AzblobStorageConfig;
-pub use storage::FsStorageConfig;
-pub use storage::S3StorageConfig;
-pub use storage::StorageConfig;
+use common_exceptions::Result;
+use opendal::Operator;
+
+pub async fn write_txt(op: Arc<Operator>, path: &str, bytes: &[u8]) -> Result<()> {
+    op.object(path).write(bytes).await?;
+    Ok(())
+}

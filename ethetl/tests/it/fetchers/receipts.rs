@@ -28,7 +28,7 @@ async fn test_receipt_fetcher() -> Result<()> {
     let mut file = mint.new_goldenfile("receipts_50010_50010.txt").unwrap();
 
     let conf = create_config();
-    let ctx = create_ctx(&conf);
+    let ctx = create_ctx(&conf).await;
 
     let mut block_fetcher = BlockFetcher::create(&ctx);
     let range: Vec<usize> = (conf.export.start_block..conf.export.end_block + 1).collect();

@@ -45,7 +45,7 @@ impl ReceiptFetcher {
 
     pub async fn fetch(&self) -> Result<Vec<TransactionReceipt>> {
         let notify = |e, duration| {
-            log::info!(
+            log::warn!(
                 "Fetch receipts error at duration {:?}, error:{:?}",
                 duration,
                 e

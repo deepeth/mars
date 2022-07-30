@@ -15,6 +15,8 @@
 use std::sync::Arc;
 
 use common_configs::EthConfig;
+use common_storages::init_storage;
+use opendal::Operator;
 
 use crate::contexts::Progress;
 
@@ -27,12 +29,15 @@ pub struct Context {
     web3_batch_size: usize,
     output_dir: String,
     output_format: String,
+    storage: Arc<Operator>,
 }
 pub type ContextRef = Arc<Context>;
 
 impl Context {
-    pub fn create(conf: &EthConfig) -> Arc<Context> {
+    pub async fn create(conf: &EthConfig) -> Arc<Context> {
         let all = conf.export.end_block - conf.export.start_block + 1;
+        let storage = Arc::new(init_storage(conf).await.unwrap());
+
         Arc::new(Context {
             progress: Progress::create(all),
             rpc_url: conf.export.provider_uri.to_string(),
@@ -41,6 +46,7 @@ impl Context {
             web3_batch_size: conf.export.web3_batch_size,
             output_dir: conf.export.output_dir.clone(),
             output_format: conf.export.output_format.clone(),
+            storage,
         })
     }
 
@@ -66,6 +72,10 @@ impl Context {
 
     pub fn get_output_dir(&self) -> &str {
         &self.output_dir
+    }
+
+    pub fn get_storage(&self) -> Arc<Operator> {
+        self.storage.clone()
     }
 
     pub fn get_output_format(&self) -> &str {

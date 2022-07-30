@@ -27,7 +27,7 @@ async fn test_blocks_fetcher() -> Result<()> {
     let mut file = mint.new_goldenfile("blocks_50010_50010.txt").unwrap();
 
     let conf = create_config();
-    let ctx = create_ctx(&conf);
+    let ctx = create_ctx(&conf).await;
     let range: Vec<usize> = (conf.export.start_block..conf.export.end_block + 1).collect();
 
     let mut fetcher = BlockFetcher::create(&ctx);

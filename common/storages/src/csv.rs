@@ -11,16 +11,24 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// Copy from https://github.com/Sherlock-Holo/ddns/blob/master/src/trace.rs
+
+use std::io::Cursor;
+use std::sync::Arc;
 
 use arrow2::array::Array;
 use arrow2::chunk::Chunk;
 use arrow2::datatypes::Schema;
 use arrow2::io::csv::write;
 use common_exceptions::Result;
+use opendal::Operator;
 
-pub fn write_csv(path: &str, schema: Schema, columns: Chunk<Box<dyn Array>>) -> Result<()> {
-    let mut writer = std::fs::File::create(path)?;
+pub async fn write_csv(
+    op: Arc<Operator>,
+    path: &str,
+    schema: Schema,
+    columns: Chunk<Box<dyn Array>>,
+) -> Result<()> {
+    let mut cursor = Cursor::new(Vec::new());
     let headers = schema
         .fields
         .iter()
@@ -28,7 +36,9 @@ pub fn write_csv(path: &str, schema: Schema, columns: Chunk<Box<dyn Array>>) -> 
         .collect::<Vec<String>>();
 
     let options = write::SerializeOptions::default();
-    write::write_header(&mut writer, headers.as_slice(), &options)?;
-    write::write_chunk(&mut writer, &columns, &options)?;
+    write::write_header(&mut cursor, headers.as_slice(), &options)?;
+    write::write_chunk(&mut cursor, &columns, &options)?;
+
+    op.object(path).write(cursor.get_ref().as_slice()).await?;
     Ok(())
 }

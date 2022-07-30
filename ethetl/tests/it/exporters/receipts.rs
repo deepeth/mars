@@ -32,7 +32,7 @@ async fn test_receipts_exporters() -> Result<()> {
     let mut conf = create_config();
     conf.export.start_block = 15138828;
     conf.export.end_block = 15138852;
-    let ctx = create_ctx(&conf);
+    let ctx = create_ctx(&conf).await;
 
     let path = "tests/it/testdata/15138828_15138852/.transaction_hashes.txt";
     let file = File::open(path)?;
