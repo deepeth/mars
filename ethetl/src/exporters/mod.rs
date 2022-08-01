@@ -15,6 +15,7 @@
 mod blocks;
 mod pipeline;
 mod receipts;
+mod token_transfer;
 mod worker;
 
 use arrow2::array::Array;
@@ -25,6 +26,7 @@ use common_exceptions::ErrorCode;
 use common_exceptions::Result;
 pub use pipeline::Pipeline;
 pub use receipts::ReceiptExporter;
+pub use token_transfer::TokenTransferExporter;
 pub use worker::Worker;
 
 use crate::contexts::ContextRef;

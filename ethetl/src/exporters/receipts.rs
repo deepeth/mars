@@ -27,6 +27,7 @@ use web3::types::U64;
 use crate::contexts::ContextRef;
 use crate::eth::ReceiptFetcher;
 use crate::exporters::write_file;
+use crate::exporters::TokenTransferExporter;
 
 pub struct ReceiptExporter {
     ctx: ContextRef,
@@ -46,8 +47,14 @@ impl ReceiptExporter {
     pub async fn export(&self) -> Result<()> {
         let mut fetcher = ReceiptFetcher::create(&self.ctx);
         fetcher.push_batch(self.hashes.to_vec())?;
+
+        // Receipts.
         let receipts = fetcher.fetch().await?;
-        self.export_receipts(&receipts).await
+        self.export_receipts(&receipts).await?;
+
+        // Token transfers.
+        let token_transfer_export = TokenTransferExporter::create(&self.ctx, "", &receipts);
+        token_transfer_export.export().await
     }
 
     pub async fn export_receipts(&self, receipts: &[TransactionReceipt]) -> Result<()> {
