@@ -24,7 +24,12 @@ use web3::types::U256;
 use web3::types::U64;
 
 use crate::contexts::ContextRef;
+use crate::exporters::bytes_to_hex;
+use crate::exporters::h256_to_hex;
 use crate::exporters::write_file;
+
+const TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX: &str =
+    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 
 pub struct TokenTransferExporter {
     ctx: ContextRef,
@@ -56,10 +61,8 @@ impl TokenTransferExporter {
                 let topic_0 = format!("{:#x}", topics[0]);
 
                 // Token transfer contract address.
-                if topic_0.as_str()
-                    == "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
-                {
-                    if topics.len() != 4 {
+                if topic_0.as_str() == TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX {
+                    if topics.len() != 3 {
                         log::warn!(
                             "Weird transaction:{:?}, transaction index:{:?}",
                             logs.transaction_hash,
@@ -69,9 +72,10 @@ impl TokenTransferExporter {
                     }
 
                     token_address_vec.push(format!("{:#x}", logs.address));
-                    from_address_vec.push(format!("{:#x}", topics[1]));
-                    to_address_vec.push(format!("{:#x}", topics[2]));
-                    value_vec.push(format!("{:#x}", topics[3]));
+                    from_address_vec.push(format!("0x{}", h256_to_hex(&topics[1])));
+                    to_address_vec.push(format!("0x{}", h256_to_hex(&topics[2])));
+                    let value = U256::from_str_radix(&bytes_to_hex(&logs.data), 16).unwrap();
+                    value_vec.push(format!("{}", value));
                     transaction_hash_vec.push(format!(
                         "{:#x}",
                         logs.transaction_hash.unwrap_or_else(H256::zero)

@@ -485,6 +485,7 @@ name = "common-storages"
 version = "0.1.0"
 dependencies = [
  "arrow2",
+ "backon",
  "common-configs",
  "common-exceptions",
  "opendal",

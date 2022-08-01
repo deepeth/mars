@@ -27,9 +27,24 @@ use common_exceptions::Result;
 pub use pipeline::Pipeline;
 pub use receipts::ReceiptExporter;
 pub use token_transfer::TokenTransferExporter;
+use web3::types::Bytes;
+use web3::types::H256;
 pub use worker::Worker;
 
 use crate::contexts::ContextRef;
+
+pub fn h256_to_hex(v: &H256) -> String {
+    let hex = v
+        .as_bytes()
+        .iter()
+        .map(|x| format!("{:02x}", x))
+        .collect::<String>();
+    hex.trim_start_matches('0').to_string()
+}
+
+pub fn bytes_to_hex(v: &Bytes) -> String {
+    v.0.iter().map(|x| format!("{:02x}", x)).collect::<String>()
+}
 
 pub async fn write_file(
     ctx: &ContextRef,

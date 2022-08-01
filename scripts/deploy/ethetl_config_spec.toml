@@ -23,10 +23,10 @@ batch_size = 10000
 max_worker = 4
 
 # Exporter directory.
-output_dir = "_datas"
+output_dir = "/tmp/eth"
 
 # Exporter Format(csv|parquet).
-output_format = "parquet"
+output_format = "csv"
 
 # Storage config.
 [storage]
