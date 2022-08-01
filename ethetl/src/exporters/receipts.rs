@@ -53,7 +53,7 @@ impl ReceiptExporter {
         self.export_receipts(&receipts).await?;
 
         // Token transfers.
-        let token_transfer_export = TokenTransferExporter::create(&self.ctx, "", &receipts);
+        let token_transfer_export = TokenTransferExporter::create(&self.ctx, &self.dir, &receipts);
         token_transfer_export.export().await
     }
 

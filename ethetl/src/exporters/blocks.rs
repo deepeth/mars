@@ -35,6 +35,7 @@ use web3::types::U64;
 
 use crate::contexts::ContextRef;
 use crate::eth::BlockFetcher;
+use crate::exporters::bytes_to_hex;
 use crate::exporters::write_file;
 use crate::exporters::ReceiptExporter;
 
@@ -256,14 +257,7 @@ impl BlockExporter {
                 value_vec.push(format!("{:}", tx.value));
                 gas_vec.push(tx.gas.as_u64());
                 gas_price_vec.push(tx.gas_price.unwrap_or_else(U256::zero).as_u64());
-                input_vec.push(format!(
-                    "0x{}",
-                    tx.input
-                        .0
-                        .iter()
-                        .map(|x| format!("{:02x}", x))
-                        .collect::<String>()
-                ));
+                input_vec.push(format!("0x{}", bytes_to_hex(&tx.input)));
                 max_fee_per_gas_vec.push(tx.max_fee_per_gas.unwrap_or_else(U256::zero).as_u64());
                 max_priority_fee_per_gas_vec.push(
                     tx.max_priority_fee_per_gas

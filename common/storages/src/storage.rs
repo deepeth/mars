@@ -14,6 +14,7 @@
 
 use std::env;
 
+use backon::ExponentialBackoff;
 use common_configs::AzblobStorageConfig;
 use common_configs::EthConfig;
 use common_configs::FsStorageConfig;
@@ -47,7 +48,7 @@ pub async fn init_fs_operator(cfg: &FsStorageConfig) -> Result<Operator> {
     }
     builder.root(&path);
 
-    Ok(Operator::new(builder.finish().await?))
+    Ok(Operator::new(builder.finish().await?).with_backoff(ExponentialBackoff::default()))
 }
 
 /// init_s3_operator will init a opendal s3 operator with input s3 config.
@@ -70,7 +71,7 @@ pub async fn init_s3_operator(cfg: &S3StorageConfig) -> Result<Operator> {
     // Root.
     builder.root(&cfg.root);
 
-    Ok(Operator::new(builder.finish().await?))
+    Ok(Operator::new(builder.finish().await?).with_backoff(ExponentialBackoff::default()))
 }
 
 /// init_azblob_operator will init an opendal azblob operator.
@@ -90,5 +91,5 @@ pub async fn init_azblob_operator(cfg: &AzblobStorageConfig) -> Result<Operator>
     builder.account_name(&cfg.account_name);
     builder.account_key(&cfg.account_key);
 
-    Ok(Operator::new(builder.finish().await?))
+    Ok(Operator::new(builder.finish().await?).with_backoff(ExponentialBackoff::default()))
 }
