@@ -15,7 +15,8 @@
 mod blocks;
 mod pipeline;
 mod receipts;
-mod token_transfer;
+mod token_transfers;
+mod transactions;
 mod worker;
 
 use arrow2::array::Array;
@@ -26,7 +27,8 @@ use common_exceptions::ErrorCode;
 use common_exceptions::Result;
 pub use pipeline::Pipeline;
 pub use receipts::ReceiptExporter;
-pub use token_transfer::TokenTransferExporter;
+pub use token_transfers::TokenTransferExporter;
+pub use transactions::TransactionExporter;
 use web3::types::Bytes;
 use web3::types::H256;
 pub use worker::Worker;
