@@ -27,7 +27,8 @@ use web3::types::U64;
 use crate::contexts::ContextRef;
 use crate::eth::ReceiptFetcher;
 use crate::exporters::write_file;
-use crate::exporters::TokenTransferExporter;
+use crate::exporters::EthTokenTransferExporter;
+use crate::exporters::NftTokenTransferExporter;
 
 pub struct ReceiptExporter {
     ctx: ContextRef,
@@ -52,9 +53,13 @@ impl ReceiptExporter {
         let receipts = fetcher.fetch().await?;
         self.export_receipts(&receipts).await?;
 
-        // Token transfers.
-        let token_transfer_export = TokenTransferExporter::create(&self.ctx, &self.dir, &receipts);
-        token_transfer_export.export().await
+        // ERC20 Token transfers.
+        let eth_transfer_export = EthTokenTransferExporter::create(&self.ctx, &self.dir, &receipts);
+        eth_transfer_export.export().await?;
+
+        // ERC721 NFT Token transfers.
+        let nft_transfer_export = NftTokenTransferExporter::create(&self.ctx, &self.dir, &receipts);
+        nft_transfer_export.export().await
     }
 
     pub async fn export_receipts(&self, receipts: &[TransactionReceipt]) -> Result<()> {

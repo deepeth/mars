@@ -15,7 +15,8 @@
 mod blocks;
 mod pipeline;
 mod receipts;
-mod token_transfers;
+mod token_eth_transfers;
+mod token_nft_transfers;
 mod transactions;
 mod worker;
 
@@ -27,13 +28,17 @@ use common_exceptions::ErrorCode;
 use common_exceptions::Result;
 pub use pipeline::Pipeline;
 pub use receipts::ReceiptExporter;
-pub use token_transfers::TokenTransferExporter;
+pub use token_eth_transfers::EthTokenTransferExporter;
+pub use token_nft_transfers::NftTokenTransferExporter;
 pub use transactions::TransactionExporter;
 use web3::types::Bytes;
 use web3::types::H256;
 pub use worker::Worker;
 
 use crate::contexts::ContextRef;
+
+pub const TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX: &str =
+    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 
 pub fn h256_to_hex(v: &H256) -> String {
     let hex = v
