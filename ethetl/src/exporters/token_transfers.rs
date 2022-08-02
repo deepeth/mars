@@ -29,13 +29,13 @@ use crate::exporters::h256_to_hex;
 use crate::exporters::write_file;
 use crate::exporters::TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX;
 
-pub struct EthTokenTransferExporter {
+pub struct TokenTransferExporter {
     ctx: ContextRef,
     dir: String,
     receipts: Vec<TransactionReceipt>,
 }
 
-impl EthTokenTransferExporter {
+impl TokenTransferExporter {
     pub fn create(ctx: &ContextRef, dir: &str, receipts: &[TransactionReceipt]) -> Self {
         Self {
             ctx: ctx.clone(),
@@ -56,9 +56,12 @@ impl EthTokenTransferExporter {
         for receipt in &self.receipts {
             for logs in &receipt.logs {
                 let topics = &logs.topics;
-                let topic_0 = format!("{:#x}", topics[0]);
+                if topics.is_empty() {
+                    continue;
+                }
 
                 // Token transfer contract address.
+                let topic_0 = format!("{:#x}", topics[0]);
                 if topic_0.as_str() == TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX && topics.len() == 3 {
                     token_address_vec.push(format!("{:#x}", logs.address));
                     from_address_vec.push(format!("0x{}", h256_to_hex(&topics[1])));

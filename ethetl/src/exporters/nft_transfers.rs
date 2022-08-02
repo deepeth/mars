@@ -28,13 +28,13 @@ use crate::exporters::h256_to_hex;
 use crate::exporters::write_file;
 use crate::exporters::TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX;
 
-pub struct NftTokenTransferExporter {
+pub struct NftTransferExporter {
     ctx: ContextRef,
     dir: String,
     receipts: Vec<TransactionReceipt>,
 }
 
-impl NftTokenTransferExporter {
+impl NftTransferExporter {
     pub fn create(ctx: &ContextRef, dir: &str, receipts: &[TransactionReceipt]) -> Self {
         Self {
             ctx: ctx.clone(),
@@ -55,9 +55,12 @@ impl NftTokenTransferExporter {
         for receipt in &self.receipts {
             for logs in &receipt.logs {
                 let topics = &logs.topics;
-                let topic_0 = format!("{:#x}", topics[0]);
+                if topics.is_empty() {
+                    continue;
+                }
 
-                // Token transfer contract address.
+                // NFT token transfer contract address.
+                let topic_0 = format!("{:#x}", topics[0]);
                 if topic_0.as_str() == TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX && topics.len() == 4 {
                     token_address_vec.push(format!("{:#x}", logs.address));
                     from_address_vec.push(format!("0x{}", h256_to_hex(&topics[1])));

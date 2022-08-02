@@ -13,10 +13,10 @@
 // limitations under the License.
 
 mod blocks;
+mod nft_transfers;
 mod pipeline;
 mod receipts;
-mod token_eth_transfers;
-mod token_nft_transfers;
+mod token_transfers;
 mod transactions;
 mod worker;
 
@@ -26,10 +26,10 @@ use arrow2::datatypes::Schema;
 pub use blocks::BlockExporter;
 use common_exceptions::ErrorCode;
 use common_exceptions::Result;
+pub use nft_transfers::NftTransferExporter;
 pub use pipeline::Pipeline;
 pub use receipts::ReceiptExporter;
-pub use token_eth_transfers::EthTokenTransferExporter;
-pub use token_nft_transfers::NftTokenTransferExporter;
+pub use token_transfers::TokenTransferExporter;
 pub use transactions::TransactionExporter;
 use web3::types::Bytes;
 use web3::types::H256;
