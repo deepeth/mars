@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS nft_transfers(
     erc_standard STRING,
     transaction_hash STRING,
     log_index BIGINT UNSIGNED,
-    block_number BIGINT UNSIGNED,
+    block_number BIGINT UNSIGNED
 );

@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS token_transfers(
     value STRING,
     transaction_hash STRING,
     log_index BIGINT UNSIGNED,
-    block_number BIGINT UNSIGNED,
+    block_number BIGINT UNSIGNED
 );
