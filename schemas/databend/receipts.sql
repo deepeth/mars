@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS receipts (
     cumulative_gas_used BIGINT UNSIGNED,
     gas_used BIGINT UNSIGNED,
     contract_address STRING,
-    root STRING,
     status BIGINT UNSIGNED,
+    root STRING,
     effective_gas_price BIGINT UNSIGNED
 );

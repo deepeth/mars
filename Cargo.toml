@@ -2,6 +2,7 @@
 members = [
     "common/configs",
     "common/exceptions",
+    "common/eth",
     "common/storages",
     "common/tracings",
     "ethetl",

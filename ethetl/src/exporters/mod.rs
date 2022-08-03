@@ -13,6 +13,7 @@
 // limitations under the License.
 
 mod blocks;
+mod logs;
 mod nft_transfers;
 mod pipeline;
 mod receipts;
@@ -26,32 +27,15 @@ use arrow2::datatypes::Schema;
 pub use blocks::BlockExporter;
 use common_exceptions::ErrorCode;
 use common_exceptions::Result;
+pub use logs::LogsExporter;
 pub use nft_transfers::NftTransferExporter;
 pub use pipeline::Pipeline;
 pub use receipts::ReceiptExporter;
 pub use token_transfers::TokenTransferExporter;
 pub use transactions::TransactionExporter;
-use web3::types::Bytes;
-use web3::types::H256;
 pub use worker::Worker;
 
 use crate::contexts::ContextRef;
-
-pub const TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX: &str =
-    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
-
-pub fn h256_to_hex(v: &H256) -> String {
-    let hex = v
-        .as_bytes()
-        .iter()
-        .map(|x| format!("{:02x}", x))
-        .collect::<String>();
-    hex.trim_start_matches('0').to_string()
-}
-
-pub fn bytes_to_hex(v: &Bytes) -> String {
-    v.0.iter().map(|x| format!("{:02x}", x)).collect::<String>()
-}
 
 pub async fn write_file(
     ctx: &ContextRef,

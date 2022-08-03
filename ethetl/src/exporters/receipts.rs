@@ -27,6 +27,7 @@ use web3::types::U64;
 use crate::contexts::ContextRef;
 use crate::eth::ReceiptFetcher;
 use crate::exporters::write_file;
+use crate::exporters::LogsExporter;
 use crate::exporters::NftTransferExporter;
 use crate::exporters::TokenTransferExporter;
 
@@ -53,6 +54,10 @@ impl ReceiptExporter {
         let receipts = fetcher.fetch().await?;
         self.export_receipts(&receipts).await?;
 
+        // Logs.
+        let logs_export = LogsExporter::create(&self.ctx, &self.dir, &receipts);
+        logs_export.export().await?;
+
         // ERC20 Token transfers.
         let eth_transfer_export = TokenTransferExporter::create(&self.ctx, &self.dir, &receipts);
         eth_transfer_export.export().await?;
@@ -71,8 +76,8 @@ impl ReceiptExporter {
         let mut cumulative_gas_used_vec = Vec::with_capacity(receipt_len);
         let mut gas_used_vec = Vec::with_capacity(receipt_len);
         let mut contract_address_vec = Vec::with_capacity(receipt_len);
-        let mut root_vec = Vec::with_capacity(receipt_len);
         let mut status_vec = Vec::with_capacity(receipt_len);
+        let mut root_vec = Vec::with_capacity(receipt_len);
         let mut effective_gas_price_vec = Vec::with_capacity(receipt_len);
 
         for receipt in receipts {
@@ -89,8 +94,8 @@ impl ReceiptExporter {
                 "{:#x}",
                 receipt.contract_address.unwrap_or_else(Address::zero)
             ));
-            root_vec.push(format!("{:#x}", receipt.root.unwrap_or_else(H256::zero)));
             status_vec.push(receipt.status.unwrap_or_else(U64::zero).as_u64());
+            root_vec.push(format!("{:#x}", receipt.root.unwrap_or_else(H256::zero)));
             effective_gas_price_vec.push(
                 receipt
                     .effective_gas_price
@@ -105,8 +110,8 @@ impl ReceiptExporter {
         let cumulative_gas_used_array = UInt64Array::from_slice(cumulative_gas_used_vec);
         let gas_used_array = UInt64Array::from_slice(gas_used_vec);
         let contract_address_array = Utf8Array::<i32>::from_slice(contract_address_vec);
-        let root_array = Utf8Array::<i32>::from_slice(root_vec);
         let status_array = UInt64Array::from_slice(status_vec);
+        let root_array = Utf8Array::<i32>::from_slice(root_vec);
         let effective_gas_price_array = UInt64Array::from_slice(effective_gas_price_vec);
 
         let transaction_hash_field = Field::new(
@@ -161,12 +166,12 @@ impl ReceiptExporter {
             cumulative_gas_used_array.boxed(),
             gas_used_array.boxed(),
             contract_address_array.boxed(),
-            root_array.boxed(),
             status_array.boxed(),
+            root_array.boxed(),
             effective_gas_price_array.boxed(),
         ])?;
 
-        let receipt_path = format!("{}/receipts", self.dir);
-        write_file(&self.ctx, &receipt_path, schema, columns, "receipts").await
+        let path = format!("{}/receipts", self.dir);
+        write_file(&self.ctx, &path, schema, columns, "receipts").await
     }
 }

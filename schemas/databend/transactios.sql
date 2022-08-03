@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS transactions (
     to_address STRING,
     value STRING,
     gas BIGINT UNSIGNED,
+    method_id STRING,
+    gas BIGINT UNSIGNED,
     gas_price BIGINT UNSIGNED,
     input STRING,
     max_fee_per_gas BIGINT UNSIGNED,

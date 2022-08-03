@@ -20,6 +20,7 @@ use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
+use common_eth::bytes_to_hex;
 use common_exceptions::Result;
 use web3::ethabi::Address;
 use web3::types::Block;
@@ -29,7 +30,6 @@ use web3::types::U256;
 use web3::types::U64;
 
 use crate::contexts::ContextRef;
-use crate::exporters::bytes_to_hex;
 use crate::exporters::write_file;
 
 pub struct TransactionExporter {
@@ -57,6 +57,7 @@ impl TransactionExporter {
         let mut to_address_vec = vec![];
         let mut value_vec = vec![];
         let mut gas_vec = vec![];
+        let mut method_id_vec = vec![];
         let mut gas_price_vec = vec![];
         let mut input_vec = vec![];
         let mut max_fee_per_gas_vec = vec![];
@@ -75,8 +76,14 @@ impl TransactionExporter {
                 to_address_vec.push(format!("{:#x}", tx.to.unwrap_or_else(Address::zero)));
                 value_vec.push(format!("{:}", tx.value));
                 gas_vec.push(tx.gas.as_u64());
+                let input = bytes_to_hex(&tx.input);
+                if input.len() > 7 {
+                    method_id_vec.push(format!("0x{:}", &input[..8]));
+                } else {
+                    method_id_vec.push(format!("0x{:0>8}", &input));
+                }
                 gas_price_vec.push(tx.gas_price.unwrap_or_else(U256::zero).as_u64());
-                input_vec.push(format!("0x{}", bytes_to_hex(&tx.input)));
+                input_vec.push(bytes_to_hex(&tx.input));
                 max_fee_per_gas_vec.push(tx.max_fee_per_gas.unwrap_or_else(U256::zero).as_u64());
                 max_priority_fee_per_gas_vec.push(
                     tx.max_priority_fee_per_gas
@@ -98,6 +105,7 @@ impl TransactionExporter {
         let to_address_array = Utf8Array::<i32>::from_slice(to_address_vec);
         let value_array = Utf8Array::<i32>::from_slice(value_vec);
         let gas_array = UInt64Array::from_slice(gas_vec);
+        let method_id_array = Utf8Array::<i32>::from_slice(method_id_vec);
         let gas_price_array = UInt64Array::from_slice(gas_price_vec);
         let input_array = Utf8Array::<i32>::from_slice(input_vec);
         let max_fee_per_gas_array = UInt64Array::from_slice(max_fee_per_gas_vec);
@@ -120,6 +128,7 @@ impl TransactionExporter {
         let to_address_field = Field::new("to_address", to_address_array.data_type().clone(), true);
         let value_field = Field::new("value", value_array.data_type().clone(), true);
         let gas_field = Field::new("gas", gas_array.data_type().clone(), true);
+        let method_id_field = Field::new("method_id", method_id_array.data_type().clone(), true);
         let gas_price_field = Field::new("gas_price", gas_price_array.data_type().clone(), true);
         let input_field = Field::new("input", input_array.data_type().clone(), true);
         let max_fee_per_gas_field = Field::new(
@@ -154,6 +163,7 @@ impl TransactionExporter {
             to_address_field,
             value_field,
             gas_field,
+            method_id_field,
             gas_price_field,
             input_field,
             max_fee_per_gas_field,
@@ -172,6 +182,7 @@ impl TransactionExporter {
             to_address_array.boxed(),
             value_array.boxed(),
             gas_array.boxed(),
+            method_id_array.boxed(),
             gas_price_array.boxed(),
             input_array.boxed(),
             max_fee_per_gas_array.boxed(),
