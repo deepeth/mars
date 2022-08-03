@@ -79,7 +79,11 @@ impl LogsExporter {
         // log topics.
         let topics_values = Utf8Array::<i32>::from_slice(topics_vec);
         let topics_array = ListArray::<i32>::from_data(
-            DataType::Utf8,
+            DataType::List(Box::from(Field::new(
+                "topics",
+                topics_values.data_type().clone(),
+                true,
+            ))),
             Buffer::from(topic_offsets_vec),
             Arc::new(topics_values),
             None,
