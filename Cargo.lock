@@ -463,6 +463,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "common-eth"
+version = "0.1.0"
+dependencies = [
+ "common-exceptions",
+ "web3",
+]
+
+[[package]]
 name = "common-exceptions"
 version = "0.1.0"
 dependencies = [
@@ -873,6 +881,7 @@ dependencies = [
  "arrow2",
  "clap",
  "common-configs",
+ "common-eth",
  "common-exceptions",
  "common-storages",
  "deadqueue",

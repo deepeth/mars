@@ -16,6 +16,7 @@ test = false
 [dependencies]
 # Workspace dependencies
 common-configs = { path = "../common/configs" }
+common-eth = { path = "../common/eth" }
 common-exceptions = { path = "../common/exceptions" }
 common-storages = { path = "../common/storages" }
 

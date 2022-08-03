@@ -17,6 +17,8 @@ use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
+use common_eth::h256_to_hex;
+use common_eth::ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX;
 use common_exceptions::Result;
 use web3::types::TransactionReceipt;
 use web3::types::H256;
@@ -24,9 +26,7 @@ use web3::types::U256;
 use web3::types::U64;
 
 use crate::contexts::ContextRef;
-use crate::exporters::h256_to_hex;
 use crate::exporters::write_file;
-use crate::exporters::TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX;
 
 pub struct NftTransferExporter {
     ctx: ContextRef,
@@ -62,7 +62,9 @@ impl NftTransferExporter {
 
                 // NFT token transfer contract address.
                 let topic_0 = format!("{:#x}", topics[0]);
-                if topic_0.as_str() == TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX && topics.len() == 4 {
+                if topic_0.as_str() == ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX
+                    && topics.len() == 4
+                {
                     token_address_vec.push(format!("{:#x}", logs.address));
                     from_address_vec.push(format!("0x{}", h256_to_hex(&topics[1])));
                     to_address_vec.push(format!("0x{}", h256_to_hex(&topics[2])));

@@ -36,7 +36,7 @@ pub async fn write_parquet(
     columns: Chunk<Box<dyn Array>>,
 ) -> Result<()> {
     let options = WriteOptions {
-        write_statistics: true,
+        write_statistics: false,
         compression: CompressionOptions::Snappy,
         version: Version::V2,
     };

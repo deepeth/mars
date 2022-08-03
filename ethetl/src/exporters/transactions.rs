@@ -20,6 +20,7 @@ use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
+use common_eth::bytes_to_hex;
 use common_exceptions::Result;
 use web3::ethabi::Address;
 use web3::types::Block;
@@ -29,7 +30,6 @@ use web3::types::U256;
 use web3::types::U64;
 
 use crate::contexts::ContextRef;
-use crate::exporters::bytes_to_hex;
 use crate::exporters::write_file;
 
 pub struct TransactionExporter {
