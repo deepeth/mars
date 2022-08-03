@@ -122,14 +122,7 @@ impl TokenTransferExporter {
             block_number_array.boxed(),
         ])?;
 
-        let receipt_path = format!("{}/eth_token_transfers", self.dir);
-        write_file(
-            &self.ctx,
-            &receipt_path,
-            schema,
-            columns,
-            "eth_token_transfer",
-        )
-        .await
+        let path = format!("{}/eth_token_transfers", self.dir);
+        write_file(&self.ctx, &path, schema, columns, "eth_token_transfer").await
     }
 }

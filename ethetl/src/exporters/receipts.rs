@@ -27,6 +27,7 @@ use web3::types::U64;
 use crate::contexts::ContextRef;
 use crate::eth::ReceiptFetcher;
 use crate::exporters::write_file;
+use crate::exporters::LogsExporter;
 use crate::exporters::NftTransferExporter;
 use crate::exporters::TokenTransferExporter;
 
@@ -52,6 +53,10 @@ impl ReceiptExporter {
         // Receipts.
         let receipts = fetcher.fetch().await?;
         self.export_receipts(&receipts).await?;
+
+        // Logs.
+        let logs_export = LogsExporter::create(&self.ctx, &self.dir, &receipts);
+        logs_export.export().await?;
 
         // ERC20 Token transfers.
         let eth_transfer_export = TokenTransferExporter::create(&self.ctx, &self.dir, &receipts);
@@ -166,7 +171,7 @@ impl ReceiptExporter {
             effective_gas_price_array.boxed(),
         ])?;
 
-        let receipt_path = format!("{}/receipts", self.dir);
-        write_file(&self.ctx, &receipt_path, schema, columns, "receipts").await
+        let path = format!("{}/receipts", self.dir);
+        write_file(&self.ctx, &path, schema, columns, "receipts").await
     }
 }

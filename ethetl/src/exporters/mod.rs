@@ -13,6 +13,7 @@
 // limitations under the License.
 
 mod blocks;
+mod logs;
 mod nft_transfers;
 mod pipeline;
 mod receipts;
@@ -26,6 +27,7 @@ use arrow2::datatypes::Schema;
 pub use blocks::BlockExporter;
 use common_exceptions::ErrorCode;
 use common_exceptions::Result;
+pub use logs::LogsExporter;
 pub use nft_transfers::NftTransferExporter;
 pub use pipeline::Pipeline;
 pub use receipts::ReceiptExporter;
