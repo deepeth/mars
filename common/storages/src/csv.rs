@@ -35,10 +35,7 @@ pub async fn write_csv(
         .map(|f| f.name.clone())
         .collect::<Vec<String>>();
 
-    let options = write::SerializeOptions {
-        delimiter: u8::try_from('\t').unwrap(),
-        ..Default::default()
-    };
+    let options = write::SerializeOptions::default();
     write::write_header(&mut cursor, headers.as_slice(), &options)?;
     write::write_chunk(&mut cursor, &columns, &options)?;
 
