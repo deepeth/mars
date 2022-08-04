@@ -86,13 +86,13 @@ jobs:
         run: |
           version="${{ needs.create_release.outputs.version }}"
           target="${{ steps.target.outputs.target }}"
-          brew install gnu-tar
           sudo /usr/sbin/purge
-          mkdir -p release/${target}/{bin,schemas}
+          mkdir -p release/${target}/{bin,schemas,configs}
           cp ./target/${target}/release/ethetl release/${target}/bin/
           rm -f release/${target}/bin/*.d
           cp -r ./schemas release/${target}/schemas
-          gtar -C ./release/${target} -czvf ethetl-${version}-${target}.tar.gz bin schemas
+          cp -r ./scripts/deploy release/${target}/configs
+          gtar -C ./release/${target} -czvf ethetl-${version}-${target}.tar.gz bin schemas configs
       - name: update release to github
         shell: bash
         # Reference: https://cli.github.com/manual/gh_release_upload
@@ -132,11 +132,12 @@ jobs:
         run: |
           version="${{ needs.create_release.outputs.version }}"
           target="${{ steps.target.outputs.target }}"
-          mkdir -p release/${target}/{bin,schemas}
+          mkdir -p release/${target}/{bin,schemas,configs}
           cp ./target/${target}/release/ethetl release/${target}/bin/
           rm -f release/${target}/bin/*.d
           cp -r ./schemas release/${target}/schemas
-          tar -C ./release/${target} -czvf ethetl-${version}-${target}.tar.gz bin schemas
+          cp -r ./scripts/deploy release/${target}/configs
+          tar -C ./release/${target} -czvf ethetl-${version}-${target}.tar.gz bin schemas configs
       - name: update release to github
         shell: bash
         # Reference: https://cli.github.com/manual/gh_release_upload
