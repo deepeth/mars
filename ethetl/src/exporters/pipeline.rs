@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::fs;
-
 use common_exceptions::Result;
 
 use crate::contexts::ContextRef;
@@ -22,24 +20,20 @@ use crate::exporters::BlockExporter;
 pub struct Pipeline {
     ctx: ContextRef,
     block_numbers: Vec<usize>,
+    dir: String,
 }
 
 impl Pipeline {
-    pub fn create(ctx: &ContextRef, block_numbers: Vec<usize>) -> Self {
+    pub fn create(ctx: &ContextRef, dir: &str, block_numbers: Vec<usize>) -> Self {
         Self {
             ctx: ctx.clone(),
+            dir: dir.to_string(),
             block_numbers,
         }
     }
 
     pub async fn execute(&self) -> Result<()> {
-        // Create chunk dir.
-        let start = self.block_numbers[0];
-        let end = self.block_numbers[self.block_numbers.len() - 1];
-        let dir = format!("{}/{}_{}", self.ctx.get_output_dir(), start, end);
-        fs::create_dir_all(&dir)?;
-
-        let export = BlockExporter::create(&self.ctx, &dir, self.block_numbers.to_vec());
+        let export = BlockExporter::create(&self.ctx, &self.dir, self.block_numbers.to_vec());
         let res = export.export().await;
         res
     }

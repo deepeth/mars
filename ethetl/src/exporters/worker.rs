@@ -48,12 +48,27 @@ impl Worker {
                 futures.push(tokio::spawn(async move {
                     while !queue.is_empty() {
                         let range = queue.pop().await;
-                        let pipeline = Pipeline::create(&ctx, range);
+                        let (start, end) = (range[0], range[range.len() - 1]);
+                        let dir = format!("{}/{}_{}", ctx.get_output_dir(), start, end);
+
+                        let pipeline = Pipeline::create(&ctx, &dir, range);
                         let res = pipeline.execute().await;
                         match res {
                             Ok(_) => {}
                             Err(e) => {
-                                log::error!("Pipeline execute error:{:?}", e)
+                                log::error!(
+                                    "Pipeline execute error will remove {:?}, error: {:?}",
+                                    dir,
+                                    e
+                                );
+
+                                // Remove dir to keep atomic.
+                                let storage = ctx.get_storage();
+                                storage.object(&dir).delete().await.unwrap_or_else(|x| {
+                                    log::error!("Remove {:?} error:{:?}", dir, x)
+                                });
+
+                                // TODO(Write the failure dir to file)
                             }
                         }
                     }

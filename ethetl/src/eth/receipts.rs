@@ -59,7 +59,6 @@ impl ReceiptFetcher {
         op.retry_with_notify(notify).await
     }
 
-    #[tracing::instrument(level = "info", skip(self))]
     async fn fetch_with_no_retry(&self) -> Result<Vec<TransactionReceipt>> {
         let http = web3::transports::Http::new(self.ctx.get_rpc_url())?;
         let web3 = web3::Web3::new(web3::transports::Batch::new(http));
