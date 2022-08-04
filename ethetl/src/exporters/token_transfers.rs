@@ -75,6 +75,11 @@ impl TokenTransferExporter {
                         to_address_vec.push(format!("0x{}", h256_to_hex(&topics[2])));
                         data_vec.push(format!("0x{}", h256_to_hex(&topics[3])));
                         erc_standard_vec.push("ERC721");
+                    } else {
+                        from_address_vec.push("0x".to_string());
+                        to_address_vec.push("0x".to_string());
+                        data_vec.push("0x".to_string());
+                        erc_standard_vec.push("");
                     }
                     token_address_vec.push(format!("{:#x}", logs.address));
                     transaction_hash_vec.push(format!(
