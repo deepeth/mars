@@ -48,7 +48,7 @@ impl TokenTransferExporter {
         let mut token_address_vec = vec![];
         let mut from_address_vec = vec![];
         let mut to_address_vec = vec![];
-        let mut value_vec = vec![];
+        let mut data_vec = vec![];
         let mut erc_standard_vec = vec![];
         let mut transaction_hash_vec = vec![];
         let mut log_index_vec = vec![];
@@ -66,10 +66,10 @@ impl TokenTransferExporter {
                 if topic_0.as_str() == ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX {
                     if topics.len() == 3 {
                         let value = U256::from_str_radix(&bytes_to_hex(&logs.data), 16).unwrap();
-                        value_vec.push(format!("{}", value));
+                        data_vec.push(format!("{}", value));
                         erc_standard_vec.push("ERC20");
                     } else if topics.len() == 4 {
-                        value_vec.push(format!("0x{}", h256_to_hex(&topics[3])));
+                        data_vec.push(format!("0x{}", h256_to_hex(&topics[3])));
                         erc_standard_vec.push("ERC721");
                     }
 
@@ -83,13 +83,14 @@ impl TokenTransferExporter {
                     log_index_vec.push(logs.log_index.unwrap_or_else(U256::zero).as_u64());
                     block_number_vec.push(logs.block_number.unwrap_or_else(U64::zero).as_u64());
                 }
+                // TODO(ERC1155)
             }
         }
 
         let token_address_array = Utf8Array::<i32>::from_slice(token_address_vec);
         let from_address_array = Utf8Array::<i32>::from_slice(from_address_vec);
         let to_address_array = Utf8Array::<i32>::from_slice(to_address_vec);
-        let value_array = Utf8Array::<i32>::from_slice(value_vec);
+        let data_array = Utf8Array::<i32>::from_slice(data_vec);
         let erc_standard_array = Utf8Array::<i32>::from_slice(erc_standard_vec);
         let transaction_hash_array = Utf8Array::<i32>::from_slice(transaction_hash_vec);
         let log_index_array = UInt64Array::from_slice(log_index_vec);
@@ -103,7 +104,7 @@ impl TokenTransferExporter {
         let from_address_field =
             Field::new("from_address", from_address_array.data_type().clone(), true);
         let to_address_field = Field::new("to_address", to_address_array.data_type().clone(), true);
-        let value_field = Field::new("value", value_array.data_type().clone(), true);
+        let data_field = Field::new("value", data_array.data_type().clone(), true);
         let erc_standard_field =
             Field::new("erc_standard", erc_standard_array.data_type().clone(), true);
         let transaction_hash_field = Field::new(
@@ -118,7 +119,7 @@ impl TokenTransferExporter {
             token_address_field,
             from_address_field,
             to_address_field,
-            value_field,
+            data_field,
             erc_standard_field,
             transaction_hash_field,
             log_index_field,
@@ -128,7 +129,7 @@ impl TokenTransferExporter {
             token_address_array.boxed(),
             from_address_array.boxed(),
             to_address_array.boxed(),
-            value_array.boxed(),
+            data_array.boxed(),
             erc_standard_array.boxed(),
             transaction_hash_array.boxed(),
             log_index_array.boxed(),
