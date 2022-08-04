@@ -28,7 +28,6 @@ use crate::contexts::ContextRef;
 use crate::eth::ReceiptFetcher;
 use crate::exporters::write_file;
 use crate::exporters::LogsExporter;
-use crate::exporters::NftTransferExporter;
 use crate::exporters::TokenTransferExporter;
 
 pub struct ReceiptExporter {
@@ -58,13 +57,9 @@ impl ReceiptExporter {
         let logs_export = LogsExporter::create(&self.ctx, &self.dir, &receipts);
         logs_export.export().await?;
 
-        // ERC20 Token transfers.
-        let eth_transfer_export = TokenTransferExporter::create(&self.ctx, &self.dir, &receipts);
-        eth_transfer_export.export().await?;
-
-        // ERC721 NFT Token transfers.
-        let nft_transfer_export = NftTransferExporter::create(&self.ctx, &self.dir, &receipts);
-        nft_transfer_export.export().await
+        // Token transfers.
+        let token_transfer_export = TokenTransferExporter::create(&self.ctx, &self.dir, &receipts);
+        token_transfer_export.export().await
     }
 
     pub async fn export_receipts(&self, receipts: &[TransactionReceipt]) -> Result<()> {
