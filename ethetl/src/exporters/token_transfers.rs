@@ -66,16 +66,17 @@ impl TokenTransferExporter {
                 if topic_0.as_str() == ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX {
                     if topics.len() == 3 {
                         let value = U256::from_str_radix(&bytes_to_hex(&logs.data), 16).unwrap();
+                        from_address_vec.push(format!("0x{}", h256_to_hex(&topics[1])));
+                        to_address_vec.push(format!("0x{}", h256_to_hex(&topics[2])));
                         data_vec.push(format!("{}", value));
                         erc_standard_vec.push("ERC20");
                     } else if topics.len() == 4 {
+                        from_address_vec.push(format!("0x{}", h256_to_hex(&topics[1])));
+                        to_address_vec.push(format!("0x{}", h256_to_hex(&topics[2])));
                         data_vec.push(format!("0x{}", h256_to_hex(&topics[3])));
                         erc_standard_vec.push("ERC721");
                     }
-
                     token_address_vec.push(format!("{:#x}", logs.address));
-                    from_address_vec.push(format!("0x{}", h256_to_hex(&topics[1])));
-                    to_address_vec.push(format!("0x{}", h256_to_hex(&topics[2])));
                     transaction_hash_vec.push(format!(
                         "{:#x}",
                         logs.transaction_hash.unwrap_or_else(H256::zero)
