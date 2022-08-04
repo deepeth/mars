@@ -69,7 +69,7 @@ impl NftTransferExporter {
                     from_address_vec.push(format!("0x{}", h256_to_hex(&topics[1])));
                     to_address_vec.push(format!("0x{}", h256_to_hex(&topics[2])));
                     token_id_vec.push(format!("0x{}", h256_to_hex(&topics[3])));
-                    erc_standard_vec.push("ERC20");
+                    erc_standard_vec.push("ERC721");
                     transaction_hash_vec.push(format!(
                         "{:#x}",
                         logs.transaction_hash.unwrap_or_else(H256::zero)
@@ -130,7 +130,7 @@ impl NftTransferExporter {
             block_number_array.boxed(),
         ])?;
 
-        let receipt_path = format!("{}/nft_token_transfers", self.dir);
+        let receipt_path = format!("{}/nft_transfers", self.dir);
         write_file(
             &self.ctx,
             &receipt_path,
