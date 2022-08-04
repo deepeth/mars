@@ -51,6 +51,5 @@ macro_rules! build_exceptions {
 build_exceptions! {
     Ok(0),
     Invalid(1001),
-    ExportBlockError(5001),
-    ExportReceiptError(5002),
+    ExportFetchError(5001),
 }

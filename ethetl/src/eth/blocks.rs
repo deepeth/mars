@@ -86,8 +86,8 @@ impl BlockFetcher {
                 let r = cb.await?;
                 match r {
                     None => {
-                        return Err(ErrorCode::ExportBlockError(
-                            "Cannot export block, please make sure eth node sync is already",
+                        return Err(ErrorCode::ExportFetchError(
+                            "Cannot export block by eth.block_with_txs(), please make sure eth node sync is already",
                         ));
                     }
                     Some(blk) => {

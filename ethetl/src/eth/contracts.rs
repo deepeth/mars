@@ -12,41 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use common_exceptions::ErrorCode;
 use common_exceptions::Result;
 use common_exceptions::Retryable;
-use web3::types::TransactionReceipt;
-use web3::types::H256;
+use web3::types::Address;
+use web3::types::Bytes;
 
 use crate::contexts::ContextRef;
 
-pub struct ReceiptFetcher {
+pub struct ContractFetcher {
     ctx: ContextRef,
-    hashes: Vec<H256>,
+    addresses: Vec<Address>,
 }
 
-impl ReceiptFetcher {
-    pub fn create(ctx: &ContextRef) -> ReceiptFetcher {
+impl ContractFetcher {
+    pub fn create(ctx: &ContextRef) -> ContractFetcher {
         Self {
             ctx: ctx.clone(),
-            hashes: vec![],
+            addresses: vec![],
         }
     }
 
-    pub fn push(&mut self, hash: H256) -> Result<()> {
-        self.hashes.push(hash);
+    pub fn push(&mut self, addr: Address) -> Result<()> {
+        self.addresses.push(addr);
         Ok(())
     }
 
-    pub fn push_batch(&mut self, hashes: Vec<H256>) -> Result<()> {
-        self.hashes.extend(hashes);
+    pub fn push_batch(&mut self, addrs: Vec<Address>) -> Result<()> {
+        self.addresses.extend(addrs);
         Ok(())
     }
 
-    pub async fn fetch(&self) -> Result<Vec<TransactionReceipt>> {
+    pub async fn fetch(&self) -> Result<Vec<Bytes>> {
         let notify = |e, duration| {
             log::warn!(
-                "Fetch receipts error at duration {:?}, error:{:?}",
+                "Fetch contracts bytes error at duration {:?}, error:{:?}",
                 duration,
                 e
             )
@@ -59,36 +58,26 @@ impl ReceiptFetcher {
         op.retry_with_notify(notify).await
     }
 
-    async fn fetch_with_no_retry(&self) -> Result<Vec<TransactionReceipt>> {
+    async fn fetch_with_no_retry(&self) -> Result<Vec<Bytes>> {
         let http = web3::transports::Http::new(self.ctx.get_rpc_url())?;
         let web3 = web3::Web3::new(web3::transports::Batch::new(http));
 
-        let mut receipts = vec![];
+        let mut contracts = vec![];
 
-        for chunks in self.hashes.chunks(self.ctx.get_web3_batch_size()) {
+        for chunks in self.addresses.chunks(self.ctx.get_web3_batch_size()) {
             let mut callbacks = vec![];
-            for hash in chunks {
-                let receipt = web3.eth().transaction_receipt(*hash);
+            for addr in chunks {
+                let receipt = web3.eth().code(*addr, None);
                 callbacks.push(receipt);
             }
             let _ = web3.transport().submit_batch().await?;
 
             for cb in callbacks {
                 let r = cb.await?;
-                match r {
-                    None => {
-                        return Err(ErrorCode::ExportFetchError(
-                            "Cannot get receipts by eth.transaction_receipt()",
-                        ));
-                    }
-                    Some(v) => {
-                        receipts.push(v);
-                    }
-                }
-                self.ctx.get_progress().incr_receipts(1);
+                contracts.push(r);
             }
         }
 
-        Ok(receipts)
+        Ok(contracts)
     }
 }
