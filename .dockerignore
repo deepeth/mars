@@ -1,0 +1,8 @@
+# Rust
+target/
+
+# Test
+_test_output_dir
+outputs
+_datas
+_logs

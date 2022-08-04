@@ -1,0 +1,106 @@
+pull_request_rules:
+  # Check if PR title contain valid types
+  - name: Comment PR if title not semantic
+    conditions:
+      - author!=Mergify
+      - -draft
+      - '-title~=^(feat|fix|refactor|ci|build|docs|website|chore)(\(.*\))?:'
+    actions:
+      comment:
+        message: |
+          This pull request's title is not fulfill the requirements. @{{author}} please update it 🙏.
+          Valid format:
+          ```
+          fix(query): fix group by string bug
+            ^         ^---------------------^
+            |         |
+            |         +-> Summary in present tense.
+            |
+            +-------> Type: feat, fix, refactor, ci, build, docs, website, chore
+          ```
+          Valid types:
+          - `feat`: this PR introduces a new feature to the codebase
+          - `fix`: this PR patches a bug in codebase
+          - `refactor`: this PR changes the code base without new features or bugfix
+          - `ci|build`: this PR changes build/testing/ci steps
+          - `docs|website`: this PR changes the documents or websites
+          - `chore`: this PR only has small changes that no need to record
+
+  # Check if PR title contain valid types
+  - name: Semantic PR Check
+    conditions:
+      - or:
+          - author=Mergify
+          - 'title~=^(feat|fix|refactor|ci|build|docs|website|chore)(\(.*\))?:'
+    actions:
+      post_check:
+        title: |
+          {% if check_succeed %}
+          Title follows Semantic PR
+          {% else %}
+          Title does not follow Semantic PR
+          {% endif %}
+        summary: |
+          {% if not check_succeed %}
+          Pull request title must follow [Semantic PR](https://databend.rs/doc/contributing/good-pr)
+          Valid format:
+          ```
+          fix(query): fix group by string bug
+            ^         ^---------------------^
+            |         |
+            |         +-> Summary in present tense.
+            |
+            +-------> Type: feat, fix, refactor, ci, build, docs, website, chore
+          ```
+          Valid types:
+          - `feat`: this PR introduces a new feature to the codebase
+          - `fix`: this PR patches a bug in codebase
+          - `refactor`: this PR changes the code base without new features or bugfix
+          - `ci|build`: this PR changes build/testing/ci steps
+          - `docs|website`: this PR changes the documents or websites
+          - `chore`: this PR only has small changes that no need to record
+          {% endif %}
+
+  # Assign pr label based of tags
+  - name: label on New Feature
+    conditions:
+      - 'title~=^(feat)(\(.*\))?:'
+    actions:
+      label:
+        add:
+          - pr-feature
+  - name: label on Bug Fix
+    conditions:
+      - 'title~=^(fix)(\(.*\))?:'
+    actions:
+      label:
+        add:
+          - pr-bugfix
+  - name: label on Refactor
+    conditions:
+      - 'title~=^(refactor)(\(.*\))?:'
+    actions:
+      label:
+        add:
+          - pr-refactor
+  - name: label on Build/Testing/CI
+    conditions:
+      - 'title~=^(ci|build)(\(.*\))?:'
+    actions:
+      label:
+        add:
+          - pr-build
+  - name: label on Documentation
+    conditions:
+      - 'title~=^(docs|website)(\(.*\))?:'
+    actions:
+      label:
+        add:
+          - pr-doc
+  - name: label on Not for changelog
+    conditions:
+      - 'title~=^(chore)(\(.*\))?:'
+    actions:
+      label:
+        add:
+          - pr-chore
