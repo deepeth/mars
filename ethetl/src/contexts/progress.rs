@@ -89,7 +89,7 @@ fn print_progress(all: usize, value: Arc<ProgressValue>) {
     if value.blocks > 0 {
         let percent = ((value.blocks as f32 / all as f32) * 100_f32) as usize;
         log::info!(
-            "{:?} blocks processed, {:?} transactions processed, {:?} receipts processed. Progress is {:}",
+            "{:?} blocks processed, {:?} transactions processed, {:?} receipts processed. Progress is {:.2}",
             value.blocks,
             value.txs,
             value.receipts,

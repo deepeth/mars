@@ -13,7 +13,9 @@
 // limitations under the License.
 
 mod blocks;
+mod contracts;
 mod receipts;
 
 pub use blocks::BlockFetcher;
+pub use contracts::ContractFetcher;
 pub use receipts::ReceiptFetcher;
