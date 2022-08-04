@@ -89,17 +89,17 @@ jobs:
           brew install gnu-tar
           sudo /usr/sbin/purge
           mkdir -p release/${target}/{bin,schemas}
-          cp ./target/${target}/release/ethtel release/${target}/bin/
+          cp ./target/${target}/release/ethetl release/${target}/bin/
           rm -f release/${target}/bin/*.d
           cp -r ./schemas release/${target}/schemas
-          gtar -C ./release/${target} -czvf ethtel-${version}-${target}.tar.gz bin schemas
+          gtar -C ./release/${target} -czvf ethetl-${version}-${target}.tar.gz bin schemas
       - name: update release to github
         shell: bash
         # Reference: https://cli.github.com/manual/gh_release_upload
         run: |
           version="${{ needs.create_release.outputs.version }}"
           target="${{ steps.target.outputs.target }}"
-          gh release upload ${version} ethtel-${version}-${target}.* --clobber
+          gh release upload ${version} ethetl-${version}-${target}.* --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -133,16 +133,16 @@ jobs:
           version="${{ needs.create_release.outputs.version }}"
           target="${{ steps.target.outputs.target }}"
           mkdir -p release/${target}/{bin,schemas}
-          cp ./target/${target}/release/ethtel release/${target}/bin/
+          cp ./target/${target}/release/ethetl release/${target}/bin/
           rm -f release/${target}/bin/*.d
           cp -r ./schemas release/${target}/schemas
-          tar -C ./release/${target} -czvf ethtel-${version}-${target}.tar.gz bin schemas
+          tar -C ./release/${target} -czvf ethetl-${version}-${target}.tar.gz bin schemas
       - name: update release to github
         shell: bash
         # Reference: https://cli.github.com/manual/gh_release_upload
         run: |
           version="${{ needs.create_release.outputs.version }}"
           target="${{ steps.target.outputs.target }}"
-          gh release upload ${version} ethtel-${version}-${target}.* --clobber
+          gh release upload ${version} ethetl-${version}-${target}.* --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
