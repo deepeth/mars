@@ -1,0 +1,75 @@
+name: dev
+
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: -- -Dwarnings
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --verbose
+
+  build_linux:
+    timeout-minutes: 30
+    name: build_linux_${{ matrix.arch }}_${{matrix.platform}}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch:
+          - x86_64
+        platform:
+          - musl
+          - gnu
+    steps:
+      - uses: actions/checkout@v3
+      - id: target
+        run: echo ::set-output name=target::${{ matrix.arch }}-unknown-linux-${{ matrix.platform }}
+      - uses: ./.github/actions/setup-cross
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --target=${{ steps.target.outputs.target }}
+
+  build_macos:
+    timeout-minutes: 30
+    name: build_macos_${{ matrix.arch }}
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        arch:
+          - aarch64
+    steps:
+      - uses: actions/checkout@v3
+      - id: target
+        run: echo ::set-output name=target::${{ matrix.arch }}-apple-darwin
+      - name: Rust setup
+        uses: actions-rs/cargo@v1
+        with:
+          command: version
+      - name: Cross setup
+        if: matrix.arch == 'aarch64'
+        run: |
+          rustup target add aarch64-apple-darwin
+          echo "JEMALLOC_SYS_WITH_LG_PAGE=14" >> $GITHUB_ENV
+      - name: Build Binary
+        run: |
+          cargo build --target=${{ steps.target.outputs.target }}

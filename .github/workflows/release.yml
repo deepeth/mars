@@ -1,0 +1,143 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  schedule:
+    # Release at 00:00 UTC+8
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+
+jobs:
+  create_release:
+    name: create release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.generated-tag.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Get latest tag
+        id: get-latest-tag
+        run: |
+          echo "::set-output name=tag::`gh release list -L 1 | cut -f 1`"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Bump version
+        id: generated-tag
+        uses: actions/github-script@v6
+        with:
+          script: |
+            if (context.ref.startsWith("refs/tags/")) {
+              let tag = context.ref.replace("refs/tags/", "");
+              core.setOutput('tag', tag);
+              console.log(`This event pushed a tag ${tag}, return directly.`)
+              return
+            }
+            let tag = "${{ steps.get-latest-tag.outputs.tag }}";
+            let result = /v(\d+)\.(\d+)\.(\d+)/g.exec(tag);
+            if (result === null) {
+              throw `The previous tag ${{ steps.get-latest-tag.outputs.tag }} is invalid, ignoring`;
+            }
+            let major = result[1];
+            let minor = result[2];
+            let patch = (parseInt(result[3]) + 1).toString();
+            let next_tag = `v${major}.${minor}.${patch}-nightly`;
+            console.log(`This event is triggered, return generated ${next_tag}.`)
+            core.setOutput('tag', next_tag)
+      - name: Create github release if not exist
+        # Reference: https://cli.github.com/manual/gh_release_create
+        run: |
+          echo "Create a release for ${{ steps.generated-tag.outputs.tag }}"
+          gh release create ${{ steps.generated-tag.outputs.tag }} --generate-notes -p
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish_macos:
+    name: macos assets
+    runs-on: macos-11
+    needs: create_release
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - x86_64
+          - aarch64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Get target
+        id: target
+        run: echo ::set-output name=target::${{ matrix.arch }}-apple-darwin
+      - name: Rust setup
+        uses: actions-rs/cargo@v1
+        with:
+          command: version
+      - name: Cross setup
+        if: matrix.arch == 'aarch64'
+        run: |
+          rustup target add aarch64-apple-darwin
+          echo "JEMALLOC_SYS_WITH_LG_PAGE=14" >> $GITHUB_ENV
+      - name: Build Binary
+        run: |
+          cargo build --release --target=${{ steps.target.outputs.target }}
+      - name: Pack binaries
+        run: |
+          brew install gnu-tar
+          sudo /usr/sbin/purge
+          mkdir -p release/${{ steps.target.outputs.target }}/bin
+          cp ./target/${{ steps.target.outputs.target }}/release/ethtel release/${{ steps.target.outputs.target }}/bin/
+          rm -f release/${{ steps.target.outputs.target }}/bin/*.d
+          cp -r ./schemas release/${{ steps.target.outputs.target }}/schemas
+          gtar -C ./release/${{ steps.target.outputs.target }} -czvf ethtel-${{ needs.create_release.outputs.version }}-${{ steps.target.outputs.target }}.tar.gz bin schemas
+      - name: Update release to github
+        shell: bash
+        # Reference: https://cli.github.com/manual/gh_release_upload
+        run: gh release upload ${{ inputs.version }} ethtel-${{ inputs.version }}-${{ inputs.target }}.* --clobber
+        env:
+          GH_TOKEN: ${{ inputs.github_token }}
+
+  publish_linux:
+    name: linux assets
+    runs-on: ubuntu-latest
+    needs: create_release
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - x86_64
+          - aarch64
+        platform:
+          - musl
+          - gnu
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Get target
+        id: target
+        run: echo ::set-output name=target::${{ matrix.arch }}-unknown-linux-${{ matrix.platform }}
+      - uses: ./.github/actions/setup-cross
+      - name: Build Binary
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --target=${{ steps.target.outputs.target }}
+      - name: Pack binaries
+        run: |
+          brew install gnu-tar
+          sudo /usr/sbin/purge
+          mkdir -p release/${{ steps.target.outputs.target }}/bin
+          cp ./target/${{ steps.target.outputs.target }}/release/ethtel release/${{ steps.target.outputs.target }}/bin/
+          rm -f release/${{ steps.target.outputs.target }}/bin/*.d
+          cp -r ./schemas release/${{ steps.target.outputs.target }}/schemas
+          gtar -C ./release/${{ steps.target.outputs.target }} -czvf ethtel-${{ needs.create_release.outputs.version }}-${{ steps.target.outputs.target }}.tar.gz bin schemas
+      - name: Update release to github
+        shell: bash
+        # Reference: https://cli.github.com/manual/gh_release_upload
+        run: gh release upload ${{ inputs.version }} ethtel-${{ inputs.version }}-${{ inputs.target }}.* --clobber
+        env:
+          GH_TOKEN: ${{ inputs.github_token }}

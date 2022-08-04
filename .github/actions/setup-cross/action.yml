@@ -1,0 +1,17 @@
+name: Setup Cross
+description: Install cargo cross
+inputs:
+  version:
+    description: Cross Version
+    required: false
+    default: "0.2.4"
+runs:
+  using: "composite"
+  steps:
+    - uses: actions-rs/cargo@v1
+      with:
+        command: version
+    - shell: bash
+      run: |
+        curl -fsSLo /tmp/cross.tar.gz https://github.com/cross-rs/cross/releases/download/v${{ inputs.version }}/cross-x86_64-unknown-linux-gnu.tar.gz
+        tar -C ~/.cargo/bin -zxvf /tmp/cross.tar.gz
