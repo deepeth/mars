@@ -14,7 +14,6 @@
 
 mod blocks;
 mod logs;
-mod nft_transfers;
 mod pipeline;
 mod receipts;
 mod token_transfers;
@@ -28,7 +27,6 @@ pub use blocks::BlockExporter;
 use common_exceptions::ErrorCode;
 use common_exceptions::Result;
 pub use logs::LogsExporter;
-pub use nft_transfers::NftTransferExporter;
 pub use pipeline::Pipeline;
 pub use receipts::ReceiptExporter;
 pub use token_transfers::TokenTransferExporter;
