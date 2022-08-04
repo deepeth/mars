@@ -65,7 +65,6 @@ impl BlockFetcher {
     }
 
     // Get the blocks.
-    #[tracing::instrument(level = "info", skip(self))]
     async fn fetch_with_no_retry(&self) -> Result<Vec<Block<Transaction>>> {
         let http = web3::transports::Http::new(self.ctx.get_rpc_url())?;
         let web3 = web3::Web3::new(web3::transports::Batch::new(http));
