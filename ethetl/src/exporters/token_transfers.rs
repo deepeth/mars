@@ -88,6 +88,8 @@ impl TokenTransferExporter {
                     ));
                     log_index_vec.push(logs.log_index.unwrap_or_else(U256::zero).as_u64());
                     block_number_vec.push(logs.block_number.unwrap_or_else(U64::zero).as_u64());
+
+                    self.ctx.get_progress().incr_token_transfers(1);
                 }
                 // TODO(ERC1155)
             }

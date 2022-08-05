@@ -64,7 +64,7 @@ impl Worker {
 
                                 // Remove dir to keep atomic.
                                 let storage = ctx.get_storage();
-                                storage.object(&dir).delete().await.unwrap_or_else(|x| {
+                                storage.batch().remove_all(&dir).await.unwrap_or_else(|x| {
                                     log::error!("Remove {:?} error:{:?}", dir, x)
                                 });
 

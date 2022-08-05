@@ -76,6 +76,8 @@ impl LogsExporter {
                     .collect::<Vec<String>>()
                     .join("|");
                 topics_vec.push(topics);
+
+                self.ctx.get_progress().incr_logs(1);
             }
         }
         let log_index_array = UInt64Array::from_slice(log_index_vec);
