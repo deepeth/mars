@@ -90,8 +90,8 @@ jobs:
           mkdir -p release/${target}/{bin,schemas,configs}
           cp ./target/${target}/release/ethetl release/${target}/bin/
           rm -f release/${target}/bin/*.d
-          cp -r ./schemas release/${target}/schemas
-          cp -r ./scripts/deploy release/${target}/configs
+          cp -r ./schemas/* release/${target}/schemas/
+          cp -r ./scripts/deploy/* release/${target}/configs/
           gtar -C ./release/${target} -czvf ethetl-${version}-${target}.tar.gz bin schemas configs
       - name: update release to github
         shell: bash
@@ -135,8 +135,8 @@ jobs:
           mkdir -p release/${target}/{bin,schemas,configs}
           cp ./target/${target}/release/ethetl release/${target}/bin/
           rm -f release/${target}/bin/*.d
-          cp -r ./schemas release/${target}/schemas
-          cp -r ./scripts/deploy release/${target}/configs
+          cp -r ./schemas/* release/${target}/schemas/
+          cp -r ./scripts/deploy/* release/${target}/configs/
           tar -C ./release/${target} -czvf ethetl-${version}-${target}.tar.gz bin schemas configs
       - name: update release to github
         shell: bash

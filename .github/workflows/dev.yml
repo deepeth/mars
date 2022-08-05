@@ -20,10 +20,6 @@ jobs:
         with:
           command: clippy
           args: -- -Dwarnings
-      - name: cargo build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
       - name: cargo test
         uses: actions-rs/cargo@v1
         with:
