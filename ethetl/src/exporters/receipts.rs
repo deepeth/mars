@@ -161,8 +161,8 @@ impl ReceiptExporter {
             cumulative_gas_used_array.boxed(),
             gas_used_array.boxed(),
             contract_address_array.boxed(),
-            status_array.boxed(),
             root_array.boxed(),
+            status_array.boxed(),
             effective_gas_price_array.boxed(),
         ])?;
 

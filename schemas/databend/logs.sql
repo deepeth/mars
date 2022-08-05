@@ -3,8 +3,8 @@ CREATE TABLE IF NOT EXISTS logs (
     transaction_hash STRING,
     transaction_index BIGINT UNSIGNED,
     block_hash STRING,
-    block_number STRING,
-    contract_adderss STRING,
+    block_number BIGINT UNSIGNED,
+    contract_address STRING,
     data STRING,
     topics STRING
 );
