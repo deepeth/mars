@@ -110,7 +110,7 @@ impl TokenTransferExporter {
         let from_address_field =
             Field::new("from_address", from_address_array.data_type().clone(), true);
         let to_address_field = Field::new("to_address", to_address_array.data_type().clone(), true);
-        let data_field = Field::new("value", data_array.data_type().clone(), true);
+        let data_field = Field::new("data", data_array.data_type().clone(), true);
         let erc_standard_field =
             Field::new("erc_standard", erc_standard_array.data_type().clone(), true);
         let transaction_hash_field = Field::new(
