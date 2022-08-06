@@ -62,7 +62,7 @@ pub struct ExportConfig {
         short = 'b',
         long,
         value_parser,
-        default_value_t = 10000,
+        default_value_t = 1000,
         help = "The number of items to export at a time"
     )]
     pub batch_size: usize,
@@ -71,12 +71,12 @@ pub struct ExportConfig {
         short = 'w',
         long,
         value_parser,
-        default_value_t = 4,
+        default_value_t = 8,
         help = "The maximum number of workers"
     )]
     pub max_worker: usize,
 
-    #[clap(long, value_parser, default_value_t = 1000)]
+    #[clap(long, value_parser, default_value_t = 100)]
     pub web3_batch_size: usize,
 
     #[clap(
