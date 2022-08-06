@@ -13,8 +13,6 @@
 // limitations under the License.
 
 mod erc;
-mod hex;
+mod jsonrpc;
 
 pub use erc::ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX;
-pub use hex::bytes_to_hex;
-pub use hex::h256_to_hex;

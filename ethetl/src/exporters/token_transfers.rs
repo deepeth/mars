@@ -17,8 +17,6 @@ use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
-use common_eth::bytes_to_hex;
-use common_eth::h256_to_hex;
 use common_eth::ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX;
 use common_exceptions::Result;
 use web3::types::TransactionReceipt;
@@ -27,6 +25,8 @@ use web3::types::U256;
 use web3::types::U64;
 
 use crate::contexts::ContextRef;
+use crate::eth::bytes_to_hex;
+use crate::eth::h256_to_hex;
 use crate::exporters::write_file;
 
 pub struct TokenTransferExporter {

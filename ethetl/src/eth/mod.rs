@@ -14,8 +14,11 @@
 
 mod blocks;
 mod contracts;
+mod hex;
 mod receipts;
 
 pub use blocks::BlockFetcher;
 pub use contracts::ContractFetcher;
+pub use hex::bytes_to_hex;
+pub use hex::h256_to_hex;
 pub use receipts::ReceiptFetcher;

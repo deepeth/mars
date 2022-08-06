@@ -10,6 +10,16 @@ test = false
 [dependencies]
 # Workspace dependencies
 common-exceptions = { path = "../exceptions" }
-web3 = "0.18.0"
+arrayvec = { version = "0.7", features = ["serde"] }
+ethereum-types = "0.13"
+ethnum = { version = "1", default-features = false, features = ["serde"] }
+jsonrpsee = { version = "0.15", features = ["macros"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_with = "2"
+bytes = "1"
+hex = "0.4"
 
 [dev-dependencies]
+hex-literal = "0.3"
+tokio = { version = "1", features = ["full"] }
