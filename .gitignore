@@ -14,3 +14,6 @@ _test_output_dir
 outputs
 _datas
 _logs
+
+# Build
+docker/release/
