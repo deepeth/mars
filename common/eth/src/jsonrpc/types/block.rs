@@ -12,7 +12,7 @@ use serde::Serialize;
 use serde::Serializer;
 
 use crate::jsonrpc::types::Bytes;
-use crate::jsonrpc::types::Tx;
+use crate::jsonrpc::types::Transaction;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 /// A 64-bit unsigned integer (or tag - "latest", "earliest", "pending").
@@ -122,99 +122,9 @@ pub struct Block {
     /// Block's timestamp.
     pub timestamp: U64,
     /// Block's transactions.
-    pub transactions: Vec<Tx>,
+    pub transactions: Vec<Transaction>,
     /// Block's uncles.
     pub uncles: Vec<H256>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub base_fee_per_gas: Option<U256>,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Header {
-    pub parent_hash: H256,
-    pub sha3_uncles: H256,
-    pub miner: Address,
-    pub state_root: H256,
-    pub transactions_root: H256,
-    pub receipts_root: H256,
-    pub logs_bloom: Bloom,
-    pub difficulty: U256,
-    pub number: U256,
-    pub gas_limit: U64,
-    pub gas_used: U64,
-    pub timestamp: U64,
-    pub extra_data: Bytes,
-    pub mix_hash: H256,
-    pub nonce: H64,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub base_fee_per_gas: Option<U256>,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn test_ser_de_block_number() {
-        let block_number = BlockNumber::Earliest;
-        let hexstring = r#""earliest""#;
-        assert_eq!(serde_json::to_string(&block_number).unwrap(), hexstring);
-        assert_eq!(
-            serde_json::from_str::<BlockNumber>(hexstring).unwrap(),
-            block_number
-        );
-
-        let block_number = BlockNumber::Latest;
-        let hexstring = r#""latest""#;
-        assert_eq!(serde_json::to_string(&block_number).unwrap(), hexstring);
-        assert_eq!(
-            serde_json::from_str::<BlockNumber>(hexstring).unwrap(),
-            block_number
-        );
-
-        let block_number = BlockNumber::Pending;
-        let hexstring = r#""pending""#;
-        assert_eq!(serde_json::to_string(&block_number).unwrap(), hexstring);
-        assert_eq!(
-            serde_json::from_str::<BlockNumber>(hexstring).unwrap(),
-            block_number
-        );
-
-        let block_number = BlockNumber::Number(1.into());
-        let hexstring = r#""0x1""#;
-        assert_eq!(serde_json::to_string(&block_number).unwrap(), hexstring);
-        assert_eq!(
-            serde_json::from_str::<BlockNumber>(hexstring).unwrap(),
-            block_number
-        );
-
-        let block_number = BlockNumber::Number(0x7b.into());
-        let hexstring = r#""0x7b""#;
-        assert_eq!(serde_json::to_string(&block_number).unwrap(), hexstring);
-    }
-
-    #[test]
-    fn test_ser_de_block_id() {
-        let block_id = r#""0x7b""#;
-        assert_eq!(
-            serde_json::to_string(&BlockId::Number(123.into())).unwrap(),
-            block_id
-        );
-
-        assert_eq!(
-            serde_json::from_str::<BlockId>(block_id).unwrap(),
-            BlockId::Number(123.into())
-        );
-
-        let block_hash = r#""0x0000000000000000000000000000000000000000000000000000000000000000""#;
-        assert_eq!(
-            serde_json::to_string(&BlockId::Hash(H256::from([0; 32]))).unwrap(),
-            block_hash
-        );
-
-        assert_eq!(
-            serde_json::from_str::<BlockId>(block_hash).unwrap(),
-            BlockId::Hash(H256::from([0; 32]))
-        );
-    }
 }

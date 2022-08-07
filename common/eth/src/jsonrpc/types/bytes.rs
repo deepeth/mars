@@ -61,14 +61,3 @@ impl<'de> Deserialize<'de> for Bytes {
             .into())
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_bytes_serialize() {
-        let bytes = Bytes(vec![1, 2, 3].into());
-        assert_eq!(bytes.to_string(), "0x010203");
-    }
-}

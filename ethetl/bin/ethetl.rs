@@ -30,9 +30,16 @@ async fn main() -> Result<()> {
 
     let ctx = Context::create(&conf).await;
 
-    let eth = Eth::create(&conf.export.provider_uri);
-    let blk = eth.block_number().await?;
-    log::info!("Eth node latest number:{:}", blk);
+    {
+        let eth = Eth::create(&conf.export.provider_uri);
+        let blk = eth.block_number().await?;
+        log::info!("Eth node latest number:{:}", blk);
+
+        //
+        let numbers = vec![1000000, 1000001, 1000002];
+        let blocks = eth.get_block_by_hash(numbers).await?;
+        log::info!("Eth get blocks:{:?}", blocks);
+    }
 
     // Interval progress.
     let progress = ctx.get_progress();

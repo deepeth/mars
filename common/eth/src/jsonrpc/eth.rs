@@ -6,6 +6,7 @@ use jsonrpsee::http_client::HttpClientBuilder;
 use jsonrpsee::rpc_params;
 
 use crate::jsonrpc::types::Block;
+use crate::jsonrpc::types::BlockNumber;
 
 pub struct Eth {
     transport: HttpClient,
@@ -22,8 +23,17 @@ impl Eth {
         self.transport.request("eth_blockNumber", params).await
     }
 
-    pub async fn get_block_by_hash(&self) -> RpcResult<Option<Block>> {
-        let params = rpc_params!();
-        self.transport.request("eth_blockNumber", params).await
+    pub async fn get_block_by_hash(&self, numbers: Vec<u64>) -> RpcResult<Vec<Option<Block>>> {
+        let batch = numbers
+            .iter()
+            .cloned()
+            .map(|x| {
+                ("eth_getBlockByNumber", rpc_params![
+                    serde_json::to_value(BlockNumber::Number(U64::from(x))).unwrap(),
+                    serde_json::to_value(true).unwrap()
+                ])
+            })
+            .collect::<Vec<_>>();
+        self.transport.batch_request::<Option<Block>>(batch).await
     }
 }
