@@ -147,3 +147,30 @@ jobs:
           gh release upload ${version} ethetl-${version}-${target}.* --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish_docker:
+    name: docker image
+    runs-on: ubuntu-latest
+    needs: [create_release, publish_linux]
+    steps:
+      - uses: actions/checkout@v3
+      - name: download binaries
+        run: |
+          version="${{ needs.create_release.outputs.version }}"
+          curl -sSLfo /tmp/ethetl.tar.gz https://github.com/deepeth/mars/releases/download/${version}/ethetl-${version}-x86_64-unknown-linux-gnu.tar.gz
+          mkdir -p docker/release
+          tar -C docker/release -zxvf /tmp/ethetl.tar.gz
+      - name: login to GitHub container registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: build & push
+        uses: docker/build-push-action@v2
+        with:
+          context: docker
+          file: docker/Dockerfile
+          push: true
+          pull: true
+          tags: ghcr.io/deepeth/mars:${{ needs.create_release.outputs.version }}
