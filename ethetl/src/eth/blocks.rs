@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use common_exceptions::ErrorCode;
 use common_exceptions::Result;
 use common_exceptions::Retryable;
+use jsonrpsee::core::client::ClientT;
+use jsonrpsee::http_client::HttpClientBuilder;
+use jsonrpsee::rpc_params;
 use web3::types::Block;
-use web3::types::BlockId;
 use web3::types::BlockNumber;
 use web3::types::Transaction;
 use web3::types::U64;
@@ -66,41 +67,20 @@ impl BlockFetcher {
 
     // Get the blocks.
     async fn fetch_with_no_retry(&self) -> Result<Vec<Block<Transaction>>> {
-        let http = web3::transports::Http::new(self.ctx.get_rpc_url())?;
-        let web3 = web3::Web3::new(web3::transports::Batch::new(http));
-
-        let mut blocks = vec![];
-
-        for chunks in self.numbers.chunks(self.ctx.get_web3_batch_size()) {
-            let mut callbacks = vec![];
-            for num in chunks {
-                let block = web3
-                    .eth()
-                    .block_with_txs(BlockId::Number(BlockNumber::Number(U64::from(*num))));
-                callbacks.push(block);
-            }
-            let _ = web3.transport().submit_batch().await?;
-
-            // Get the callback.
-            for cb in callbacks {
-                let r = cb.await?;
-                match r {
-                    None => {
-                        return Err(ErrorCode::ExportFetchError(
-                            "Cannot export block by eth.block_with_txs(), please make sure eth node sync is already",
-                        ));
-                    }
-                    Some(blk) => {
-                        let len = blk.transactions.len();
-                        blocks.push(blk);
-
-                        self.ctx.get_progress().incr_blocks(1);
-                        self.ctx.get_progress().incr_txs(len);
-                    }
-                }
-            }
-        }
-
-        Ok(blocks)
+        let transport = HttpClientBuilder::default()
+            .build(self.ctx.get_rpc_url())
+            .unwrap();
+        let batch = self
+            .numbers
+            .iter()
+            .cloned()
+            .map(|x| {
+                ("eth_getBlockByNumber", rpc_params![
+                    serde_json::to_value(BlockNumber::Number(U64::from(x))).unwrap(),
+                    serde_json::to_value(true).unwrap()
+                ])
+            })
+            .collect::<Vec<_>>();
+        Ok(transport.batch_request::<Block<Transaction>>(batch).await?)
     }
 }

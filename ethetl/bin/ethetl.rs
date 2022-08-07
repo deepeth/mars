@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use common_configs::EthConfig;
-use common_eth::Eth;
 use common_exceptions::Result;
 use env_logger::Builder;
 use env_logger::Env;
@@ -29,17 +28,6 @@ async fn main() -> Result<()> {
     log::info!("Config: {:?}", conf);
 
     let ctx = Context::create(&conf).await;
-
-    {
-        let eth = Eth::create(&conf.export.provider_uri);
-        let blk = eth.block_number().await?;
-        log::info!("Eth node latest number:{:}", blk);
-
-        //
-        let numbers = vec![1000000, 1000001, 1000002];
-        let blocks = eth.get_block_by_hash(numbers).await?;
-        log::info!("Eth get blocks:{:?}", blocks);
-    }
 
     // Interval progress.
     let progress = ctx.get_progress();
