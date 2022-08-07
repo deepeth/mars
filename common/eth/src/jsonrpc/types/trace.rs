@@ -7,7 +7,7 @@ use ethereum_types::U64;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::jsonrpc::Bytes;
+use crate::jsonrpc::types::Bytes;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

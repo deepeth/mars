@@ -1,3 +1,4 @@
-mod types;
+mod eth;
+pub mod types;
 
-pub use types::*;
+pub use eth::Eth;

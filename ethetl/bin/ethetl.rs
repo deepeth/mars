@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use common_configs::EthConfig;
+use common_eth::Eth;
 use common_exceptions::Result;
 use env_logger::Builder;
 use env_logger::Env;
@@ -27,8 +28,11 @@ async fn main() -> Result<()> {
     let conf = EthConfig::load()?;
     log::info!("Config: {:?}", conf);
 
-    // Create data dir.
     let ctx = Context::create(&conf).await;
+
+    let eth = Eth::create(&conf.export.provider_uri);
+    let blk = eth.block_number().await?;
+    log::info!("Eth node latest number:{:}", blk);
 
     // Interval progress.
     let progress = ctx.get_progress();

@@ -16,3 +16,4 @@ mod erc;
 mod jsonrpc;
 
 pub use erc::ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX;
+pub use jsonrpc::Eth;

@@ -11,8 +11,8 @@ use serde::Deserializer;
 use serde::Serialize;
 use serde::Serializer;
 
-use crate::jsonrpc::Bytes;
-use crate::jsonrpc::Tx;
+use crate::jsonrpc::types::Bytes;
+use crate::jsonrpc::types::Tx;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 /// A 64-bit unsigned integer (or tag - "latest", "earliest", "pending").

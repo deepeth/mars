@@ -13,7 +13,7 @@ common-exceptions = { path = "../exceptions" }
 arrayvec = { version = "0.7", features = ["serde"] }
 ethereum-types = "0.13"
 ethnum = { version = "1", default-features = false, features = ["serde"] }
-jsonrpsee = { version = "0.15", features = ["macros"] }
+jsonrpsee = { version = "0.15", features = ["full"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_with = "2"
