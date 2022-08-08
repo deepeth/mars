@@ -9,7 +9,6 @@ test = false
 
 [dependencies]
 # Workspace dependencies
-common-exceptions = { path = "../exceptions" }
 web3 = "0.18.0"
 
 [dev-dependencies]
