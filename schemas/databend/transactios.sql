@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     transaction_index BIGINT UNSIGNED,
     from_address STRING,
     to_address STRING,
-    value STRING,
+    value DOUBLE,
     gas BIGINT UNSIGNED,
     gas_price BIGINT UNSIGNED,
     method_id STRING,
