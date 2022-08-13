@@ -466,6 +466,9 @@ dependencies = [
 name = "common-eth"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "hex",
+ "serde_json",
  "web3",
 ]
 

@@ -65,9 +65,11 @@ impl TokenTransferExporter {
                 let topic_0 = format!("{:#x}", topics[0]);
                 if topic_0.as_str() == ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX {
                     if topics.len() == 3 {
-                        let value = U256::from_str_radix(&bytes_to_hex(&logs.data), 16).unwrap();
                         from_address_vec.push(format!("0x{}", h256_to_hex(&topics[1])));
                         to_address_vec.push(format!("0x{}", h256_to_hex(&topics[2])));
+
+                        let bytes = serde_json::to_string(&logs.data)?;
+                        let value: U256 = serde_json::from_str(&bytes)?;
                         data_vec.push(format!("{}", value));
                         erc_standard_vec.push("ERC20");
                     } else if topics.len() == 4 {
