@@ -17,7 +17,6 @@ use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
-use common_eth::bytes_to_hex;
 use common_eth::h256_to_hex;
 use common_eth::ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX;
 use common_exceptions::Result;
@@ -65,17 +64,17 @@ impl TokenTransferExporter {
                 let topic_0 = format!("{:#x}", topics[0]);
                 if topic_0.as_str() == ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX {
                     if topics.len() == 3 {
-                        from_address_vec.push(format!("0x{}", h256_to_hex(&topics[1])));
-                        to_address_vec.push(format!("0x{}", h256_to_hex(&topics[2])));
+                        from_address_vec.push(h256_to_hex(&topics[1]));
+                        to_address_vec.push(h256_to_hex(&topics[2]));
 
                         let bytes = serde_json::to_string(&logs.data)?;
                         let value: U256 = serde_json::from_str(&bytes)?;
                         data_vec.push(format!("{}", value));
                         erc_standard_vec.push("ERC20");
                     } else if topics.len() == 4 {
-                        from_address_vec.push(format!("0x{}", h256_to_hex(&topics[1])));
-                        to_address_vec.push(format!("0x{}", h256_to_hex(&topics[2])));
-                        data_vec.push(format!("0x{}", h256_to_hex(&topics[3])));
+                        from_address_vec.push(h256_to_hex(&topics[1]));
+                        to_address_vec.push(h256_to_hex(&topics[2]));
+                        data_vec.push(h256_to_hex(&topics[3]));
                         erc_standard_vec.push("ERC721");
                     } else {
                         from_address_vec.push("0x".to_string());

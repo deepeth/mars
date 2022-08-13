@@ -20,7 +20,11 @@ use web3::ethabi::Uint;
 use web3::types::Bytes;
 
 pub fn bytes_to_u256(bytes: Bytes) -> anyhow::Result<Uint> {
-    let bytes = serde_json::to_string(&bytes)?;
+    let bytes = bytes
+        .0
+        .iter()
+        .map(|x| format!("{:02x}", x))
+        .collect::<String>();
     let types = vec!["uint".to_string()];
     let tokens = decode_with_types(&types, &bytes)?;
     match tokens[0] {
@@ -57,9 +61,11 @@ mod test {
         }
 
         {
-            let bytes =
-                Bytes::from("000000000000000000000000000000000000000000000017112108b7e7f1ba68");
-            let expect = "[Uint(425509391054159329896)]";
+            let expect = "425509391054159329896";
+            let data =
+                hex::decode("000000000000000000000000000000000000000000000017112108b7e7f1ba68")
+                    .unwrap();
+            let bytes = Bytes::from(data);
             let actual = format!("{:?}", bytes_to_u256(bytes).unwrap());
             assert_eq!(expect, actual);
         }

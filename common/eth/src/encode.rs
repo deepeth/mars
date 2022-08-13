@@ -21,9 +21,9 @@ pub fn h256_to_hex(v: &H256) -> String {
         .iter()
         .map(|x| format!("{:02x}", x))
         .collect::<String>();
-    hex.trim_start_matches('0').to_string()
+    "0x".to_owned() + hex.trim_start_matches('0')
 }
 
 pub fn bytes_to_hex(v: &Bytes) -> String {
-    v.0.iter().map(|x| format!("{:02x}", x)).collect::<String>()
+    "0x".to_string() + &v.0.iter().map(|x| format!("{:02x}", x)).collect::<String>()
 }

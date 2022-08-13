@@ -15,10 +15,10 @@
 #![deny(unused_crate_dependencies)]
 
 mod address;
-mod bytes;
 mod decode;
+mod encode;
 
 pub use address::ENS_NAME_REGISTERED_METHOD_ADDRESS_HEX;
 pub use address::ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX;
-pub use bytes::*;
 pub use decode::*;
+pub use encode::*;

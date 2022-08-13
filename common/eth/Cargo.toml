@@ -13,6 +13,5 @@ test = false
 anyhow = "1"
 hex = "0.4"
 web3 = "0.18.0"
-serde_json = "1.0.82"
 
 [dev-dependencies]

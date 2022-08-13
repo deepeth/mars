@@ -79,11 +79,12 @@ impl TransactionExporter {
                 value_vec.push((tx.value.as_u128() / 10000000) as f64);
                 gas_vec.push(tx.gas.as_u64());
                 gas_price_vec.push(tx.gas_price.unwrap_or_else(U256::zero).as_u64());
+                // Prefix with 0x
                 let input = bytes_to_hex(&tx.input);
-                if input.len() > 7 {
-                    method_id_vec.push(format!("0x{:}", &input[..8]));
+                if input.len() > 9 {
+                    method_id_vec.push(input[..10].to_string());
                 } else {
-                    method_id_vec.push(format!("0x{:0>8}", &input));
+                    method_id_vec.push(format!("{:0>10}", &input));
                 }
                 input_vec.push(bytes_to_hex(&tx.input));
                 max_fee_per_gas_vec.push(tx.max_fee_per_gas.unwrap_or_else(U256::zero).as_u64());
