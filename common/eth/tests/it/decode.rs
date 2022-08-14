@@ -64,7 +64,7 @@ fn decode_u256_data_test() {
         let data = hex::decode("000000000000000000000000000000000000000000000017112108b7e7f1ba68")
             .unwrap();
         let bytes = Bytes::from(data);
-        let actual = format!("{:?}", decode_u256_data(bytes).unwrap());
+        let actual = format!("{:?}", decode_u256_data(&bytes).unwrap());
         assert_eq!(expect, actual);
     }
 }
@@ -76,7 +76,7 @@ fn decode_single_transfer_data_test() {
                 hex::decode("00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001")
                     .unwrap();
     let bytes = Bytes::from(data);
-    let actual = format!("{:?}", decode_transfer_single_data(bytes).unwrap());
+    let actual = format!("{:?}", decode_transfer_single_data(&bytes).unwrap());
     assert_eq!(expect, actual);
 }
 
@@ -87,7 +87,7 @@ fn decode_batch_transfer_data_test() {
                 hex::decode("000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000027a9fe22691c811ea339d9b73150e6911a5343dca0000000000000000060090007a9fe22691c811ea339d9b73150e6911a5343dca000000000000000006009001000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001")
                     .unwrap();
     let bytes = Bytes::from(data);
-    let actual = format!("{:?}", decode_transfer_batch_data(bytes).unwrap());
+    let actual = format!("{:?}", decode_transfer_batch_data(&bytes).unwrap());
     assert_eq!(expect, actual);
 }
 
@@ -98,6 +98,6 @@ fn decode_name_registered_test() {
                 hex::decode("000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000033afeca7f3dc500000000000000000000000000000000000000000000000000000000638714c800000000000000000000000000000000000000000000000000000000000000083030303030323334000000000000000000000000000000000000000000000000")
                     .unwrap();
     let bytes = Bytes::from(data);
-    let actual = format!("{:?}", decode_name_registered_data(bytes).unwrap());
+    let actual = format!("{:?}", decode_name_registered_data(&bytes).unwrap());
     assert_eq!(expect, actual);
 }

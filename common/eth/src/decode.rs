@@ -32,8 +32,8 @@ pub fn decode_with_types(types: &[String], data: &str) -> anyhow::Result<Vec<Tok
 }
 
 // Transfer (index_topic_1 address from, index_topic_2 address to, uint256 value)
-pub fn decode_u256_data(bytes: Bytes) -> anyhow::Result<U256> {
-    let bytes = hex::encode(bytes.0);
+pub fn decode_u256_data(bytes: &Bytes) -> anyhow::Result<U256> {
+    let bytes = hex::encode(&bytes.0);
     let types = vec!["uint".to_string()];
     let tokens = decode_with_types(&types, &bytes)?;
     match tokens[0] {
@@ -43,8 +43,8 @@ pub fn decode_u256_data(bytes: Bytes) -> anyhow::Result<U256> {
 }
 
 // TransferSingle (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256 id, uint256 value)
-pub fn decode_transfer_single_data(bytes: Bytes) -> anyhow::Result<Option<(U256, U256)>> {
-    let bytes = hex::encode(bytes.0);
+pub fn decode_transfer_single_data(bytes: &Bytes) -> anyhow::Result<Option<(U256, U256)>> {
+    let bytes = hex::encode(&bytes.0);
     let types = vec!["uint".to_string(), "uint".to_string()];
     let tokens = decode_with_types(&types, &bytes)?;
     if tokens.len() < 2 {
@@ -58,8 +58,8 @@ pub fn decode_transfer_single_data(bytes: Bytes) -> anyhow::Result<Option<(U256,
 }
 
 // TransferBatch (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256[] ids, uint256[] values)
-pub fn decode_transfer_batch_data(bytes: Bytes) -> anyhow::Result<Option<(Vec<U256>, Vec<U256>)>> {
-    let bytes = hex::encode(bytes.0);
+pub fn decode_transfer_batch_data(bytes: &Bytes) -> anyhow::Result<Option<(Vec<U256>, Vec<U256>)>> {
+    let bytes = hex::encode(&bytes.0);
     let types = vec!["uint[]".to_string(), "uint[]".to_string()];
     let tokens = decode_with_types(&types, &bytes)?;
     if tokens.len() < 2 {
@@ -90,8 +90,8 @@ pub fn decode_transfer_batch_data(bytes: Bytes) -> anyhow::Result<Option<(Vec<U2
 }
 
 // NameRegistered (string name, index_topic_1 bytes32 label, index_topic_2 address owner, uint256 cost, uint256 expires)
-pub fn decode_name_registered_data(bytes: Bytes) -> anyhow::Result<Option<(String, U256, U256)>> {
-    let bytes = hex::encode(bytes.0);
+pub fn decode_name_registered_data(bytes: &Bytes) -> anyhow::Result<Option<(String, U256, U256)>> {
+    let bytes = hex::encode(&bytes.0);
     let types = vec!["string".to_string(), "uint".to_string(), "uint".to_string()];
     let tokens = decode_with_types(&types, &bytes)?;
     if tokens.len() < 3 {
