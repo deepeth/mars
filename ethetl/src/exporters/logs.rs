@@ -18,6 +18,8 @@ use arrow2::chunk::Chunk;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
 use common_eth::bytes_to_hex;
+use common_eth::h160_to_hex;
+use common_eth::h256_to_hex;
 use common_exceptions::Result;
 use web3::types::Address;
 use web3::types::TransactionReceipt;
@@ -57,22 +59,18 @@ impl LogsExporter {
         for (idx, receipt) in receipts.iter().enumerate() {
             for log in &receipt.logs {
                 log_index_vec.push(idx as u64);
-                transaction_hash_vec.push(format!("{:#x}", receipt.transaction_hash));
+                transaction_hash_vec.push(h256_to_hex(&receipt.transaction_hash));
                 transaction_index_vec.push(receipt.transaction_index.as_u64());
-                block_hash_vec.push(format!(
-                    "{:#x}",
-                    receipt.block_hash.unwrap_or_else(H256::zero)
-                ));
+                block_hash_vec.push(h256_to_hex(&receipt.block_hash.unwrap_or_else(H256::zero)));
                 block_number_vec.push(receipt.block_number.unwrap_or_else(U64::zero).as_u64());
-                contract_address_vec.push(format!(
-                    "{:#x}",
-                    receipt.contract_address.unwrap_or_else(Address::zero)
+                contract_address_vec.push(h160_to_hex(
+                    &receipt.contract_address.unwrap_or_else(Address::zero),
                 ));
                 data_vec.push(bytes_to_hex(&log.data));
                 let topics = log
                     .topics
                     .iter()
-                    .map(|x| format!("0x{:#x}", x))
+                    .map(h256_to_hex)
                     .collect::<Vec<String>>()
                     .join("|");
                 topics_vec.push(topics);

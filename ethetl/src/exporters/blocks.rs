@@ -23,6 +23,11 @@ use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
+use common_eth::bytes_to_hex;
+use common_eth::h2048_to_hex;
+use common_eth::h256_to_hex;
+use common_eth::h64_to_hex;
+use common_eth::u256_to_hex;
 use common_exceptions::Result;
 use web3::types::Block;
 use web3::types::Transaction;
@@ -93,32 +98,20 @@ impl BlockExporter {
 
         for block in blocks {
             number_vec.push(block.number.unwrap_or_else(U64::zero).as_u64());
-            hash_vec.push(format!("{:#x}", block.hash.unwrap_or_else(H256::zero)));
-            parent_hash_vec.push(format!("{:#x}", block.parent_hash));
-            nonce_vec.push(format!("{:#x}", block.nonce.unwrap_or_else(H64::zero)));
-            sha3_uncles_vec.push(format!("{:#x}", block.uncles_hash));
-            logs_bloom_vec.push(format!(
-                "{:#x}",
-                block.logs_bloom.unwrap_or_else(H2048::zero)
-            ));
-            transactions_root_vec.push(format!("{:#x}", block.transactions_root));
-            state_root_vec.push(format!("{:#x}", block.state_root));
-            receipts_root_vec.push(format!("{:#x}", block.receipts_root));
-            difficulty_vec.push(format!("{:}", block.difficulty));
-            total_difficulty_vec.push(format!(
-                "{:}",
-                block.total_difficulty.unwrap_or_else(U256::zero)
+            hash_vec.push(h256_to_hex(&block.hash.unwrap_or_else(H256::zero)));
+            parent_hash_vec.push(h256_to_hex(&block.parent_hash));
+            nonce_vec.push(h64_to_hex(&block.nonce.unwrap_or_else(H64::zero)));
+            sha3_uncles_vec.push(h256_to_hex(&block.uncles_hash));
+            logs_bloom_vec.push(h2048_to_hex(&block.logs_bloom.unwrap_or_else(H2048::zero)));
+            transactions_root_vec.push(h256_to_hex(&block.transactions_root));
+            state_root_vec.push(h256_to_hex(&block.state_root));
+            receipts_root_vec.push(h256_to_hex(&block.receipts_root));
+            difficulty_vec.push(u256_to_hex(&block.difficulty));
+            total_difficulty_vec.push(u256_to_hex(
+                &block.total_difficulty.unwrap_or_else(U256::zero),
             ));
             size_vec.push(block.size.unwrap_or_else(U256::zero).as_u64());
-            extra_data_vec.push(format!(
-                "0x{}",
-                block
-                    .extra_data
-                    .0
-                    .iter()
-                    .map(|x| format!("{:02x}", x))
-                    .collect::<String>()
-            ));
+            extra_data_vec.push(bytes_to_hex(&block.extra_data));
             gas_limit_vec.push(block.gas_limit.as_u64());
             gas_used_vec.push(block.gas_used.as_u64());
             timestamp_vec.push(block.timestamp.as_u64());
