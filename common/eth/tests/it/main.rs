@@ -12,22 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use web3::types::Bytes;
-use web3::types::H256;
-use web3::types::U256;
-
-// H256 to hex trim the start 0 and with the 0x prefix.
-pub fn h256_to_hex(v: &H256) -> String {
-    let hex = hex::encode(v.0);
-    "0x".to_owned() + hex.trim_start_matches('0')
-}
-
-// Bytes to hex with 0x prefix.
-pub fn bytes_to_hex(v: &Bytes) -> String {
-    "0x".to_string() + &v.0.iter().map(|x| format!("{:02x}", x)).collect::<String>()
-}
-
-// U256 type to f64 divide by 10000000, to make double work.
-pub fn u256_to_f64(v: &U256) -> f64 {
-    v.as_u128() as f64 / 10000000_f64
-}
+mod decode;
+mod encode;
