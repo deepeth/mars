@@ -14,6 +14,7 @@
 
 // Transfer (index_topic_1 address from, index_topic_2 address to, uint256 value)
 // Transfer (index_topic_1 address src, index_topic_2 address dst, uint256 wad)
+// Transfer (index_topic_1 address from, index_topic_2 address to, index_topic_3 uint256 tokenId)
 pub const ERC20_TOKEN_TRANSFER_SIG: &str =
     "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 
