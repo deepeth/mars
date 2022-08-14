@@ -14,9 +14,10 @@
 
 #![deny(unused_crate_dependencies)]
 
-mod erc;
-mod hex;
+mod abi;
+mod decode;
+mod encode;
 
-pub use erc::ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX;
-pub use hex::bytes_to_hex;
-pub use hex::h256_to_hex;
+pub use abi::*;
+pub use decode::*;
+pub use encode::*;

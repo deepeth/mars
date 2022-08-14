@@ -22,6 +22,7 @@ use arrow2::chunk::Chunk;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
 use common_eth::bytes_to_hex;
+use common_eth::u256_to_f64;
 use common_exceptions::Result;
 use web3::ethabi::Address;
 use web3::types::Block;
@@ -76,14 +77,15 @@ impl TransactionExporter {
                 from_address_vec.push(format!("{:#x}", tx.from.unwrap_or_else(Address::zero)));
                 to_address_vec.push(format!("{:#x}", tx.to.unwrap_or_else(Address::zero)));
                 // divide 100000000, to make double work.
-                value_vec.push((tx.value.as_u128() / 10000000) as f64);
+                value_vec.push(u256_to_f64(&tx.value));
                 gas_vec.push(tx.gas.as_u64());
                 gas_price_vec.push(tx.gas_price.unwrap_or_else(U256::zero).as_u64());
+                // Prefix with 0x
                 let input = bytes_to_hex(&tx.input);
-                if input.len() > 7 {
-                    method_id_vec.push(format!("0x{:}", &input[..8]));
+                if input.len() > 9 {
+                    method_id_vec.push(input[..10].to_string());
                 } else {
-                    method_id_vec.push(format!("0x{:0>8}", &input));
+                    method_id_vec.push(input.to_string());
                 }
                 input_vec.push(bytes_to_hex(&tx.input));
                 max_fee_per_gas_vec.push(tx.max_fee_per_gas.unwrap_or_else(U256::zero).as_u64());

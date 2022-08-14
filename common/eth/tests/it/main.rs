@@ -12,5 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub const ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX: &str =
-    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+mod decode;
+mod encode;
