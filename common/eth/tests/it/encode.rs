@@ -14,8 +14,29 @@
 
 use common_eth::*;
 use web3::types::Bytes;
+use web3::types::H160;
+use web3::types::H2048;
 use web3::types::H256;
+use web3::types::H64;
 use web3::types::U256;
+
+#[test]
+fn h64_to_hex_test() {
+    let data = hex::decode("d4307b3ec19e6b6a").unwrap();
+    let h64 = H64::from_slice(&data);
+    let expect = "0xd4307b3ec19e6b6a";
+    let actual = h64_to_hex(&h64);
+    assert_eq!(expect, actual);
+}
+
+#[test]
+fn h160_to_hex_test() {
+    let data = hex::decode("cfef8857e9c80e3440a823971420f7fa5f62f020").unwrap();
+    let h160 = H160::from_slice(&data);
+    let expect = "0xcfef8857e9c80e3440a823971420f7fa5f62f020";
+    let actual = h160_to_hex(&h160);
+    assert_eq!(expect, actual);
+}
 
 #[test]
 fn h256_to_hex_test() {
@@ -34,6 +55,16 @@ fn h256_to_hex_test() {
         let actual = h256_to_hex(&h256);
         assert_eq!(expect, actual);
     }
+}
+
+#[test]
+fn h2048_to_hex_test() {
+    let bytes = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+    let data = hex::decode(bytes).unwrap();
+    let h2048 = H2048::from_slice(&data);
+    let expect = "0x";
+    let actual = h2048_to_hex(&h2048);
+    assert_eq!(expect, actual);
 }
 
 #[test]

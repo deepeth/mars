@@ -32,6 +32,5 @@ pub const ERC1155_TRANSFER_BATCH_SIG: &str =
 pub const ENS_NAME_REGISTERED_SIG: &str =
     "0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f";
 
-
 // Other demos
 // NFTs: https://etherscan.io/tx/0x1de541bae0b91097e39403f688a22eb6ee6eb6a226b8bf00f20851c4a9e7ac67

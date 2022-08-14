@@ -22,7 +22,10 @@ use arrow2::chunk::Chunk;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
 use common_eth::bytes_to_hex;
+use common_eth::h160_to_hex;
+use common_eth::h256_to_hex;
 use common_eth::u256_to_f64;
+use common_eth::u256_to_hex;
 use common_exceptions::Result;
 use web3::ethabi::Address;
 use web3::types::Block;
@@ -71,11 +74,11 @@ impl TransactionExporter {
 
         for block in blocks {
             for tx in &block.transactions {
-                hash_vec.push(format!("{:#x}", tx.hash));
-                nonce_vec.push(format!("{:}", tx.nonce));
+                hash_vec.push(h256_to_hex(&tx.hash));
+                nonce_vec.push(u256_to_hex(&tx.nonce));
                 transaction_index_vec.push(tx.transaction_index.unwrap_or_else(U64::zero).as_u64());
-                from_address_vec.push(format!("{:#x}", tx.from.unwrap_or_else(Address::zero)));
-                to_address_vec.push(format!("{:#x}", tx.to.unwrap_or_else(Address::zero)));
+                from_address_vec.push(h160_to_hex(&tx.from.unwrap_or_else(Address::zero)));
+                to_address_vec.push(h160_to_hex(&tx.to.unwrap_or_else(Address::zero)));
                 // divide 100000000, to make double work.
                 value_vec.push(u256_to_f64(&tx.value));
                 gas_vec.push(tx.gas.as_u64());
@@ -95,7 +98,7 @@ impl TransactionExporter {
                         .as_u64(),
                 );
                 transaction_type_vec.push(tx.transaction_type.unwrap_or_else(U64::zero).as_u64());
-                block_hash_vec.push(format!("{:#x}", block.hash.unwrap_or_else(H256::zero)));
+                block_hash_vec.push(h256_to_hex(&block.hash.unwrap_or_else(H256::zero)));
                 block_number_vec.push(block.number.unwrap_or_else(U64::zero).as_u64());
                 block_timestamp_vec.push(block.timestamp.as_u64());
             }

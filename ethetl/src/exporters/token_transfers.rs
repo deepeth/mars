@@ -17,6 +17,8 @@ use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
+use common_eth::bytes_to_hex;
+use common_eth::h160_to_hex;
 use common_eth::h256_to_hex;
 use common_eth::ERC20_TOKEN_TRANSFER_SIG;
 use common_exceptions::Result;
@@ -66,10 +68,7 @@ impl TokenTransferExporter {
                     if topics.len() == 3 {
                         from_address_vec.push(h256_to_hex(&topics[1]));
                         to_address_vec.push(h256_to_hex(&topics[2]));
-
-                        let bytes = serde_json::to_string(&logs.data)?;
-                        let value: U256 = serde_json::from_str(&bytes)?;
-                        data_vec.push(format!("{}", value));
+                        data_vec.push(bytes_to_hex(&logs.data));
                         erc_standard_vec.push("ERC20");
                     } else if topics.len() == 4 {
                         from_address_vec.push(h256_to_hex(&topics[1]));
@@ -77,15 +76,14 @@ impl TokenTransferExporter {
                         data_vec.push(h256_to_hex(&topics[3]));
                         erc_standard_vec.push("ERC721");
                     } else {
-                        from_address_vec.push("0x".to_string());
-                        to_address_vec.push("0x".to_string());
-                        data_vec.push("0x".to_string());
+                        from_address_vec.push("".to_string());
+                        to_address_vec.push("".to_string());
+                        data_vec.push("".to_string());
                         erc_standard_vec.push("");
                     }
-                    token_address_vec.push(format!("{:#x}", logs.address));
-                    transaction_hash_vec.push(format!(
-                        "{:#x}",
-                        logs.transaction_hash.unwrap_or_else(H256::zero)
+                    token_address_vec.push(h160_to_hex(&logs.address));
+                    transaction_hash_vec.push(h256_to_hex(
+                        &logs.transaction_hash.unwrap_or_else(H256::zero),
                     ));
                     log_index_vec.push(logs.log_index.unwrap_or_else(U256::zero).as_u64());
                     block_number_vec.push(logs.block_number.unwrap_or_else(U64::zero).as_u64());
