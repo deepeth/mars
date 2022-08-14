@@ -42,7 +42,7 @@ fn h160_to_hex_test() {
 fn h256_to_hex_test() {
     {
         let h256 = H256::zero();
-        let expect = "0x";
+        let expect = "0x0000000000000000000000000000000000000000000000000000000000000000";
         let actual = h256_to_hex(&h256);
         assert_eq!(expect, actual);
     }
@@ -51,7 +51,7 @@ fn h256_to_hex_test() {
         let data = hex::decode("0000000000000000000000000000000000000000000000000000000000000001")
             .unwrap();
         let h256 = H256::from_slice(&data);
-        let expect = "0x1";
+        let expect = "0x0000000000000000000000000000000000000000000000000000000000000001";
         let actual = h256_to_hex(&h256);
         assert_eq!(expect, actual);
     }

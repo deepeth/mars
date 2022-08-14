@@ -54,14 +54,14 @@ impl Default for StorageConfig {
 #[serde(default)]
 pub struct FsStorageConfig {
     /// fs storage backend data path
-    #[clap(long = "storage-fs-data-path", default_value = "fs")]
+    #[clap(long = "storage-fs-data-path", default_value = "_datas")]
     pub data_path: String,
 }
 
 impl Default for FsStorageConfig {
     fn default() -> Self {
         FsStorageConfig {
-            data_path: "fs".to_string(),
+            data_path: "_datas".to_string(),
         }
     }
 }

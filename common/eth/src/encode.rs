@@ -20,19 +20,16 @@ use web3::types::H64;
 use web3::types::U256;
 
 pub fn h64_to_hex(v: &H64) -> String {
-    let hex = hex::encode(v.0);
-    "0x".to_owned() + hex.trim_start_matches('0')
+    "0x".to_owned() + &hex::encode(v)
 }
 
 pub fn h160_to_hex(v: &H160) -> String {
-    let hex = hex::encode(v.0);
-    "0x".to_owned() + hex.trim_start_matches('0')
+    "0x".to_owned() + &hex::encode(v)
 }
 
 // H256 to hex trim the start 0 and with the 0x prefix.
 pub fn h256_to_hex(v: &H256) -> String {
-    let hex = hex::encode(v.0);
-    "0x".to_owned() + hex.trim_start_matches('0')
+    "0x".to_owned() + &hex::encode(v)
 }
 
 pub fn u256_to_hex(v: &U256) -> String {
