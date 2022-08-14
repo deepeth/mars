@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub const ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX: &str =
+// Transfer (index_topic_1 address src, index_topic_2 address dst, uint256 wad)
+// Transfer (index_topic_1 address from, index_topic_2 address to, uint256 value)
+pub const ERC20_TOKEN_TRANSFER_SIG_HEX: &str =
     "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 
-pub const ENS_NAME_REGISTERED_METHOD_ADDRESS_HEX: &str =
+// NameRegistered (string name, index_topic_1 bytes32 label, index_topic_2 address owner, uint256 cost, uint256 expires)
+pub const ENS_NAME_REGISTERED_SIG_HEX: &str =
     "0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f";

@@ -68,7 +68,7 @@ impl LogsExporter {
                     "{:#x}",
                     receipt.contract_address.unwrap_or_else(Address::zero)
                 ));
-                data_vec.push(format!("0x{:}", &bytes_to_hex(&log.data)));
+                data_vec.push(bytes_to_hex(&log.data));
                 let topics = log
                     .topics
                     .iter()

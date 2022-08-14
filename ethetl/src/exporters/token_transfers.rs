@@ -18,7 +18,7 @@ use arrow2::chunk::Chunk;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
 use common_eth::h256_to_hex;
-use common_eth::ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX;
+use common_eth::ERC20_TOKEN_TRANSFER_SIG_HEX;
 use common_exceptions::Result;
 use web3::types::TransactionReceipt;
 use web3::types::H256;
@@ -62,7 +62,7 @@ impl TokenTransferExporter {
 
                 // Token transfer contract address.
                 let topic_0 = format!("{:#x}", topics[0]);
-                if topic_0.as_str() == ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX {
+                if topic_0.as_str() == ERC20_TOKEN_TRANSFER_SIG_HEX {
                     if topics.len() == 3 {
                         from_address_vec.push(h256_to_hex(&topics[1]));
                         to_address_vec.push(h256_to_hex(&topics[2]));

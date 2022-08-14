@@ -14,11 +14,11 @@
 
 #![deny(unused_crate_dependencies)]
 
-mod address;
+mod abi;
 mod decode;
 mod encode;
 
-pub use address::ENS_NAME_REGISTERED_METHOD_ADDRESS_HEX;
-pub use address::ERC20_TOKEN_TRANSFER_CONTRACT_ADDRESS_HEX;
+pub use abi::ENS_NAME_REGISTERED_SIG_HEX;
+pub use abi::ERC20_TOKEN_TRANSFER_SIG_HEX;
 pub use decode::*;
 pub use encode::*;
