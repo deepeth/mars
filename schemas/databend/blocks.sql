@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS blocks
+CREATE TABLE blocks
 (
     number            BIGINT UNSIGNED,
     hash              STRING,

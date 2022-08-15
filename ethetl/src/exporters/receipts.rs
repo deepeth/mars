@@ -17,8 +17,6 @@ use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
-use common_eth::h160_to_hex;
-use common_eth::h256_to_hex;
 use common_exceptions::Result;
 use web3::types::Address;
 use web3::types::TransactionReceipt;
@@ -29,6 +27,7 @@ use web3::types::U64;
 use crate::contexts::ContextRef;
 use crate::eth::ReceiptFetcher;
 use crate::exporters::write_file;
+use crate::exporters::EnsExporter;
 use crate::exporters::LogsExporter;
 use crate::exporters::TokenTransferExporter;
 
@@ -61,7 +60,11 @@ impl ReceiptExporter {
 
         // Token transfers.
         let token_transfer_export = TokenTransferExporter::create(&self.ctx, &self.dir, &receipts);
-        token_transfer_export.export().await
+        token_transfer_export.export().await?;
+
+        // Ens.
+        let ens_export = EnsExporter::create(&self.ctx, &self.dir, &receipts);
+        ens_export.export().await
     }
 
     pub async fn export_receipts(&self, receipts: &[TransactionReceipt]) -> Result<()> {
@@ -78,17 +81,21 @@ impl ReceiptExporter {
         let mut effective_gas_price_vec = Vec::with_capacity(receipt_len);
 
         for receipt in receipts {
-            transaction_hash_vec.push(h256_to_hex(&receipt.transaction_hash));
+            transaction_hash_vec.push(format!("{:#x}", receipt.transaction_hash));
             transaction_index_vec.push(receipt.transaction_index.as_u64());
-            block_hash_vec.push(h256_to_hex(&receipt.block_hash.unwrap_or_else(H256::zero)));
+            block_hash_vec.push(format!(
+                "{:#x}",
+                receipt.block_hash.unwrap_or_else(H256::zero)
+            ));
             block_number_vec.push(receipt.block_number.unwrap_or_else(U64::zero).as_u64());
             cumulative_gas_used_vec.push(receipt.cumulative_gas_used.as_u64());
             gas_used_vec.push(receipt.gas_used.unwrap_or_else(U256::zero).as_u64());
-            contract_address_vec.push(h160_to_hex(
-                &receipt.contract_address.unwrap_or_else(Address::zero),
+            contract_address_vec.push(format!(
+                "{:#x}",
+                receipt.contract_address.unwrap_or_else(Address::zero)
             ));
             status_vec.push(receipt.status.unwrap_or_else(U64::zero).as_u64());
-            root_vec.push(h256_to_hex(&receipt.root.unwrap_or_else(H256::zero)));
+            root_vec.push(format!("{:#x}", receipt.root.unwrap_or_else(H256::zero)));
             effective_gas_price_vec.push(
                 receipt
                     .effective_gas_price

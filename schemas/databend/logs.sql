@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS logs (
+CREATE TABLE logs (
     log_index BIGINT UNSIGNED,
     transaction_hash STRING,
     transaction_index BIGINT UNSIGNED,

@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS token_transfers(
+CREATE TABLE token_transfers(
     token_address STRING,
     from_address STRING,
     to_address STRING,

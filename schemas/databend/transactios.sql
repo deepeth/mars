@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS transactions (
+CREATE TABLE transactions (
     hash STRING,
     nonce STRING,
     transaction_index BIGINT UNSIGNED,

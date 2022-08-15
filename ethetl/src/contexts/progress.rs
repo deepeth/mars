@@ -28,6 +28,7 @@ pub struct ProgressValue {
     pub receipts: usize,
     pub logs: usize,
     pub token_transfers: usize,
+    pub ens: usize,
 }
 
 #[derive(Debug)]
@@ -38,6 +39,7 @@ pub struct Progress {
     receipts: AtomicUsize,
     logs: AtomicUsize,
     token_transfers: AtomicUsize,
+    ens: AtomicUsize,
 }
 
 impl Progress {
@@ -49,6 +51,7 @@ impl Progress {
             receipts: AtomicUsize::new(0),
             logs: AtomicUsize::new(0),
             token_transfers: AtomicUsize::new(0),
+            ens: AtomicUsize::new(0),
         })
     }
 
@@ -72,6 +75,10 @@ impl Progress {
         self.token_transfers.fetch_add(v, Ordering::Relaxed);
     }
 
+    pub fn incr_ens(&self, v: usize) {
+        self.ens.fetch_add(v, Ordering::Relaxed);
+    }
+
     pub fn value(&self) -> Arc<ProgressValue> {
         Arc::new(ProgressValue {
             blocks: self.blocks.load(Ordering::Relaxed),
@@ -79,6 +86,7 @@ impl Progress {
             receipts: self.receipts.load(Ordering::Relaxed),
             logs: self.logs.load(Ordering::Relaxed),
             token_transfers: self.token_transfers.load(Ordering::Relaxed),
+            ens: self.ens.load(Ordering::Relaxed),
         })
     }
 
@@ -105,12 +113,13 @@ fn print_progress(all: usize, value: Arc<ProgressValue>) {
     if value.blocks > 0 {
         let percent = ((value.blocks as f32 / all as f32) * 100_f32) as usize;
         log::info!(
-            "{:?} blocks processed, {:?} transactions processed, {:?} receipts processed, {:?} logs processed, {:?} token_transfers processed. Progress is {:.2}",
+            "{:?} blocks processed, {:?} transactions processed, {:?} receipts processed, {:?} logs processed, {:?} token_transfers processed, {:?} ens processed. Progress is {:.2}",
             value.blocks,
             value.txs,
             value.receipts,
             value.logs,
             value.token_transfers,
+            value.ens,
             percent.percent(),
         );
     }
