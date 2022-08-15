@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS receipts (
+CREATE TABLE receipts (
     transaction_hash STRING,
     transaction_index BIGINT UNSIGNED,
     block_hash STRING,

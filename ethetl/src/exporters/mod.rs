@@ -13,6 +13,7 @@
 // limitations under the License.
 
 mod blocks;
+mod ens;
 mod logs;
 mod pipeline;
 mod receipts;
@@ -26,6 +27,7 @@ use arrow2::datatypes::Schema;
 pub use blocks::BlockExporter;
 use common_exceptions::ErrorCode;
 use common_exceptions::Result;
+pub use ens::EnsExporter;
 pub use logs::LogsExporter;
 pub use pipeline::Pipeline;
 pub use receipts::ReceiptExporter;

@@ -22,11 +22,10 @@ use crate::common::create_config;
 use crate::common::create_ctx;
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-#[ignore]
 async fn test_blocks_exporters() -> Result<()> {
     let mut conf = create_config();
-    conf.export.start_block = 15138828;
-    conf.export.end_block = 15138852;
+    conf.export.start_block = 15340159;
+    conf.export.end_block = 15340160;
     let ctx = create_ctx(&conf).await;
 
     let dir = format!(
@@ -45,36 +44,39 @@ async fn test_blocks_exporters() -> Result<()> {
         exporter.export().await?;
 
         goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/15138828_15138852/blocks.csv"),
-            Path::new("_test_output_dir/15138828_15138852/blocks.csv"),
+            Path::new("tests/it/testdata/15340159_15340160/blocks.csv"),
+            Path::new("_datas/_test_output_dir/15340159_15340160/blocks.csv"),
         );
 
         goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/15138828_15138852/transactions.csv"),
-            Path::new("_test_output_dir/15138828_15138852/transactions.csv"),
+            Path::new("tests/it/testdata/15340159_15340160/transactions.csv"),
+            Path::new("_datas/_test_output_dir/15340159_15340160/transactions.csv"),
         );
 
         goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/15138828_15138852/_transaction_hashes.txt"),
-            Path::new("_test_output_dir/15138828_15138852/_transaction_hashes.txt"),
+            Path::new("tests/it/testdata/15340159_15340160/_transaction_hashes.txt"),
+            Path::new("_datas/_test_output_dir/15340159_15340160/_transaction_hashes.txt"),
         );
     }
 
     // Parquet.
     {
+        /*
         conf.export.output_format = "parquet".to_string();
         let exporter = BlockExporter::create(&ctx, &dir, range);
         exporter.export().await?;
 
         goldenfile::differs::binary_diff(
-            Path::new("tests/it/testdata/15138828_15138852/blocks.parquet"),
-            Path::new("_test_output_dir/15138828_15138852/blocks.parquet"),
+            Path::new("tests/it/testdata/15340159_15340160/blocks.parquet"),
+            Path::new("_datas/_test_output_dir/15340159_15340160/blocks.parquet"),
         );
 
         goldenfile::differs::binary_diff(
-            Path::new("tests/it/testdata/15138828_15138852/transactions.parquet"),
-            Path::new("_test_output_dir/15138828_15138852/transactions.parquet"),
+            Path::new("tests/it/testdata/15340159_15340160/transactions.parquet"),
+            Path::new("_datas/_test_output_dir/15340159_15340160/transactions.parquet"),
         );
+
+         */
     }
 
     Ok(())
