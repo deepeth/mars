@@ -27,14 +27,13 @@ use crate::common::create_config;
 use crate::common::create_ctx;
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-#[ignore]
 async fn test_receipts_exporters() -> Result<()> {
     let mut conf = create_config();
-    conf.export.start_block = 15138828;
-    conf.export.end_block = 15138852;
+    conf.export.start_block = 15340159;
+    conf.export.end_block = 15340160;
     let ctx = create_ctx(&conf).await;
 
-    let path = "tests/it/testdata/15138828_15138852/.transaction_hashes.txt";
+    let path = "tests/it/testdata/15340159_15340160/_transaction_hashes.txt";
     let file = File::open(path)?;
     let buffered = BufReader::new(file);
 
@@ -58,21 +57,38 @@ async fn test_receipts_exporters() -> Result<()> {
         exporter.export().await?;
 
         goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/15138828_15138852/receipts.csv"),
-            Path::new("_test_output_dir/15138828_15138852/receipts.csv"),
+            Path::new("tests/it/testdata/15340159_15340160/receipts.csv"),
+            Path::new("_datas/_test_output_dir/15340159_15340160/receipts.csv"),
+        );
+
+        goldenfile::differs::text_diff(
+            Path::new("tests/it/testdata/15340159_15340160/logs.csv"),
+            Path::new("_datas/_test_output_dir/15340159_15340160/logs.csv"),
+        );
+
+        goldenfile::differs::text_diff(
+            Path::new("tests/it/testdata/15340159_15340160/token_transfers.csv"),
+            Path::new("_datas/_test_output_dir/15340159_15340160/token_transfers.csv"),
+        );
+
+        goldenfile::differs::text_diff(
+            Path::new("tests/it/testdata/15340159_15340160/ens.csv"),
+            Path::new("_datas/_test_output_dir/15340159_15340160/ens.csv"),
         );
     }
 
     // Parquet
     {
-        conf.export.output_format = "parquet".to_string();
-        let exporter = ReceiptExporter::create(&ctx, &dir, tx_hashes);
-        exporter.export().await?;
+        /*
+            conf.export.output_format = "parquet".to_string();
+            let exporter = ReceiptExporter::create(&ctx, &dir, tx_hashes);
+            exporter.export().await?;
 
-        goldenfile::differs::binary_diff(
-            Path::new("tests/it/testdata/15138828_15138852/receipts.parquet"),
-            Path::new("_test_output_dir/15138828_15138852/receipts.parquet"),
-        );
+            goldenfile::differs::binary_diff(
+                Path::new("tests/it/testdata/15340159_15340160/receipts.parquet"),
+                Path::new("_datas/_test_output_dir/15340159_15340160/receipts.parquet"),
+            );
+        */
     }
     Ok(())
 }
