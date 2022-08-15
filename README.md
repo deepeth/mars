@@ -10,31 +10,138 @@
 
 - __Easy to Use__ Web3 visualization and analysis at your fingertips.
 
-## Tools
+## ethetl
 
 - __ethetl__ Lets you export Ethereum data into CSV/Parquet/JSON file format and databases, blazing fast.
 
-## How to Use
+### Schema
+
+#### blocks.csv/parquet
+
+| Column            | Type            |
+|-------------------|-----------------|
+| number            | BIGINT UNSIGNED |
+| hash              | STRING          |
+| parent_hash       | STRING          |
+| nonce             | STRING          |
+| sha3_uncles       | STRING          |
+| logs_bloom        | STRING          |
+| transactions_root | STRING          |
+| state_root        | STRING          |
+| receipts_root     | STRING          |
+| difficulty        | STRING          |
+| total_difficulty  | STRING          |
+| size              | BIGINT UNSIGNED |
+| extra_data        | STRING          |
+| gas_limit         | BIGINT UNSIGNED |
+| gas_used          | BIGINT UNSIGNED |
+| timestamp         | BIGINT UNSIGNED |
+| transaction_count | BIGINT UNSIGNED |
+| base_fee_per_gas  | BIGINT UNSIGNED |
+
+
+#### transactions.csv/parquet
+
+| Column                   | Type            |
+|--------------------------|-----------------|
+| hash                     | STRING          |
+| nonce                    | STRING          |
+| transaction_index        | BIGINT UNSIGNED |
+| from_address             | STRING          |
+| to_address               | STRING          |
+| value                    | DOUBLE          |
+| gas                      | BIGINT UNSIGNED |
+| method_id                | STRING          |
+| input                    | STRING          |
+| max_fee_per_gas          | BIGINT UNSIGNED |
+| max_priority_fee_per_gas | BIGINT UNSIGNED |
+| transaction_type         | BIGINT UNSIGNED |
+| block_hash               | STRING          |
+| block_number             | BIGINT UNSIGNED |
+| block_timestamp          | BIGINT UNSIGNED |
+
+#### logs.csv/parquet
+
+| Column            | Type            |
+|-------------------|-----------------|
+| log_index         | BIGINT UNSIGNED |
+| transaction_hash  | STRING          |
+| transaction_index | BIGINT UNSIGNED |
+| block_hash        | STRING          |
+| block_number      | BIGINT UNSIGNED |
+| contract_address  | STRING          |
+| data              | STRING          |
+| topics            | STRING          |
+
+
+#### receipts.csv/parquet
+
+| Column               | Type            |
+|----------------------|-----------------|
+| transaction_hash     | STRING          |
+| transaction_index    | BIGINT UNSIGNED |
+| block_hash           | STRING          |
+| block_number         | BIGINT UNSIGNED |
+| cumulative_gas_used  | BIGINT UNSIGNED |
+| gas_used             | BIGINT UNSIGNED |
+| contract_address     | STRING          |
+| root                 | STRING          |
+| status               | BIGINT UNSIGNED |
+| effective_gas_price  | BIGINT UNSIGNED |
+
+#### token_transfers.csv/parquet
+
+| Column             | Type            |
+|--------------------|-----------------|
+| token_address      | STRING          |
+| from_address       | STRING          |
+| to_address         | STRING          |
+| token_id           | STRING          |
+| value              | STRING          |
+| erc_standard       | STRING          |
+| transaction_hash   | STRING          |
+| log_index          | BIGINT UNSIGNED |
+| block_number       | BIGINT UNSIGNED |
+
+#### ens.csv/parquet
+
+| Column             | Type            |
+|--------------------|-----------------|
+| name               | STRING          |
+| cost               | DOUBLE          |
+| expires            | BIGINT UNSIGNED |
+| owner              | STRING          |
+| transaction_hash   | STRING          |
+| block_number       | BIGINT UNSIGNED |
+
+
+
+### How to Use
 
 ```shell
 $ make build
 
-./target/release/ethetl -s 3000000 -e 3099999 -p http://192.168.191.66:8848  -o /tmp/datas/ -w 16 -f parquet
-[2022-07-26T06:59:35Z INFO ] Config: Config { provider_uri: "http://192.168.191.66:8848", start_block: 3000000, end_block: 3099999, batch_size: 10000, max_worker: 16, web3_batch_size: 1000, output_dir: "/tmp/datas/", output_format: "parquet" }
-[2022-07-26T06:59:41Z INFO ] 8590 blocks processed, 62662 transactions processed, 0 receipts processed. Progress is 8%
-[2022-07-26T06:59:43Z INFO ] 10000 blocks processed, 77326 transactions processed, 0 receipts processed. Progress is 10%
-[2022-07-26T06:59:45Z INFO ] 17000 blocks processed, 128311 transactions processed, 0 receipts processed. Progress is 17%
-[2022-07-26T06:59:47Z INFO ] 21000 blocks processed, 164659 transactions processed, 0 receipts processed. Progress is 21%
-[2022-07-26T06:59:49Z INFO ] 26000 blocks processed, 201764 transactions processed, 0 receipts processed. Progress is 26%
-[2022-07-26T06:59:51Z INFO ] 29000 blocks processed, 222384 transactions processed, 0 receipts processed. Progress is 29%
-[2022-07-26T06:59:53Z INFO ] 37000 blocks processed, 274097 transactions processed, 0 receipts processed. Progress is 37%
-[2022-07-26T06:59:55Z INFO ] 41000 blocks processed, 307932 transactions processed, 0 receipts processed. Progress is 41%
-[2022-07-26T06:59:57Z INFO ] 44000 blocks processed, 332340 transactions processed, 0 receipts processed. Progress is 44%
+./target/release/ethetl -p https://mainnet.infura.io/v3/6e83aaa316ef4a8c947b949364f81619 -s 15340159 -e 15340160 -o /tmp/eth -w 16
+[2022-08-15T08:25:47Z WARN ] collect: No such file or directory (os error 2)
+[2022-08-15T08:25:47Z INFO ] Config: EthConfig { log: LogConfig { level: "INFO", dir: "_logs" }, export: ExportConfig { provider_uri: "https://mainnet.infura.io/v3/6e83aaa316ef4a8c947b949364f81619", start_block: 15340159, end_block: 15340160, batch_size: 1000, max_worker: 16, web3_batch_size: 100, output_dir: "/tmp/eth", output_format: "csv" }, storage: StorageConfig { storage_type: "fs", fs: FsStorageConfig { data_path: "_datas" }, s3: S3StorageConfig { endpoint_url: "https://s3.amazonaws.com", region: "", bucket: "", root: "", access_key_id: "", secret_access_key: "" }, azblob: AzureStorageBlobConfig { endpoint_url: "", container: "", root: "", account_name: "", account_key: "" } }, config_file: "" }
+[2022-08-15T08:25:47Z INFO ] backend build started: Builder { root: Some("/home/bohu/github/deepeth/mars/_datas") }
+[2022-08-15T08:25:47Z INFO ] backend build finished: Builder { root: Some("/home/bohu/github/deepeth/mars/_datas") }
+[2022-08-15T08:25:52Z INFO ] Write blocks to /tmp/eth/15340159_15340160/blocks.csv
+[2022-08-15T08:25:52Z INFO ] Write transactions to /tmp/eth/15340159_15340160/transactions.csv
+[2022-08-15T08:25:52Z INFO ] Write /tmp/eth/15340159_15340160/_transaction_hashes.txt
+[2022-08-15T08:25:53Z INFO ] 2 blocks processed, 703 transactions processed, 0 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 100%
+[2022-08-15T08:25:55Z INFO ] 2 blocks processed, 703 transactions processed, 0 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 100%
+[2022-08-15T08:25:57Z INFO ] 2 blocks processed, 703 transactions processed, 100 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 100%
+[2022-08-15T08:25:59Z INFO ] 2 blocks processed, 703 transactions processed, 200 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 100%
+[2022-08-15T08:26:01Z INFO ] 2 blocks processed, 703 transactions processed, 300 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 100%
+[2022-08-15T08:26:03Z INFO ] 2 blocks processed, 703 transactions processed, 500 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 100%
+[2022-08-15T08:26:05Z INFO ] 2 blocks processed, 703 transactions processed, 600 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 100%
+[2022-08-15T08:26:06Z INFO ] Write receipts to /tmp/eth/15340159_15340160/receipts.csv
+[2022-08-15T08:26:06Z INFO ] Write logs to /tmp/eth/15340159_15340160/logs.csv
+[2022-08-15T08:26:07Z INFO ] Write token_transfer to /tmp/eth/15340159_15340160/token_transfers.csv
+[2022-08-15T08:26:07Z INFO ] Write ens to /tmp/eth/15340159_15340160/ens.csv
+[2022-08-15T08:26:07Z INFO ] 2 blocks processed, 703 transactions processed, 703 receipts processed, 1542 logs processed, 777 token_transfers processed, 3 ens processed. Progress is 100%
 ... ...
-
-ls /tmp/datas/
-3000000_3009999  3020000_3029999  3040000_3049999  3060000_3069999  3080000_3089999  3100000_3100000  3110000_3119999  3130000_3139999  3150000_3159999
-3010000_3019999  3030000_3039999  3050000_3059999  3070000_3079999  3090000_3099999  3100000_3109999  3120000_3129999  3140000_3149999  3160000_3169999
 ```
 
 ## License
