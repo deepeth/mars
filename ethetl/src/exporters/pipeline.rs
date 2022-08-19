@@ -20,20 +20,27 @@ use crate::exporters::BlockExporter;
 pub struct Pipeline {
     ctx: ContextRef,
     block_numbers: Vec<usize>,
-    dir: String,
+    output_dir: String,
+    range_path: String,
 }
 
 impl Pipeline {
-    pub fn create(ctx: &ContextRef, dir: &str, block_numbers: Vec<usize>) -> Self {
+    pub fn create(ctx: &ContextRef, range_path: &str, block_numbers: Vec<usize>) -> Self {
         Self {
             ctx: ctx.clone(),
-            dir: dir.to_string(),
+            output_dir: ctx.get_output_dir().to_string(),
+            range_path: range_path.to_string(),
             block_numbers,
         }
     }
 
     pub async fn execute(&self) -> Result<()> {
-        let export = BlockExporter::create(&self.ctx, &self.dir, self.block_numbers.to_vec());
+        let export = BlockExporter::create(
+            &self.ctx,
+            &self.output_dir,
+            &self.range_path,
+            self.block_numbers.to_vec(),
+        );
         let res = export.export().await;
         res
     }

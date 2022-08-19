@@ -33,15 +33,22 @@ use crate::exporters::TokenTransferExporter;
 
 pub struct ReceiptExporter {
     ctx: ContextRef,
-    dir: String,
+    output_dir: String,
+    range_path: String,
     hashes: Vec<H256>,
 }
 
 impl ReceiptExporter {
-    pub fn create(ctx: &ContextRef, dir: &str, hashes: Vec<H256>) -> ReceiptExporter {
+    pub fn create(
+        ctx: &ContextRef,
+        dir: &str,
+        range_path: &str,
+        hashes: Vec<H256>,
+    ) -> ReceiptExporter {
         Self {
             ctx: ctx.clone(),
-            dir: dir.to_string(),
+            output_dir: dir.to_string(),
+            range_path: range_path.to_string(),
             hashes,
         }
     }
@@ -55,15 +62,18 @@ impl ReceiptExporter {
         self.export_receipts(&receipts).await?;
 
         // Logs.
-        let logs_export = LogsExporter::create(&self.ctx, &self.dir, &receipts);
+        let logs_export =
+            LogsExporter::create(&self.ctx, &self.output_dir, &self.range_path, &receipts);
         logs_export.export().await?;
 
         // Token transfers.
-        let token_transfer_export = TokenTransferExporter::create(&self.ctx, &self.dir, &receipts);
+        let token_transfer_export =
+            TokenTransferExporter::create(&self.ctx, &self.output_dir, &self.range_path, &receipts);
         token_transfer_export.export().await?;
 
         // Ens.
-        let ens_export = EnsExporter::create(&self.ctx, &self.dir, &receipts);
+        let ens_export =
+            EnsExporter::create(&self.ctx, &self.output_dir, &self.range_path, &receipts);
         ens_export.export().await
     }
 
@@ -171,7 +181,7 @@ impl ReceiptExporter {
             effective_gas_price_array.boxed(),
         ])?;
 
-        let path = format!("{}/receipts", self.dir);
+        let path = format!("{}/receipts/receipts_{}", self.output_dir, self.range_path);
         write_file(&self.ctx, &path, schema, columns, "receipts").await
     }
 }

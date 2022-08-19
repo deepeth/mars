@@ -46,15 +46,22 @@ struct Transfer {
 
 pub struct TokenTransferExporter {
     ctx: ContextRef,
-    dir: String,
+    output_dir: String,
+    range_path: String,
     receipts: Vec<TransactionReceipt>,
 }
 
 impl TokenTransferExporter {
-    pub fn create(ctx: &ContextRef, dir: &str, receipts: &[TransactionReceipt]) -> Self {
+    pub fn create(
+        ctx: &ContextRef,
+        dir: &str,
+        range_path: &str,
+        receipts: &[TransactionReceipt],
+    ) -> Self {
         Self {
             ctx: ctx.clone(),
-            dir: dir.to_string(),
+            output_dir: dir.to_string(),
+            range_path: range_path.to_string(),
             receipts: receipts.to_vec(),
         }
     }
@@ -218,7 +225,10 @@ impl TokenTransferExporter {
             block_number_array.boxed(),
         ])?;
 
-        let path = format!("{}/token_transfers", self.dir);
+        let path = format!(
+            "{}/token_transfers/token_transfers_{}",
+            self.output_dir, self.range_path
+        );
         write_file(&self.ctx, &path, schema, columns, "token_transfer").await
     }
 }

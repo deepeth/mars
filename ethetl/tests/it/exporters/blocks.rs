@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::fs;
 use std::path::Path;
 
 use common_exceptions::Result;
@@ -28,55 +27,32 @@ async fn test_blocks_exporters() -> Result<()> {
     conf.export.end_block = 15340160;
     let ctx = create_ctx(&conf).await;
 
-    let dir = format!(
-        "{}/{}_{}",
-        ctx.get_output_dir(),
-        conf.export.start_block,
-        conf.export.end_block
-    );
-    fs::create_dir_all(&dir)?;
+    let range_path = format!("{}_{}", conf.export.start_block, conf.export.end_block);
 
     let range: Vec<usize> = (conf.export.start_block..conf.export.end_block + 1).collect();
 
     // CSV.
     {
-        let exporter = BlockExporter::create(&ctx, &dir, range.to_vec());
+        let exporter =
+            BlockExporter::create(&ctx, ctx.get_output_dir(), &range_path, range.to_vec());
         exporter.export().await?;
 
         goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/15340159_15340160/blocks.csv"),
-            Path::new("_datas/_test_output_dir/15340159_15340160/blocks.csv"),
+            Path::new("tests/it/testdata/blocks/blocks_15340159_15340160.csv"),
+            Path::new("_datas/_test_output_dir/blocks/blocks_15340159_15340160.csv"),
         );
 
         goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/15340159_15340160/transactions.csv"),
-            Path::new("_datas/_test_output_dir/15340159_15340160/transactions.csv"),
+            Path::new("tests/it/testdata/transactions/transactions_15340159_15340160.csv"),
+            Path::new("_datas/_test_output_dir/transactions/transactions_15340159_15340160.csv"),
         );
 
         goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/15340159_15340160/_transaction_hashes.txt"),
-            Path::new("_datas/_test_output_dir/15340159_15340160/_transaction_hashes.txt"),
+            Path::new("tests/it/testdata/transactions/_transactions_hash_15340159_15340160.txt"),
+            Path::new(
+                "_datas/_test_output_dir/transactions/_transactions_hash_15340159_15340160.txt",
+            ),
         );
-    }
-
-    // Parquet.
-    {
-        /*
-        conf.export.output_format = "parquet".to_string();
-        let exporter = BlockExporter::create(&ctx, &dir, range);
-        exporter.export().await?;
-
-        goldenfile::differs::binary_diff(
-            Path::new("tests/it/testdata/15340159_15340160/blocks.parquet"),
-            Path::new("_datas/_test_output_dir/15340159_15340160/blocks.parquet"),
-        );
-
-        goldenfile::differs::binary_diff(
-            Path::new("tests/it/testdata/15340159_15340160/transactions.parquet"),
-            Path::new("_datas/_test_output_dir/15340159_15340160/transactions.parquet"),
-        );
-
-         */
     }
 
     Ok(())
