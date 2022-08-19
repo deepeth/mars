@@ -40,15 +40,22 @@ struct Ens {
 
 pub struct EnsExporter {
     ctx: ContextRef,
-    dir: String,
+    output_dir: String,
+    range_path: String,
     receipts: Vec<TransactionReceipt>,
 }
 
 impl EnsExporter {
-    pub fn create(ctx: &ContextRef, dir: &str, receipts: &[TransactionReceipt]) -> Self {
+    pub fn create(
+        ctx: &ContextRef,
+        dir: &str,
+        range_path: &str,
+        receipts: &[TransactionReceipt],
+    ) -> Self {
         Self {
             ctx: ctx.clone(),
-            dir: dir.to_string(),
+            output_dir: dir.to_string(),
+            range_path: range_path.to_string(),
             receipts: receipts.to_vec(),
         }
     }
@@ -135,7 +142,7 @@ impl EnsExporter {
             block_number_array.boxed(),
         ])?;
 
-        let path = format!("{}/ens", self.dir);
+        let path = format!("{}/ens/ens_{}", self.output_dir, self.range_path);
         write_file(&self.ctx, &path, schema, columns, "ens").await
     }
 }

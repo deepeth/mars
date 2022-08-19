@@ -39,15 +39,22 @@ use crate::exporters::write_file;
 
 pub struct TransactionExporter {
     ctx: ContextRef,
-    dir: String,
+    output_dir: String,
+    range_path: String,
     blocks: Vec<Block<Transaction>>,
 }
 
 impl TransactionExporter {
-    pub fn create(ctx: &ContextRef, dir: &str, blocks: &[Block<Transaction>]) -> Self {
+    pub fn create(
+        ctx: &ContextRef,
+        dir: &str,
+        range_path: &str,
+        blocks: &[Block<Transaction>],
+    ) -> Self {
         Self {
             ctx: ctx.clone(),
-            dir: dir.to_string(),
+            output_dir: dir.to_string(),
+            range_path: range_path.to_string(),
             blocks: blocks.to_vec(),
         }
     }
@@ -200,13 +207,19 @@ impl TransactionExporter {
             block_timestamp_array.boxed(),
         ])?;
 
-        let tx_path = format!("{}/transactions", self.dir);
+        let tx_path = format!(
+            "{}/transactions/transactions_{}",
+            self.output_dir, self.range_path
+        );
         write_file(&self.ctx, &tx_path, schema, columns, "transactions").await?;
         self.write_tx_hash_file(&hash_vec).await
     }
 
     pub async fn write_tx_hash_file(&self, tx_hashes: &[String]) -> Result<()> {
-        let path = format!("{}/_transaction_hashes.txt", self.dir);
+        let path = format!(
+            "{}/transactions/_transactions_hash_{}.txt",
+            self.output_dir, self.range_path
+        );
         let mut cursor = Cursor::new(Vec::new());
         for hash in tx_hashes {
             writeln!(cursor, "{}", hash)?;

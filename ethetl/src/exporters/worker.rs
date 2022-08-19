@@ -49,26 +49,18 @@ impl Worker {
                     while !queue.is_empty() {
                         let range = queue.pop().await;
                         let (start, end) = (range[0], range[range.len() - 1]);
-                        let dir = format!("{}/{}_{}", ctx.get_output_dir(), start, end);
+                        let range_path = format!("{}_{}", start, end);
 
-                        let pipeline = Pipeline::create(&ctx, &dir, range);
+                        let pipeline = Pipeline::create(&ctx, &range_path, range);
                         let res = pipeline.execute().await;
                         match res {
                             Ok(_) => {}
                             Err(e) => {
                                 log::error!(
                                     "Pipeline execute error will remove {:?}, error: {:?}",
-                                    dir,
+                                    range_path,
                                     e
                                 );
-
-                                // Remove dir to keep atomic.
-                                let storage = ctx.get_storage();
-                                storage.batch().remove_all(&dir).await.unwrap_or_else(|x| {
-                                    log::error!("Remove {:?} error:{:?}", dir, x)
-                                });
-
-                                // TODO(Write the failure dir to file)
                             }
                         }
                     }

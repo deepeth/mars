@@ -15,7 +15,6 @@
 use std::io::BufRead;
 use std::io::BufReader;
 use std::io::Cursor;
-use std::io::Write;
 use std::str::FromStr;
 
 use arrow2::array::UInt64Array;
@@ -45,15 +44,22 @@ use crate::exporters::TransactionExporter;
 
 pub struct BlockExporter {
     ctx: ContextRef,
-    dir: String,
+    output_dir: String,
+    range_path: String,
     numbers: Vec<usize>,
 }
 
 impl BlockExporter {
-    pub fn create(ctx: &ContextRef, dir: &str, numbers: Vec<usize>) -> BlockExporter {
+    pub fn create(
+        ctx: &ContextRef,
+        output_dir: &str,
+        range_path: &str,
+        numbers: Vec<usize>,
+    ) -> BlockExporter {
         Self {
             ctx: ctx.clone(),
-            dir: dir.to_string(),
+            output_dir: output_dir.to_string(),
+            range_path: range_path.to_string(),
             numbers,
         }
     }
@@ -63,13 +69,11 @@ impl BlockExporter {
         fetcher.push_batch(self.numbers.to_vec())?;
         let blocks = fetcher.fetch().await?;
 
-        self.write_begin_file().await?;
         {
             self.export_blocks(&blocks).await?;
             self.export_txs(&blocks).await?;
             self.export_tx_receipts().await?;
         }
-        self.write_commit_file().await?;
 
         Ok(())
     }
@@ -218,25 +222,30 @@ impl BlockExporter {
             base_fee_per_gas_array.boxed(),
         ])?;
 
-        let block_path = format!("{}/blocks", self.dir);
+        let block_path = format!("{}/blocks/blocks_{}", self.output_dir, self.range_path);
         write_file(&self.ctx, &block_path, schema, columns, "blocks").await
     }
 
     pub async fn export_txs(&self, blocks: &[Block<Transaction>]) -> Result<()> {
-        let exporter = TransactionExporter::create(&self.ctx, &self.dir, blocks);
+        let exporter =
+            TransactionExporter::create(&self.ctx, &self.output_dir, &self.range_path, blocks);
         exporter.export().await
     }
 
     pub async fn export_tx_receipts(&self) -> Result<()> {
         let tx_hashes = self.read_tx_hash_file().await?;
-        let exporter = ReceiptExporter::create(&self.ctx, &self.dir, tx_hashes);
+        let exporter =
+            ReceiptExporter::create(&self.ctx, &self.output_dir, &self.range_path, tx_hashes);
         exporter.export().await?;
         Ok(())
     }
 
     pub async fn read_tx_hash_file(&self) -> Result<Vec<H256>> {
         let mut tx_hashes = vec![];
-        let path = format!("{}/_transaction_hashes.txt", self.dir);
+        let path = format!(
+            "{}/transactions/_transactions_hash_{}.txt",
+            self.output_dir, self.range_path
+        );
 
         let meta = self.ctx.get_storage().object(&path).metadata().await?;
         if meta.content_length() > 0 {
@@ -250,21 +259,5 @@ impl BlockExporter {
             }
         }
         Ok(tx_hashes)
-    }
-
-    pub async fn write_begin_file(&self) -> Result<()> {
-        let path = format!("{}/_begin.txt", self.dir);
-        let mut cursor = Cursor::new(Vec::new());
-        writeln!(cursor, "begin")?;
-        cursor.flush()?;
-        common_storages::write_txt(self.ctx.get_storage(), &path, cursor.get_ref().as_slice()).await
-    }
-
-    pub async fn write_commit_file(&self) -> Result<()> {
-        let path = format!("{}/_commit.txt", self.dir);
-        let mut cursor = Cursor::new(Vec::new());
-        writeln!(cursor, "commit")?;
-        cursor.flush()?;
-        common_storages::write_txt(self.ctx.get_storage(), &path, cursor.get_ref().as_slice()).await
     }
 }

@@ -31,15 +31,22 @@ use crate::exporters::write_file;
 
 pub struct LogsExporter {
     ctx: ContextRef,
-    dir: String,
+    output_dir: String,
+    range_path: String,
     receipts: Vec<TransactionReceipt>,
 }
 
 impl LogsExporter {
-    pub fn create(ctx: &ContextRef, dir: &str, receipts: &[TransactionReceipt]) -> LogsExporter {
+    pub fn create(
+        ctx: &ContextRef,
+        dir: &str,
+        range_path: &str,
+        receipts: &[TransactionReceipt],
+    ) -> LogsExporter {
         Self {
             ctx: ctx.clone(),
-            dir: dir.to_string(),
+            output_dir: dir.to_string(),
+            range_path: range_path.to_string(),
             receipts: receipts.to_vec(),
         }
     }
@@ -130,7 +137,7 @@ impl LogsExporter {
             topics_array.boxed(),
         ])?;
 
-        let path = format!("{}/logs", self.dir);
+        let path = format!("{}/logs/logs_{}", self.output_dir, self.range_path);
         write_file(&self.ctx, &path, schema, columns, "logs").await
     }
 }
