@@ -22,6 +22,5 @@ pub use eth::EthConfig;
 pub use eth::ExportConfig;
 pub use log::LogConfig;
 pub use storage::AzblobStorageConfig;
-pub use storage::FsStorageConfig;
 pub use storage::S3StorageConfig;
 pub use storage::StorageConfig;

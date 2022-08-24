@@ -26,10 +26,6 @@ pub struct StorageConfig {
     #[serde(rename = "type", alias = "storage_type")]
     pub storage_type: String,
 
-    // Fs storage backend config.
-    #[clap(flatten)]
-    pub fs: FsStorageConfig,
-
     // S3 storage backend config.
     #[clap(flatten)]
     pub s3: S3StorageConfig,
@@ -43,25 +39,8 @@ impl Default for StorageConfig {
     fn default() -> Self {
         StorageConfig {
             storage_type: "fs".to_string(),
-            fs: Default::default(),
             s3: Default::default(),
             azblob: Default::default(),
-        }
-    }
-}
-
-#[derive(Parser, Debug, Clone, Serialize, Deserialize)]
-#[serde(default)]
-pub struct FsStorageConfig {
-    /// fs storage backend data path
-    #[clap(long = "storage-fs-data-path", default_value = "_datas")]
-    pub data_path: String,
-}
-
-impl Default for FsStorageConfig {
-    fn default() -> Self {
-        FsStorageConfig {
-            data_path: "_datas".to_string(),
         }
     }
 }

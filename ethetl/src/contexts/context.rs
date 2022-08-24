@@ -15,7 +15,7 @@
 use std::sync::Arc;
 
 use common_configs::EthConfig;
-use common_storages::init_storage;
+use common_storages::init_fs_storage;
 use opendal::Operator;
 
 use crate::contexts::Progress;
@@ -36,7 +36,7 @@ pub type ContextRef = Arc<Context>;
 impl Context {
     pub async fn create(conf: &EthConfig) -> Arc<Context> {
         let all = conf.export.end_block - conf.export.start_block + 1;
-        let storage = Arc::new(init_storage(conf).await.unwrap());
+        let storage = Arc::new(init_fs_storage(&conf.export.output_dir).await.unwrap());
 
         Arc::new(Context {
             progress: Progress::create(all),
