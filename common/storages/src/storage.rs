@@ -17,7 +17,6 @@ use std::env;
 use backon::ExponentialBackoff;
 use common_configs::AzblobStorageConfig;
 use common_configs::EthConfig;
-use common_configs::FsStorageConfig;
 use common_configs::S3StorageConfig;
 use common_exceptions::ErrorCode;
 use common_exceptions::Result;
@@ -26,9 +25,22 @@ use opendal::services::fs;
 use opendal::services::s3;
 use opendal::Operator;
 
-pub async fn init_storage(conf: &EthConfig) -> Result<Operator> {
+/// init_fs_operator will init a opendal fs operator.
+pub async fn init_fs_storage(data_path: &str) -> Result<Operator> {
+    let mut builder = fs::Backend::build();
+
+    let mut path = data_path.to_string();
+    if !path.starts_with('/') {
+        path = env::current_dir().unwrap().join(path).display().to_string();
+    }
+    builder.root(&path);
+
+    Ok(Operator::new(builder.finish().await?).with_backoff(ExponentialBackoff::default()))
+}
+
+/// init object storage
+pub async fn init_object_storage(conf: &EthConfig) -> Result<Operator> {
     match conf.storage.storage_type.as_str() {
-        "fs" => init_fs_operator(&conf.storage.fs).await,
         "s3" => init_s3_operator(&conf.storage.s3).await,
         "azure" => init_azblob_operator(&conf.storage.azblob).await,
         typ => Err(ErrorCode::Invalid(format!(
@@ -36,19 +48,6 @@ pub async fn init_storage(conf: &EthConfig) -> Result<Operator> {
             typ
         ))),
     }
-}
-
-/// init_fs_operator will init a opendal fs operator.
-pub async fn init_fs_operator(cfg: &FsStorageConfig) -> Result<Operator> {
-    let mut builder = fs::Backend::build();
-
-    let mut path = cfg.data_path.clone();
-    if !path.starts_with('/') {
-        path = env::current_dir().unwrap().join(path).display().to_string();
-    }
-    builder.root(&path);
-
-    Ok(Operator::new(builder.finish().await?).with_backoff(ExponentialBackoff::default()))
 }
 
 /// init_s3_operator will init a opendal s3 operator with input s3 config.
