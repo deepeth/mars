@@ -16,7 +16,7 @@
 
 ### Schema
 
-#### blocks.csv/parquet
+#### blocks.parquet
 
 | Column            | Type            |
 |-------------------|-----------------|
@@ -40,7 +40,7 @@
 | base_fee_per_gas  | BIGINT UNSIGNED |
 
 
-#### transactions.csv/parquet
+#### transactions.parquet
 
 | Column                   | Type            |
 |--------------------------|-----------------|
@@ -60,7 +60,7 @@
 | block_number             | BIGINT UNSIGNED |
 | block_timestamp          | BIGINT UNSIGNED |
 
-#### logs.csv/parquet
+#### logs.parquet
 
 | Column            | Type            |
 |-------------------|-----------------|
@@ -74,7 +74,7 @@
 | topics            | VARCHAR         |
 
 
-#### receipts.csv/parquet
+#### receipts.parquet
 
 | Column               | Type              |
 |----------------------|-------------------|
@@ -89,7 +89,7 @@
 | status               | BIGINT UNSIGNED   |
 | effective_gas_price  | BIGINT UNSIGNED   |
 
-#### token_transfers.csv/parquet
+#### token_transfers.parquet
 
 | Column             | Type              |
 |--------------------|-------------------|
@@ -103,7 +103,7 @@
 | log_index          | BIGINT UNSIGNED   |
 | block_number       | BIGINT UNSIGNED   |
 
-#### ens.csv/parquet
+#### ens.parquet
 
 | Column             | Type            |
 |--------------------|-----------------|
