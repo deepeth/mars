@@ -92,7 +92,7 @@ pub struct ExportConfig {
         short = 'f',
         long,
         value_parser,
-        default_value = "csv",
+        default_value = "parquet",
         help = "Exporter Format(csv|parquet)"
     )]
     pub output_format: String,
@@ -108,7 +108,7 @@ impl Default for ExportConfig {
             max_worker: 4,
             web3_batch_size: 1000,
             output_dir: "_datas".to_string(),
-            output_format: "csv".to_string(),
+            output_format: "parquet".to_string(),
         }
     }
 }
