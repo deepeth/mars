@@ -1,8 +1,8 @@
 CREATE TABLE ens(
-    name STRING,
+    name VARCHAR,
     cost DOUBLE,
     expires BIGINT UNSIGNED,
-    owner STRING,
-    transaction_hash STRING,
+    owner VARCHAR,
+    transaction_hash VARCHAR,
     block_number BIGINT UNSIGNED
 );

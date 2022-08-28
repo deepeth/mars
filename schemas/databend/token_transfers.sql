@@ -1,11 +1,11 @@
 CREATE TABLE token_transfers(
-    token_address STRING,
-    from_address STRING,
-    to_address STRING,
-    token_id STRING,
-    value STRING,
-    erc_standard STRING,
-    transaction_hash STRING,
+    token_address VARCHAR,
+    from_address VARCHAR,
+    to_address VARCHAR,
+    token_id VARCHAR,
+    value VARCHAR,
+    erc_standard VARCHAR,
+    transaction_hash VARCHAR,
     log_index BIGINT UNSIGNED,
     block_number BIGINT UNSIGNED
 );

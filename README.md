@@ -21,18 +21,18 @@
 | Column            | Type            |
 |-------------------|-----------------|
 | number            | BIGINT UNSIGNED |
-| hash              | STRING          |
-| parent_hash       | STRING          |
-| nonce             | STRING          |
-| sha3_uncles       | STRING          |
-| logs_bloom        | STRING          |
-| transactions_root | STRING          |
-| state_root        | STRING          |
-| receipts_root     | STRING          |
-| difficulty        | STRING          |
-| total_difficulty  | STRING          |
+| hash              | VARCHAR         |
+| parent_hash       | VARCHAR         |
+| nonce             | VARCHAR         |
+| sha3_uncles       | VARCHAR         |
+| logs_bloom        | VARCHAR         |
+| transactions_root | VARCHAR         |
+| state_root        | VARCHAR         |
+| receipts_root     | VARCHAR         |
+| difficulty        | VARCHAR         |
+| total_difficulty  | VARCHAR         |
 | size              | BIGINT UNSIGNED |
-| extra_data        | STRING          |
+| extra_data        | VARCHAR         |
 | gas_limit         | BIGINT UNSIGNED |
 | gas_used          | BIGINT UNSIGNED |
 | timestamp         | BIGINT UNSIGNED |
@@ -44,19 +44,19 @@
 
 | Column                   | Type            |
 |--------------------------|-----------------|
-| hash                     | STRING          |
-| nonce                    | STRING          |
+| hash                     | VARCHAR         |
+| nonce                    | VARCHAR         |
 | transaction_index        | BIGINT UNSIGNED |
-| from_address             | STRING          |
-| to_address               | STRING          |
+| from_address             | VARCHAR         |
+| to_address               | VARCHAR         |
 | value                    | DOUBLE          |
 | gas                      | BIGINT UNSIGNED |
-| method_id                | STRING          |
-| input                    | STRING          |
+| method_id                | VARCHAR         |
+| input                    | VARCHAR         |
 | max_fee_per_gas          | BIGINT UNSIGNED |
 | max_priority_fee_per_gas | BIGINT UNSIGNED |
 | transaction_type         | BIGINT UNSIGNED |
-| block_hash               | STRING          |
+| block_hash               | VARCHAR         |
 | block_number             | BIGINT UNSIGNED |
 | block_timestamp          | BIGINT UNSIGNED |
 
@@ -65,53 +65,53 @@
 | Column            | Type            |
 |-------------------|-----------------|
 | log_index         | BIGINT UNSIGNED |
-| transaction_hash  | STRING          |
+| transaction_hash  | VARCHAR         |
 | transaction_index | BIGINT UNSIGNED |
-| block_hash        | STRING          |
+| block_hash        | VARCHAR         |
 | block_number      | BIGINT UNSIGNED |
-| contract_address  | STRING          |
-| data              | STRING          |
-| topics            | STRING          |
+| contract_address  | VARCHAR         |
+| data              | VARCHAR         |
+| topics            | VARCHAR         |
 
 
 #### receipts.csv/parquet
 
-| Column               | Type            |
-|----------------------|-----------------|
-| transaction_hash     | STRING          |
-| transaction_index    | BIGINT UNSIGNED |
-| block_hash           | STRING          |
-| block_number         | BIGINT UNSIGNED |
-| cumulative_gas_used  | BIGINT UNSIGNED |
-| gas_used             | BIGINT UNSIGNED |
-| contract_address     | STRING          |
-| root                 | STRING          |
-| status               | BIGINT UNSIGNED |
-| effective_gas_price  | BIGINT UNSIGNED |
+| Column               | Type              |
+|----------------------|-------------------|
+| transaction_hash     | VARCHAR           |
+| transaction_index    | BIGINT UNSIGNED   |
+| block_hash           | VARCHAR           |
+| block_number         | BIGINT UNSIGNED   |
+| cumulative_gas_used  | BIGINT UNSIGNED   |
+| gas_used             | BIGINT UNSIGNED   |
+| contract_address     | VARCHAR           |
+| root                 | VARCHAR           |
+| status               | BIGINT UNSIGNED   |
+| effective_gas_price  | BIGINT UNSIGNED   |
 
 #### token_transfers.csv/parquet
 
-| Column             | Type            |
-|--------------------|-----------------|
-| token_address      | STRING          |
-| from_address       | STRING          |
-| to_address         | STRING          |
-| token_id           | STRING          |
-| value              | STRING          |
-| erc_standard       | STRING          |
-| transaction_hash   | STRING          |
-| log_index          | BIGINT UNSIGNED |
-| block_number       | BIGINT UNSIGNED |
+| Column             | Type              |
+|--------------------|-------------------|
+| token_address      | VARCHAR           |
+| from_address       | VARCHAR           |
+| to_address         | VARCHAR           |
+| token_id           | VARCHAR           |
+| value              | VARCHAR           |
+| erc_standard       | VARCHAR           |
+| transaction_hash   | VARCHAR           |
+| log_index          | BIGINT UNSIGNED   |
+| block_number       | BIGINT UNSIGNED   |
 
 #### ens.csv/parquet
 
 | Column             | Type            |
 |--------------------|-----------------|
-| name               | STRING          |
+| name               | VARCHAR         |
 | cost               | DOUBLE          |
 | expires            | BIGINT UNSIGNED |
-| owner              | STRING          |
-| transaction_hash   | STRING          |
+| owner              | VARCHAR         |
+| transaction_hash   | VARCHAR         |
 | block_number       | BIGINT UNSIGNED |
 
 
@@ -121,7 +121,7 @@
 ```shell
 $ make build
 
-./target/release/ethetl -p https://mainnet.infura.io/v3/6e83aaa316ef4a8c947b949364f81619 -s 15340159 -e 15340160 -o /tmp/eth -w 16
+./target/release/ethetl -p https://mainnet.infura.io/v3/6e83aaa316ef4a8c947b949364f81619 -s 15340159 -e 15340160  -w 16
 [2022-08-15T08:25:47Z WARN ] collect: No such file or directory (os error 2)
 [2022-08-15T08:25:47Z INFO ] Config: EthConfig { log: LogConfig { level: "INFO", dir: "_logs" }, export: ExportConfig { provider_uri: "https://mainnet.infura.io/v3/6e83aaa316ef4a8c947b949364f81619", start_block: 15340159, end_block: 15340160, batch_size: 1000, max_worker: 16, web3_batch_size: 100, output_dir: "/tmp/eth", output_format: "csv" }, storage: StorageConfig { storage_type: "fs", fs: FsStorageConfig { data_path: "_datas" }, s3: S3StorageConfig { endpoint_url: "https://s3.amazonaws.com", region: "", bucket: "", root: "", access_key_id: "", secret_access_key: "" }, azblob: AzureStorageBlobConfig { endpoint_url: "", container: "", root: "", account_name: "", account_key: "" } }, config_file: "" }
 [2022-08-15T08:25:47Z INFO ] backend build started: Builder { root: Some("/home/bohu/github/deepeth/mars/_datas") }
