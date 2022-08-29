@@ -25,6 +25,7 @@ use web3::types::H256;
 use crate::common::create_config;
 use crate::common::create_ctx;
 
+#[ignore]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn test_receipts_exporters() -> Result<()> {
     let mut conf = create_config();
