@@ -12,7 +12,7 @@ latest
         FROM   blocks
         WHERE  timestamp >
     (
-    SELECT   subtract_hours(to_datetime(timestamp), 1)
+    SELECT   subtract_hours(to_datetime(timestamp), 6)
     FROM     blocks
     ORDER BY timestamp DESC
     LIMIT    1 ))
