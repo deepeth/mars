@@ -60,6 +60,7 @@ impl LogsExporter {
         let mut block_hash_vec = Vec::new();
         let mut block_number_vec = Vec::new();
         let mut contract_address_vec = Vec::new();
+        let mut event_address_vec = Vec::new();
         let mut data_vec = Vec::new();
         let mut topics_vec = Vec::new();
 
@@ -73,6 +74,7 @@ impl LogsExporter {
                 contract_address_vec.push(h160_to_hex(
                     &receipt.contract_address.unwrap_or_else(Address::zero),
                 ));
+                event_address_vec.push(h160_to_hex(&log.address));
                 data_vec.push(bytes_to_hex(&log.data));
                 let topics = log
                     .topics
@@ -91,6 +93,7 @@ impl LogsExporter {
         let block_hash_array = Utf8Array::<i32>::from_slice(block_hash_vec);
         let block_number_array = UInt64Array::from_slice(block_number_vec);
         let contract_address_array = Utf8Array::<i32>::from_slice(contract_address_vec);
+        let event_address_array = Utf8Array::<i32>::from_slice(event_address_vec);
         let data_array = Utf8Array::<i32>::from_slice(data_vec);
         let topics_array = Utf8Array::<i32>::from_slice(topics_vec);
 
@@ -108,9 +111,14 @@ impl LogsExporter {
         let block_hash_field = Field::new("block_hash", block_hash_array.data_type().clone(), true);
         let block_number_field =
             Field::new("block_number", block_number_array.data_type().clone(), true);
-        let contracet_address_field = Field::new(
+        let contract_address_field = Field::new(
             "contract_address",
             contract_address_array.data_type().clone(),
+            true,
+        );
+        let event_address_field = Field::new(
+            "event_address",
+            event_address_array.data_type().clone(),
             true,
         );
         let data_field = Field::new("data", data_array.data_type().clone(), true);
@@ -122,7 +130,8 @@ impl LogsExporter {
             transaction_index_field,
             block_hash_field,
             block_number_field,
-            contracet_address_field,
+            contract_address_field,
+            event_address_field,
             data_field,
             topics_field,
         ]);
@@ -133,6 +142,7 @@ impl LogsExporter {
             block_hash_array.boxed(),
             block_number_array.boxed(),
             contract_address_array.boxed(),
+            event_address_array.boxed(),
             data_array.boxed(),
             topics_array.boxed(),
         ])?;
