@@ -62,6 +62,7 @@ Cloud: https://app.databend.com/
 | block_hash        | VARCHAR         |
 | block_number      | BIGINT UNSIGNED |
 | contract_address  | VARCHAR         |
+| event_address     | VARCHAR         |
 | data              | VARCHAR         |
 | topics            | VARCHAR         |
 

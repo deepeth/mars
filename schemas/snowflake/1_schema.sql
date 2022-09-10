@@ -54,6 +54,7 @@ CREATE TABLE logs
     block_hash        VARCHAR,
     block_number      BIGINT,
     contract_address  VARCHAR,
+    event_address     VARCHAR,
     data              VARCHAR,
     topics            VARCHAR
 );
