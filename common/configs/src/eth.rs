@@ -168,6 +168,6 @@ impl EthConfig {
 
         // Finally, load from args.
         builder = builder.collect(from_self(arg_conf));
-        Ok(builder.build()?)
+        builder.build()
     }
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use common_exceptions::ErrorCode;
+use common_exceptions::Error;
 use common_exceptions::Result;
 use common_exceptions::Retryable;
 use web3::types::TransactionReceipt;
@@ -77,7 +77,7 @@ impl ReceiptFetcher {
                 let r = cb.await?;
                 match r {
                     None => {
-                        return Err(ErrorCode::ExportFetchError(
+                        return Err(Error::msg(
                             "Cannot get receipts by eth.transaction_receipt()",
                         ));
                     }

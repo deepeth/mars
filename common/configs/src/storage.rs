@@ -11,20 +11,53 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// Copy from https://github.com/Sherlock-Holo/ddns/blob/master/src/trace.rs
 
 use std::fmt;
+use std::str::FromStr;
 
 use clap::Parser;
 use serde::Deserialize;
 use serde::Serialize;
 
+#[derive(clap::ArgEnum, Debug, Clone, Serialize, Deserialize)]
+pub enum StorageType {
+    Fs,
+    S3,
+    Azure,
+}
+
+impl ToString for StorageType {
+    fn to_string(&self) -> String {
+        match self {
+            StorageType::Fs => "Fs".to_string(),
+            StorageType::S3 => "S3".to_string(),
+            StorageType::Azure => "Azure".to_string(),
+        }
+    }
+}
+
+impl FromStr for StorageType {
+    type Err = common_exceptions::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "fs" => Ok(StorageType::Fs),
+            "s3" => Ok(StorageType::S3),
+            "azure" => Ok(StorageType::Azure),
+            &_ => Ok(StorageType::Fs),
+        }
+    }
+}
+
 #[derive(Parser, Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct StorageConfig {
-    #[clap(long, default_value = "fs")]
+    #[clap(long, default_value_t = StorageType::Fs)]
     #[serde(rename = "type", alias = "storage_type")]
-    pub storage_type: String,
+    pub storage_type: StorageType,
+
+    #[clap(flatten)]
+    pub fs: FsStorageConfig,
 
     // S3 storage backend config.
     #[clap(flatten)]
@@ -38,9 +71,26 @@ pub struct StorageConfig {
 impl Default for StorageConfig {
     fn default() -> Self {
         StorageConfig {
-            storage_type: "fs".to_string(),
+            storage_type: StorageType::Fs,
+            fs: Default::default(),
             s3: Default::default(),
             azblob: Default::default(),
+        }
+    }
+}
+
+#[derive(Parser, Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
+pub struct FsStorageConfig {
+    /// Region for S3 storage
+    #[clap(long = "storage-fs-data-path", default_value = "./_datas")]
+    pub data_path: String,
+}
+
+impl Default for FsStorageConfig {
+    fn default() -> Self {
+        FsStorageConfig {
+            data_path: "./_datas".to_string(),
         }
     }
 }
@@ -74,6 +124,9 @@ pub struct S3StorageConfig {
     /// <root>
     #[clap(long = "storage-s3-root", default_value_t)]
     pub root: String,
+
+    #[clap(long = "storage-s3-enable_virtual_host_style", default_value_t)]
+    pub enable_virtual_host_style: bool,
 }
 
 impl Default for S3StorageConfig {
@@ -85,6 +138,7 @@ impl Default for S3StorageConfig {
             secret_access_key: "".to_string(),
             bucket: "".to_string(),
             root: "".to_string(),
+            enable_virtual_host_style: false,
         }
     }
 }
@@ -101,6 +155,7 @@ impl fmt::Debug for S3StorageConfig {
                 "secret_access_key",
                 &mask_string(&self.secret_access_key, 3),
             )
+            .field("enable_virtual_host_style", &self.enable_virtual_host_style)
             .finish()
     }
 }

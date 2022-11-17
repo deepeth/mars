@@ -13,14 +13,9 @@
 // limitations under the License.
 
 #![deny(unused_crate_dependencies)]
-#![feature(backtrace)]
 
-mod exception;
-mod exception_code;
-mod exception_into;
 mod retry;
 
-pub use exception::ErrorCode;
-pub use exception::ErrorCodeBacktrace;
-pub use exception::Result;
+pub use anyhow::Error;
+pub use anyhow::Result;
 pub use retry::Retryable;

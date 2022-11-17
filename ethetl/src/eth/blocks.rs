@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use common_exceptions::ErrorCode;
+use common_exceptions::Error;
 use common_exceptions::Result;
 use common_exceptions::Retryable;
 use web3::types::Block;
@@ -86,7 +86,7 @@ impl BlockFetcher {
                 let r = cb.await?;
                 match r {
                     None => {
-                        return Err(ErrorCode::ExportFetchError(
+                        return Err(Error::msg(
                             "Cannot export block by eth.block_with_txs(), please make sure eth node sync is already",
                         ));
                     }

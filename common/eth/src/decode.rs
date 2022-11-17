@@ -25,7 +25,7 @@ pub fn decode_with_types(types: &[String], data: &str) -> anyhow::Result<Vec<Tok
         .map(|s| Reader::read(s))
         .collect::<Result<_, _>>()?;
 
-    let data: Vec<u8> = hex::decode(&data)?;
+    let data: Vec<u8> = hex::decode(data)?;
     let tokens = decode(&types, &data)?;
     assert_eq!(types.len(), tokens.len());
     Ok(tokens)
