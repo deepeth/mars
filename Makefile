@@ -14,5 +14,9 @@ build:
 test:
 	bash ./scripts/ci/ci-run-unit-tests.sh
 
+# Setup dev toolchain
+setup:
+	bash ./scripts/setup/dev_setup.sh
+
 clean:
 	cargo clean
