@@ -15,7 +15,9 @@
 mod blocks;
 mod contracts;
 mod receipts;
+mod syncing;
 
 pub use blocks::BlockFetcher;
 pub use contracts::ContractFetcher;
 pub use receipts::ReceiptFetcher;
+pub use syncing::Syncing;
