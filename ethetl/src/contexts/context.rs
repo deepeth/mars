@@ -22,6 +22,7 @@ use crate::contexts::Progress;
 
 #[derive(Clone, Debug)]
 pub struct Context {
+    conf: EthConfig,
     progress: Arc<Progress>,
     rpc_url: String,
     batch_size: usize,
@@ -39,6 +40,7 @@ impl Context {
         let storage = Arc::new(init_object_storage(conf).await.unwrap());
 
         Arc::new(Context {
+            conf: conf.clone(),
             progress: Progress::create(all),
             rpc_url: conf.export.provider_uri.to_string(),
             batch_size: conf.export.batch_size,
@@ -48,6 +50,10 @@ impl Context {
             output_format: conf.export.output_format.clone(),
             storage,
         })
+    }
+
+    pub fn get_config(&self) -> EthConfig {
+        self.conf.clone()
     }
 
     pub fn get_rpc_url(&self) -> &str {

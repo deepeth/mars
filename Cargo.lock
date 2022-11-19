@@ -785,6 +785,7 @@ dependencies = [
  "log",
  "opendal",
  "percentage-rs",
+ "serde",
  "serde_json",
  "tokio",
  "web3",
