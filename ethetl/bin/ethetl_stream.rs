@@ -17,7 +17,7 @@ use common_exceptions::Result;
 use env_logger::Builder;
 use env_logger::Env;
 use ethetl::contexts::Context;
-use ethetl::exporters::Worker;
+use ethetl::stream::Stream;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -34,15 +34,8 @@ async fn main() -> Result<()> {
     let progress = ctx.get_progress();
     progress.start();
 
-    // Exporter.
-    let start = conf.export.start_block;
-    let end = conf.export.end_block;
-    let range: Vec<usize> = (start..end + 1).collect();
-
-    // Worker.
-    let worker = Worker::create(&ctx, range);
-    worker.start().await?;
-
+    let stream = Stream::create(ctx);
+    stream.start().await?;
 
     Ok(())
 }

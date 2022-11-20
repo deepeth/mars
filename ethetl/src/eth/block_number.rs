@@ -14,23 +14,23 @@
 
 use common_exceptions::Result;
 use common_exceptions::Retryable;
-use web3::types::SyncState;
+use web3::types::U64;
 
 use crate::contexts::ContextRef;
 
-pub struct Syncing {
+pub struct BlockNumber {
     ctx: ContextRef,
 }
 
-impl Syncing {
-    pub fn create(ctx: &ContextRef) -> Syncing {
+impl BlockNumber {
+    pub fn create(ctx: &ContextRef) -> BlockNumber {
         Self { ctx: ctx.clone() }
     }
 
-    pub async fn fetch(&self) -> Result<SyncState> {
+    pub async fn fetch(&self) -> Result<U64> {
         let notify = |e, duration| {
             log::warn!(
-                "Fetch blocks error at duration {:?}, error:{:?}",
+                "Fetch block number api error at duration {:?}, error:{:?}",
                 duration,
                 e
             )
@@ -44,10 +44,10 @@ impl Syncing {
     }
 
     // Get the blocks.
-    async fn fetch_with_no_retry(&self) -> Result<SyncState> {
+    async fn fetch_with_no_retry(&self) -> Result<U64> {
         let http = web3::transports::Http::new(self.ctx.get_rpc_url())?;
         let web3 = web3::Web3::new(http);
 
-        Ok(web3.eth().syncing().await?)
+        Ok(web3.eth().block_number().await?)
     }
 }

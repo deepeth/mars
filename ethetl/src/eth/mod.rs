@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+mod block_number;
 mod blocks;
 mod contracts;
 mod receipts;
-mod syncing;
 
+pub use block_number::BlockNumber;
 pub use blocks::BlockFetcher;
 pub use contracts::ContractFetcher;
 pub use receipts::ReceiptFetcher;
-pub use syncing::Syncing;
