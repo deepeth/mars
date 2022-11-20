@@ -96,6 +96,116 @@ function install_build_essentials {
 	esac
 }
 
+function install_openssl {
+	PACKAGE_MANAGER=$1
+
+	echo "==> installing openssl libs..."
+
+	case "$PACKAGE_MANAGER" in
+	apt-get)
+		install_pkg libssl-dev "$PACKAGE_MANAGER"
+		;;
+	pacman)
+		install_pkg openssl "$PACKAGE_MANAGER"
+		;;
+	apk)
+		install_pkg openssl-dev "$PACKAGE_MANAGER"
+		install_pkg openssl-libs-static "$PACKAGE_MANAGER"
+		;;
+	yum)
+		install_pkg openssl-devel "$PACKAGE_MANAGER"
+		;;
+	dnf)
+		install_pkg openssl-devel "$PACKAGE_MANAGER"
+		;;
+	brew)
+		install_pkg openssl "$PACKAGE_MANAGER"
+		;;
+	*)
+		echo "Unable to install openssl with package manager: $PACKAGE_MANAGER"
+		exit 1
+		;;
+	esac
+}
+
+function install_protobuf {
+	PACKAGE_MANAGER=$1
+
+	echo "==> installing protobuf compiler..."
+
+	case "$PACKAGE_MANAGER" in
+	apt-get)
+		install_pkg protobuf-compiler "$PACKAGE_MANAGER"
+		;;
+	pacman)
+		install_pkg protoc "$PACKAGE_MANAGER"
+		;;
+	apk)
+		install_pkg protoc "$PACKAGE_MANAGER"
+		;;
+	yum)
+		install_pkg protobuf "$PACKAGE_MANAGER"
+		;;
+	dnf)
+		install_pkg protobuf-compiler "$PACKAGE_MANAGER"
+		;;
+	brew)
+		install_pkg protobuf "$PACKAGE_MANAGER"
+		;;
+	*)
+		echo "Unable to install protobuf with package manager: $PACKAGE_MANAGER"
+		exit 1
+		;;
+	esac
+}
+
+function install_pkg_config {
+	PACKAGE_MANAGER=$1
+
+	echo "==> installing pkg-config..."
+
+	case "$PACKAGE_MANAGER" in
+	apt-get | dnf)
+		install_pkg pkg-config "$PACKAGE_MANAGER"
+		;;
+	pacman)
+		install_pkg pkgconf "$PACKAGE_MANAGER"
+		;;
+	apk | brew | yum)
+		install_pkg pkgconfig "$PACKAGE_MANAGER"
+		;;
+	*)
+		echo "Unable to install pkg-config with package manager: $PACKAGE_MANAGER"
+		exit 1
+		;;
+	esac
+}
+
+function install_mysql_client {
+	PACKAGE_MANAGER=$1
+
+	echo "==> installing mysql client..."
+
+	case "$PACKAGE_MANAGER" in
+	apt-get)
+		install_pkg default-mysql-client "$PACKAGE_MANAGER"
+		;;
+	pacman)
+		install_pkg mysql-clients "$PACKAGE_MANAGER"
+		;;
+	apk)
+		install_pkg mysql-client "$PACKAGE_MANAGER"
+		;;
+	yum | dnf | brew)
+		install_pkg mysql "$PACKAGE_MANAGER"
+		;;
+	*)
+		echo "Unable to install mysql client with package manager: $PACKAGE_MANAGER"
+		exit 1
+		;;
+	esac
+}
+
 function install_rustup {
 	RUST_TOOLCHAIN=$1
 
@@ -153,6 +263,8 @@ EOF
 Build tools (since -b or no option was provided):
   * Rust (and the necessary components, e.g. rust-fmt, clippy)
   * build-essential
+  * pkg-config
+  * libssl-dev
 EOF
 	fi
 
@@ -167,6 +279,11 @@ EOF
 	if [[ "$INSTALL_DEV_TOOLS" == "true" ]]; then
 		cat <<EOF
 Development tools (since -d was provided):
+  * mysql client
+  * python3 (boto3, yapf, yamllint, ...)
+  * python database drivers (mysql-connector-python, pymysql, sqlalchemy, clickhouse_driver)
+  * sqllogic test dependencies (PyHamcrest, environs, fire, ...)
+  * fuzz test dependencies (fuzzingbook)
 EOF
 	fi
 
@@ -197,7 +314,7 @@ EOF
 
 AUTO_APPROVE=false
 VERBOSE=false
-INSTALL_BUILD_TOOLS=false
+INSTALL_BUILD_TOOLS=true
 INSTALL_CHECK_TOOLS=false
 INSTALL_DEV_TOOLS=false
 INSTALL_PROFILE=false
@@ -316,7 +433,11 @@ if [[ "$INSTALL_BUILD_TOOLS" == "true" ]]; then
 	install_rustup "$RUST_TOOLCHAIN"
 
 	install_build_essentials "$PACKAGE_MANAGER"
+	install_pkg_config "$PACKAGE_MANAGER"
+	install_openssl "$PACKAGE_MANAGER"
+	install_protobuf "$PACKAGE_MANAGER"
 
+	install_pkg cmake "$PACKAGE_MANAGER"
 	install_pkg clang "$PACKAGE_MANAGER"
 	install_pkg llvm "$PACKAGE_MANAGER"
 
