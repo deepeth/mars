@@ -265,10 +265,6 @@ Build tools (since -b or no option was provided):
   * build-essential
   * pkg-config
   * libssl-dev
-  * protobuf-compiler
-  * thrift-compiler
-  * openjdk
-  * tpch dataset for benchmark
 EOF
 	fi
 
@@ -318,7 +314,7 @@ EOF
 
 AUTO_APPROVE=false
 VERBOSE=false
-INSTALL_BUILD_TOOLS=false
+INSTALL_BUILD_TOOLS=true
 INSTALL_CHECK_TOOLS=false
 INSTALL_DEV_TOOLS=false
 INSTALL_PROFILE=false
