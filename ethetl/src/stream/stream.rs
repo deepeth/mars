@@ -12,15 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::time::Duration;
+
 use common_exceptions::Result;
+use log::error;
 use log::info;
+use ticker::Ticker;
+use web3::types::SyncState;
 
 use crate::contexts::ContextRef;
-use crate::eth::BlockNumber;
+use crate::eth::Syncing;
 use crate::exporters::Worker;
 
+static SYNCING_STATUS_FILE: &str = "mars_syncing_status.json";
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-struct StreamSyncing {
+struct SyncingStatus {
     start: usize,
     end: usize,
 }
@@ -35,38 +42,87 @@ impl Stream {
     }
 
     pub async fn start(&self) -> Result<()> {
-        // Try to read stream_syncing.json
-        let stream_syncing_file = "stream_syncing.json";
-        let op = self.ctx.get_storage();
         let mut start = self.ctx.get_config().export.start_block;
 
-        let block_number = BlockNumber::create(&self.ctx);
-        let end = block_number.fetch().await?.as_u64() as usize;
-        info!("Stream chain latest block is: {:?}", end);
-
-        // Check syncing file.
-        if let Ok(data) = op.object(stream_syncing_file).read().await {
-            let prev_syncing: StreamSyncing = serde_json::from_slice(&data)?;
-            start = prev_syncing.end + 1;
-            info!(
-                "Found stream syncing file, syncing status: {:?}, change the start block to:{}",
-                prev_syncing, start
-            );
+        // Fetch syncing file.
+        {
+            let op = self.ctx.get_storage();
+            if let Ok(data) = op.object(SYNCING_STATUS_FILE).read().await {
+                let prev_syncing_status: SyncingStatus = serde_json::from_slice(&data)?;
+                start = prev_syncing_status.end + 1;
+                info!(
+                    "Found syncing status file={}, status={:?}",
+                    SYNCING_STATUS_FILE, prev_syncing_status
+                );
+            }
         }
 
-        info!("Stream sync range: [{:?}, {:?}]", start, end);
-        let range: Vec<usize> = (start..end + 1).collect();
+        let ticker = Ticker::new(0.., Duration::from_secs(1));
+        for _i in ticker {
+            // Fetch syncing state.
+            let end = {
+                let syncing_state = Syncing::create(&self.ctx).fetch().await?;
+                match syncing_state {
+                    SyncState::Syncing(v) => {
+                        let syncing_current_block = v.current_block.as_usize();
+                        let syncing_highest_block = v.highest_block.as_usize();
+                        info!(
+                            "eth.syncing, currentBlock={:}, highestBlock={:}",
+                            syncing_current_block, syncing_highest_block
+                        );
+                        syncing_current_block
+                    }
+                    SyncState::NotSyncing => {
+                        error!("eth.syncing stopped, please check your eth node is working fine");
+                        0usize
+                    }
+                }
+            };
+            if start <= end {
+                self.syncing_batch(start, end).await?;
+                start = end + 1;
+            }
+        }
+
+        Ok(())
+    }
+
+    async fn syncing_batch(&self, start: usize, end: usize) -> Result<()> {
+        let op = self.ctx.get_storage();
+        let range: Vec<usize> = (start..=end).collect();
         // Fits each chunk to max worker.
         let chunk_size = self.ctx.get_batch_size() * self.ctx.get_max_worker();
-        for chunk in range.chunks(chunk_size) {
-            let syncing = StreamSyncing {
+        let chunks = range.chunks(chunk_size);
+        info!(
+            "Syncing batch, range=[{:?}, {:?}], chunk_size={}, chunks={}",
+            start,
+            end,
+            chunk_size,
+            chunks.len()
+        );
+
+        for (i, chunk) in chunks.enumerate() {
+            let syncing_status = SyncingStatus {
                 start: *chunk.first().unwrap(),
                 end: *chunk.last().unwrap(),
             };
-            info!("Stream syncing chunk: {:?}", syncing);
-            let worker = Worker::create(&self.ctx, chunk.to_vec());
-            worker.start().await?;
+
+            // Start to syncing.
+            {
+                info!("Syncing batch[{}], status={:?}", i, syncing_status);
+                let worker = Worker::create(&self.ctx, chunk.to_vec());
+                worker.start().await?;
+            }
+
             // Write syncing file.
+            {
+                let syncing_json = serde_json::to_vec(&syncing_status)?;
+                op.object(SYNCING_STATUS_FILE).write(syncing_json).await?;
+                info!(
+                    "Syncing batch[{}], write file={}, status={:?}",
+                    i, SYNCING_STATUS_FILE, syncing_status
+                );
+            }
         }
 
         Ok(())

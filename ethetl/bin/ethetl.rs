@@ -37,7 +37,7 @@ async fn main() -> Result<()> {
     // Exporter.
     let start = conf.export.start_block;
     let end = conf.export.end_block;
-    let range: Vec<usize> = (start..end + 1).collect();
+    let range: Vec<usize> = (start..=end).collect();
 
     // Worker.
     let worker = Worker::create(&ctx, range);
