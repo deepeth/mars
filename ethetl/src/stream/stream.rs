@@ -91,6 +91,9 @@ impl Stream {
     }
 
     async fn syncing_batch(&self, start: usize, end: usize) -> Result<()> {
+        // Reset the progress.
+        self.ctx.get_progress().set_all(end - start);
+
         let op = self.ctx.get_storage();
         let range: Vec<usize> = (start..=end).collect();
         // Fits each chunk to max worker.

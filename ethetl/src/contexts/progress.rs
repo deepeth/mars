@@ -33,7 +33,7 @@ pub struct ProgressValue {
 
 #[derive(Debug)]
 pub struct Progress {
-    all: usize,
+    all: AtomicUsize,
     blocks: AtomicUsize,
     txs: AtomicUsize,
     receipts: AtomicUsize,
@@ -45,7 +45,7 @@ pub struct Progress {
 impl Progress {
     pub fn create(all: usize) -> Arc<Progress> {
         Arc::new(Progress {
-            all,
+            all: AtomicUsize::new(all),
             blocks: AtomicUsize::new(0),
             txs: AtomicUsize::new(0),
             receipts: AtomicUsize::new(0),
@@ -53,6 +53,10 @@ impl Progress {
             token_transfers: AtomicUsize::new(0),
             ens: AtomicUsize::new(0),
         })
+    }
+
+    pub fn set_all(&self, v: usize) {
+        self.all.store(v, Ordering::Relaxed);
     }
 
     pub fn incr_blocks(&self, v: usize) {
@@ -95,7 +99,7 @@ impl Progress {
             let mut interval = time::interval(Duration::from_secs(2));
             loop {
                 interval.tick().await;
-                print_progress(self.all, self.value().clone());
+                print_progress(self.all.load(Ordering::Relaxed), self.value().clone());
             }
         });
     }
@@ -105,7 +109,7 @@ impl Progress {
 impl Drop for Progress {
     fn drop(&mut self) {
         let value = self.value();
-        print_progress(self.all, value);
+        print_progress(self.all.load(Ordering::Relaxed), value);
     }
 }
 
