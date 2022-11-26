@@ -17,3 +17,4 @@ extern crate core;
 pub mod contexts;
 pub mod eth;
 pub mod exporters;
+pub mod stream;

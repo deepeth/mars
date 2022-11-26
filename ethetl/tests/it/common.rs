@@ -28,6 +28,7 @@ pub fn create_config() -> EthConfig {
             batch_size: 100,
             max_worker: 4,
             web3_batch_size: 50,
+            syncing_interval_secs: 1,
             output_dir: "_test_output_dir".to_string(),
             output_format: "csv".to_string(),
         },
