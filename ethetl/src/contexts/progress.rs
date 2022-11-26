@@ -19,7 +19,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use percentage_rs::Percent;
-use tokio::time;
+use ticker::Ticker;
 
 #[derive(Clone, Debug)]
 pub struct ProgressValue {
@@ -43,9 +43,9 @@ pub struct Progress {
 }
 
 impl Progress {
-    pub fn create(all: usize) -> Arc<Progress> {
+    pub fn create() -> Arc<Progress> {
         Arc::new(Progress {
-            all: AtomicUsize::new(all),
+            all: AtomicUsize::new(0),
             blocks: AtomicUsize::new(0),
             txs: AtomicUsize::new(0),
             receipts: AtomicUsize::new(0),
@@ -55,8 +55,8 @@ impl Progress {
         })
     }
 
-    pub fn set_all(&self, v: usize) {
-        self.all.store(v, Ordering::Relaxed);
+    pub fn inc_all(&self, v: usize) {
+        self.all.fetch_add(v, Ordering::Relaxed);
     }
 
     pub fn incr_blocks(&self, v: usize) {
@@ -96,35 +96,37 @@ impl Progress {
 
     pub fn start(self: Arc<Self>) {
         tokio::spawn(async move {
-            let mut interval = time::interval(Duration::from_secs(2));
-            loop {
-                interval.tick().await;
-                print_progress(self.all.load(Ordering::Relaxed), self.value().clone());
+            let ticker = Ticker::new(0.., Duration::from_secs(2));
+            for _i in ticker {
+                self.print_progress();
             }
         });
+    }
+
+    fn print_progress(&self) {
+        let all = self.all.load(Ordering::Relaxed);
+        let value = self.value();
+
+        if value.blocks > 0 {
+            let percent = ((value.blocks as f32 / all as f32) * 100_f32) as usize;
+            log::info!(
+                "block {:?} processed/{}, {:?} transactions processed, {:?} receipts processed, {:?} logs processed, {:?} token_transfers processed, {:?} ens processed. Progress is {:.2}",
+                value.blocks,
+                all,
+                value.txs,
+                value.receipts,
+                value.logs,
+                value.token_transfers,
+                value.ens,
+                percent.percent(),
+            );
+        }
     }
 }
 
 // Print the final result when the progress dropped.
 impl Drop for Progress {
     fn drop(&mut self) {
-        let value = self.value();
-        print_progress(self.all.load(Ordering::Relaxed), value);
-    }
-}
-
-fn print_progress(all: usize, value: Arc<ProgressValue>) {
-    if value.blocks > 0 {
-        let percent = ((value.blocks as f32 / all as f32) * 100_f32) as usize;
-        log::info!(
-            "{:?} blocks processed, {:?} transactions processed, {:?} receipts processed, {:?} logs processed, {:?} token_transfers processed, {:?} ens processed. Progress is {:.2}",
-            value.blocks,
-            value.txs,
-            value.receipts,
-            value.logs,
-            value.token_transfers,
-            value.ens,
-            percent.percent(),
-        );
+        self.print_progress();
     }
 }

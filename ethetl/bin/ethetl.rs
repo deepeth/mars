@@ -32,6 +32,8 @@ async fn main() -> Result<()> {
 
     // Interval progress.
     let progress = ctx.get_progress();
+    let all = conf.export.end_block - conf.export.start_block + 1;
+    progress.inc_all(all);
     progress.start();
 
     // Exporter.

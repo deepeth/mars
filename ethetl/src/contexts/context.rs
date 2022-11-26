@@ -36,12 +36,11 @@ pub type ContextRef = Arc<Context>;
 
 impl Context {
     pub async fn create(conf: &EthConfig) -> Arc<Context> {
-        let all = conf.export.end_block - conf.export.start_block + 1;
         let storage = Arc::new(init_object_storage(conf).await.unwrap());
 
         Arc::new(Context {
             conf: conf.clone(),
-            progress: Progress::create(all),
+            progress: Progress::create(),
             rpc_url: conf.export.provider_uri.to_string(),
             batch_size: conf.export.batch_size,
             max_worker: conf.export.max_worker,
