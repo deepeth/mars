@@ -57,7 +57,10 @@ impl Stream {
             }
         }
 
-        let ticker = Ticker::new(0.., Duration::from_secs(1));
+        let ticker = Ticker::new(
+            0..,
+            Duration::from_secs(self.ctx.get_config().export.syncing_interval_secs as u64),
+        );
         for _i in ticker {
             // Fetch syncing state.
             let end = {

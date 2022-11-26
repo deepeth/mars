@@ -80,6 +80,14 @@ pub struct ExportConfig {
     pub web3_batch_size: usize,
 
     #[clap(
+        long,
+        value_parser,
+        default_value_t = 1,
+        help = "Syncing with eth node every N seconds"
+    )]
+    pub syncing_interval_secs: usize,
+
+    #[clap(
         short = 'o',
         long,
         value_parser,
@@ -101,12 +109,13 @@ pub struct ExportConfig {
 impl Default for ExportConfig {
     fn default() -> Self {
         ExportConfig {
-            provider_uri: "https://127.0.0.1:8845".to_string(),
+            provider_uri: "https://127.0.0.1:8545".to_string(),
             start_block: 0,
             end_block: 10000,
             batch_size: 10000,
             max_worker: 4,
             web3_batch_size: 1000,
+            syncing_interval_secs: 2,
             output_dir: "_datas".to_string(),
             output_format: "parquet".to_string(),
         }
