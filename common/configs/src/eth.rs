@@ -28,7 +28,7 @@ use crate::LogConfig;
 use crate::StorageConfig;
 
 #[derive(Parser, Debug, Clone, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, deny_unknown_fields)]
 pub struct ExportConfig {
     #[clap(
         short = 'p',

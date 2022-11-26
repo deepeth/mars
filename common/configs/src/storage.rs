@@ -50,7 +50,7 @@ impl FromStr for StorageType {
 }
 
 #[derive(Parser, Debug, Clone, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, deny_unknown_fields)]
 pub struct StorageConfig {
     #[clap(long, default_value_t = StorageType::Fs)]
     #[serde(rename = "type", alias = "storage_type")]
