@@ -25,22 +25,31 @@ https://github.com/deepeth/mars/tree/main/schemas/snowflake
 
 ### How to Use
 
+#### ethetl-stream
+
+`ethetl-stream` will continuously fetch data from Ethereum node and transfrom the chain data to parquet files.
+
 ```shell
 $ make build
 
-./target/release/ethetl -p https://mainnet.infura.io/v3/6e83aaa316ef4a8c947b949364f81619 -s 15340159 -e 15340160  -w 16
-[2022-08-15T08:25:47Z WARN ] collect: No such file or directory (os error 2)
-[2022-08-15T08:25:47Z INFO ] Config: EthConfig { log: LogConfig { level: "INFO", dir: "_logs" }, export: ExportConfig { provider_uri: "https://mainnet.infura.io/v3/6e83aaa316ef4a8c947b949364f81619", start_block: 15340159, end_block: 15340160, batch_size: 1000, max_worker: 16, web3_batch_size: 100, output_dir: "/tmp/eth", output_format: "csv" }, storage: StorageConfig { storage_type: "fs", fs: FsStorageConfig { data_path: "_datas" }, s3: S3StorageConfig { endpoint_url: "https://s3.amazonaws.com", region: "", bucket: "", root: "", access_key_id: "", secret_access_key: "" }, azblob: AzureStorageBlobConfig { endpoint_url: "", container: "", root: "", account_name: "", account_key: "" } }, config_file: "" }
-[2022-08-15T08:25:47Z INFO ] backend build started: Builder { root: Some("/home/bohu/github/deepeth/mars/_datas") }
-[2022-08-15T08:25:47Z INFO ] backend build finished: Builder { root: Some("/home/bohu/github/deepeth/mars/_datas") }
-[2022-08-15T08:25:53Z INFO ] 2 blocks processed, 703 transactions processed, 0 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 100%
-[2022-08-15T08:25:55Z INFO ] 2 blocks processed, 703 transactions processed, 0 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 100%
-[2022-08-15T08:25:57Z INFO ] 2 blocks processed, 703 transactions processed, 100 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 100%
-[2022-08-15T08:25:59Z INFO ] 2 blocks processed, 703 transactions processed, 200 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 100%
-[2022-08-15T08:26:01Z INFO ] 2 blocks processed, 703 transactions processed, 300 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 100%
-[2022-08-15T08:26:03Z INFO ] 2 blocks processed, 703 transactions processed, 500 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 100%
-[2022-08-15T08:26:05Z INFO ] 2 blocks processed, 703 transactions processed, 600 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 100%
-[2022-08-15T08:26:07Z INFO ] 2 blocks processed, 703 transactions processed, 703 receipts processed, 1542 logs processed, 777 token_transfers processed, 3 ens processed. Progress is 100%
+ubuntu@ip-172-31-45-138:/data1/github/mars$ ./target/release/ethetl-stream -p http://127.0.0.1:8545 -s 1
+[2022-11-26T06:44:56Z WARN ] collect: No such file or directory (os error 2)
+[2022-11-26T06:44:56Z INFO ] Config: EthConfig { log: LogConfig { level: "INFO", dir: "_logs" }, export: ExportConfig { provider_uri: "http://127.0.0.1:8545", start_block: 1, end_block: 10000, batch_size: 1000, max_worker: 8, web3_batch_size: 100, syncing_interval_secs: 1, output_dir: "_datas", output_format: "parquet" }, storage: StorageConfig { storage_type: Fs, fs: FsStorageConfig { data_path: "./_datas" }, s3: S3StorageConfig { endpoint_url: "https://s3.amazonaws.com", region: "", bucket: "", root: "", access_key_id: "", secret_access_key: "", enable_virtual_host_style: true }, azblob: AzureStorageBlobConfig { endpoint_url: "", container: "", root: "", account_name: "", account_key: "" } }, config_file: "" }
+[2022-11-26T06:44:56Z INFO ] Found syncing status file=mars_syncing_status.json, status=SyncingStatus { start: 1, end: 8000 }
+[2022-11-26T06:44:57Z INFO ] eth.syncing, currentBlock=12679194, highestBlock=16051868
+[2022-11-26T06:44:57Z INFO ] Syncing batch, range=[8001, 12679194], chunk_size=8000, chunks=1584
+[2022-11-26T06:44:57Z INFO ] Syncing batch[0], status=SyncingStatus { start: 8001, end: 16000 }
+[2022-11-26T06:44:58Z INFO ] 2500 blocks processed, 0 transactions processed, 0 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 25%
+[2022-11-26T06:45:00Z INFO ] 2500 blocks processed, 0 transactions processed, 0 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 25%
+[2022-11-26T06:45:02Z INFO ] 2500 blocks processed, 0 transactions processed, 0 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 25%
+[2022-11-26T06:45:04Z INFO ] 2500 blocks processed, 0 transactions processed, 0 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 25%
+[2022-11-26T06:45:06Z INFO ] 2800 blocks processed, 0 transactions processed, 0 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 28%
+[2022-11-26T06:45:08Z INFO ] 3300 blocks processed, 0 transactions processed, 0 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 33%
+[2022-11-26T06:45:10Z INFO ] 3300 blocks processed, 0 transactions processed, 0 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 33%
+[2022-11-26T06:45:12Z INFO ] 3300 blocks processed, 0 transactions processed, 0 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 33%
+[2022-11-26T06:45:14Z INFO ] 3300 blocks processed, 0 transactions processed, 0 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 33%
+[2022-11-26T06:45:16Z INFO ] 3300 blocks processed, 0 transactions processed, 0 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 33%
+[2022-11-26T06:45:18Z INFO ] 3300 blocks processed, 0 transactions processed, 0 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 33%
 ... ...
 ```
 
