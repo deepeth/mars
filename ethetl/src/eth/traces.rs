@@ -79,6 +79,7 @@ impl Traces {
             // Get the callback.
             for cb in callbacks {
                 let r = cb.await?;
+                self.ctx.get_progress().incr_traces(r.len());
                 block_traces.extend(r);
             }
         }
