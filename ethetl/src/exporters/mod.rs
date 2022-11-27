@@ -18,6 +18,7 @@ mod logs;
 mod pipeline;
 mod receipts;
 mod token_transfers;
+mod traces;
 mod transactions;
 mod worker;
 
@@ -32,6 +33,7 @@ pub use logs::LogsExporter;
 pub use pipeline::Pipeline;
 pub use receipts::ReceiptExporter;
 pub use token_transfers::TokenTransferExporter;
+pub use traces::TracesExporter;
 pub use transactions::TransactionExporter;
 pub use worker::Worker;
 
