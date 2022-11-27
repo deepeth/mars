@@ -37,14 +37,21 @@ pub struct TracesExporter {
     ctx: ContextRef,
     output_dir: String,
     range_path: String,
+    traces: Vec<Trace>,
 }
 
 impl TracesExporter {
-    pub fn create(ctx: &ContextRef, output_dir: &str, range_path: &str) -> TracesExporter {
+    pub fn create(
+        ctx: &ContextRef,
+        output_dir: &str,
+        range_path: &str,
+        traces: &[Trace],
+    ) -> TracesExporter {
         Self {
             ctx: ctx.clone(),
             output_dir: output_dir.to_string(),
             range_path: range_path.to_string(),
+            traces: traces.to_vec(),
         }
     }
 
@@ -89,7 +96,8 @@ impl TracesExporter {
         ])
     }
 
-    pub async fn export_traces(&self, traces: &[Trace]) -> Result<()> {
+    pub async fn export(&self) -> Result<()> {
+        let traces = &self.traces;
         let traces_len = traces.len();
         let mut block_number_vec = Vec::with_capacity(traces_len);
         let mut transaction_hash_vec = Vec::with_capacity(traces_len);

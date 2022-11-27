@@ -38,8 +38,10 @@ use web3::types::U64;
 
 use crate::contexts::ContextRef;
 use crate::eth::BlockFetcher;
+use crate::eth::Traces;
 use crate::exporters::write_file;
 use crate::exporters::ReceiptExporter;
+use crate::exporters::TracesExporter;
 use crate::exporters::TransactionExporter;
 
 pub struct BlockExporter {
@@ -73,6 +75,7 @@ impl BlockExporter {
             self.export_blocks(&blocks).await?;
             self.export_txs(&blocks).await?;
             self.export_tx_receipts().await?;
+            self.export_traces().await?;
         }
 
         Ok(())
@@ -259,5 +262,15 @@ impl BlockExporter {
             }
         }
         Ok(tx_hashes)
+    }
+
+    pub async fn export_traces(&self) -> Result<()> {
+        let mut traces = Traces::create(&self.ctx);
+        traces.push_batch(self.numbers.clone())?;
+        let block_traces = traces.fetch().await?;
+
+        let exporter =
+            TracesExporter::create(&self.ctx, &self.output_dir, &self.range_path, &block_traces);
+        exporter.export().await
     }
 }
