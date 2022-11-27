@@ -27,6 +27,16 @@ pub async fn write_file(
     columns: Chunk<Box<dyn Array>>,
     msg: &str,
 ) -> Result<()> {
+    debug_assert!(
+        schema
+            .fields
+            .iter()
+            .zip(columns.iter())
+            .all(|(dt1, dt2)| &dt1.data_type == dt2.data_type()),
+        "schema={schema:?}\ncolumns={:?}",
+        columns.iter().map(|v| v.data_type()).collect::<Vec<_>>()
+    );
+
     match ctx.get_output_format().to_lowercase().as_str() {
         "csv" => {
             let path = format!("{}.csv", path);
