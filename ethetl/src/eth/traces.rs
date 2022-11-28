@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use log::info;
 use common_exceptions::Result;
 use common_exceptions::Retryable;
 use web3::types::BlockNumber;
@@ -79,7 +80,7 @@ impl Traces {
             // Get the callback.
             for cb in callbacks {
                 let r = cb.await?;
-                self.ctx.get_progress().incr_traces(r.len());
+                info!("traces: {:?}", r);
                 block_traces.extend(r);
             }
         }
