@@ -68,7 +68,7 @@ impl Traces {
 
         let mut block_traces = vec![];
 
-        for chunks in self.numbers.chunks(self.ctx.get_web3_batch_size()) {
+        for chunks in self.numbers.chunks(10) {
             let mut callbacks = vec![];
             for num in chunks {
                 let block_trace = web3.trace().block(BlockNumber::Number(U64::from(*num)));
