@@ -13,7 +13,7 @@ common-configs = { path = "../configs" }
 common-exceptions = { path = "../exceptions" }
 
 arrow2 = { version = "0.12.0", features = ["io_csv", "io_parquet", "io_parquet_compression"]}
-opendal = { version = "0.19", features = ["compress"] }
+opendal = { version = "0.26.2"}
 
 
 [dev-dependencies]
