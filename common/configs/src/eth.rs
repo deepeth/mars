@@ -123,7 +123,7 @@ impl Default for ExportConfig {
 }
 
 #[derive(Parser, Debug, Clone, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, deny_unknown_fields)]
 pub struct EthConfig {
     #[clap(flatten)]
     pub log: LogConfig,
