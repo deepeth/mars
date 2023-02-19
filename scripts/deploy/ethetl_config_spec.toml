@@ -30,8 +30,8 @@ output_format = "csv"
 
 # Storage config.
 [storage]
-# fs | s3 | azblob
-type = "fs"
+# Fs| S3 | Azblob
+type = "Fs"
 
 # Set a local folder to store your data.
 # Comment out this block if you're NOT using local file system as storage.

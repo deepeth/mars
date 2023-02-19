@@ -19,9 +19,6 @@
 Databend:
 https://github.com/deepeth/mars/tree/main/schemas/databend
 
-Snowflake:
-https://github.com/deepeth/mars/tree/main/schemas/snowflake
-
 
 ### How to Use
 

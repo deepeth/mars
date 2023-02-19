@@ -29,9 +29,9 @@ pub enum StorageType {
 impl ToString for StorageType {
     fn to_string(&self) -> String {
         match self {
-            StorageType::Fs => "Fs".to_string(),
-            StorageType::S3 => "S3".to_string(),
-            StorageType::Azure => "Azure".to_string(),
+            StorageType::Fs => "fs".to_string(),
+            StorageType::S3 => "s3".to_string(),
+            StorageType::Azure => "azure".to_string(),
         }
     }
 }
@@ -96,7 +96,7 @@ impl Default for FsStorageConfig {
 }
 
 #[derive(Parser, Clone, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, deny_unknown_fields)]
 pub struct S3StorageConfig {
     /// Region for S3 storage
     #[clap(long = "storage-s3-region", default_value_t)]
@@ -125,7 +125,7 @@ pub struct S3StorageConfig {
     #[clap(long = "storage-s3-root", default_value_t)]
     pub root: String,
 
-    #[clap(long = "storage-s3-enable_virtual_host_style", default_value_t)]
+    #[clap(long = "storage-s3-enable_virtual_host_style")]
     pub enable_virtual_host_style: bool,
 }
 
@@ -161,7 +161,7 @@ impl fmt::Debug for S3StorageConfig {
 }
 
 #[derive(Parser, Clone, Serialize, Deserialize)]
-#[serde(default)]
+#[serde(default, deny_unknown_fields)]
 pub struct AzblobStorageConfig {
     /// Account for Azblob
     #[clap(long = "storage-azblob-account-name", default_value_t)]

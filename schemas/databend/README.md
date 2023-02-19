@@ -2,7 +2,7 @@
 
 Databend is an open-source Elastic and Workload-Aware modern cloud data warehouse, activate your object storage for real-time analytics. 
 
-Github: https://github.com/datafuselabs/databend
+Deploy: https://github.com/datafuselabs/databend
 
 Cloud: https://app.databend.com/
 
