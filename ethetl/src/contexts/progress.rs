@@ -29,6 +29,7 @@ pub struct ProgressValue {
     pub logs: usize,
     pub token_transfers: usize,
     pub ens: usize,
+    pub traces: usize,
 }
 
 #[derive(Debug)]
@@ -40,6 +41,7 @@ pub struct Progress {
     logs: AtomicUsize,
     token_transfers: AtomicUsize,
     ens: AtomicUsize,
+    traces: AtomicUsize,
 }
 
 impl Progress {
@@ -52,6 +54,7 @@ impl Progress {
             logs: AtomicUsize::new(0),
             token_transfers: AtomicUsize::new(0),
             ens: AtomicUsize::new(0),
+            traces: AtomicUsize::new(0),
         })
     }
 
@@ -83,6 +86,10 @@ impl Progress {
         self.ens.fetch_add(v, Ordering::Relaxed);
     }
 
+    pub fn incr_traces(&self, v: usize) {
+        self.traces.fetch_add(v, Ordering::Relaxed);
+    }
+
     pub fn value(&self) -> Arc<ProgressValue> {
         Arc::new(ProgressValue {
             blocks: self.blocks.load(Ordering::Relaxed),
@@ -91,6 +98,7 @@ impl Progress {
             logs: self.logs.load(Ordering::Relaxed),
             token_transfers: self.token_transfers.load(Ordering::Relaxed),
             ens: self.ens.load(Ordering::Relaxed),
+            traces: self.traces.load(Ordering::Relaxed),
         })
     }
 
@@ -110,7 +118,7 @@ impl Progress {
         if value.blocks > 0 {
             let percent = ((value.blocks as f32 / all as f32) * 100_f32) as usize;
             log::info!(
-                "block {:?} processed/{}, {:?} transactions processed, {:?} receipts processed, {:?} logs processed, {:?} token_transfers processed, {:?} ens processed. Progress is {:.2}",
+                "block {:?} processed/{}, {:?} transactions processed, {:?} receipts processed, {:?} logs processed, {:?} token_transfers processed, {:?} ens processed, {:?} traces processed. Progress is {:.2}",
                 value.blocks,
                 all,
                 value.txs,
@@ -118,6 +126,7 @@ impl Progress {
                 value.logs,
                 value.token_transfers,
                 value.ens,
+                value.traces,
                 percent.percent(),
             );
         }

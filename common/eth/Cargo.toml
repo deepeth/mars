@@ -12,6 +12,6 @@ test = false
 
 anyhow = "1"
 hex = "0.4"
-web3 = "0.18.0"
+web3 = { git = "https://github.com/BohuTANG/rust-web3"}
 
 [dev-dependencies]
