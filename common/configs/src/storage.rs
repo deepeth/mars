@@ -29,9 +29,9 @@ pub enum StorageType {
 impl ToString for StorageType {
     fn to_string(&self) -> String {
         match self {
-            StorageType::Fs => "Fs".to_string(),
-            StorageType::S3 => "S3".to_string(),
-            StorageType::Azure => "Azure".to_string(),
+            StorageType::Fs => "fs".to_string(),
+            StorageType::S3 => "s3".to_string(),
+            StorageType::Azure => "azure".to_string(),
         }
     }
 }
