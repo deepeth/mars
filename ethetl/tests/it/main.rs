@@ -14,4 +14,3 @@
 
 mod common;
 mod exporters;
-mod fetchers;
