@@ -20,38 +20,44 @@ use ethetl::exporters::BlockExporter;
 use crate::common::create_config;
 use crate::common::create_ctx;
 
-#[ignore]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn test_blocks_exporters() -> Result<()> {
-    let mut conf = create_config();
-    conf.export.start_block = 15340159;
-    conf.export.end_block = 15340160;
+    let conf = create_config();
     let ctx = create_ctx(&conf).await;
 
+    let range_name = format!("{}_{}", conf.export.start_block, conf.export.end_block);
     let range_path = format!("{}_{}", conf.export.start_block, conf.export.end_block);
 
     let range: Vec<usize> = (conf.export.start_block..conf.export.end_block + 1).collect();
 
-    // CSV.
     {
         let exporter =
             BlockExporter::create(&ctx, ctx.get_output_dir(), &range_path, range.to_vec());
         exporter.export().await?;
 
         goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/blocks/blocks_15340159_15340160.csv"),
-            Path::new("_datas/_test_output_dir/blocks/blocks_15340159_15340160.csv"),
+            Path::new(format!("tests/it/testdata/blocks/blocks_{range_name}.csv").as_str()),
+            Path::new(format!("_datas/_test_output_dir/blocks/blocks_{range_name}.csv").as_str()),
         );
 
         goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/transactions/transactions_15340159_15340160.csv"),
-            Path::new("_datas/_test_output_dir/transactions/transactions_15340159_15340160.csv"),
-        );
-
-        goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/transactions/_transactions_hash_15340159_15340160.txt"),
             Path::new(
-                "_datas/_test_output_dir/transactions/_transactions_hash_15340159_15340160.txt",
+                format!("tests/it/testdata/transactions/transactions_{range_name}.csv").as_str(),
+            ),
+            Path::new(
+                format!("_datas/_test_output_dir/transactions/transactions_{range_name}.csv")
+                    .as_str(),
+            ),
+        );
+
+        goldenfile::differs::text_diff(
+            Path::new(
+                format!("tests/it/testdata/transactions/_transactions_hash_{range_name}.txt")
+                    .as_str(),
+            ),
+            Path::new(
+                format!("_datas/_test_output_dir/transactions/_transactions_hash_{range_name}.txt")
+                    .as_str(),
             ),
         );
     }

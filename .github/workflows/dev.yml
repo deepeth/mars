@@ -22,6 +22,8 @@ jobs:
           args: -- -Dwarnings
       - name: cargo test
         uses: actions-rs/cargo@v1
+        env:
+          PROVIDER_URI: ${{ secrets.PROVIDER_URI}}
         with:
           command: test
           args: --verbose

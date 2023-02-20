@@ -25,15 +25,13 @@ use web3::types::H256;
 use crate::common::create_config;
 use crate::common::create_ctx;
 
-#[ignore]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn test_receipts_exporters() -> Result<()> {
-    let mut conf = create_config();
-    conf.export.start_block = 15340159;
-    conf.export.end_block = 15340160;
+    let conf = create_config();
+    let range_name = format!("{}_{}", conf.export.start_block, conf.export.end_block);
     let ctx = create_ctx(&conf).await;
 
-    let path = "tests/it/testdata/transactions/_transactions_hash_15340159_15340160.txt";
+    let path = format!("tests/it/testdata/transactions/_transactions_hash_{range_name}.txt");
     let file = File::open(path)?;
     let buffered = BufReader::new(file);
 
@@ -45,32 +43,37 @@ async fn test_receipts_exporters() -> Result<()> {
 
     let range_path = format!("{}_{}", conf.export.start_block, conf.export.end_block);
 
-    // CSV.
     {
         let exporter =
             ReceiptExporter::create(&ctx, ctx.get_output_dir(), &range_path, tx_hashes.to_vec());
         exporter.export().await?;
 
         goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/receipts/receipts_15340159_15340160.csv"),
-            Path::new("_datas/_test_output_dir/receipts/receipts_15340159_15340160.csv"),
-        );
-
-        goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/logs/logs_15340159_15340160.csv"),
-            Path::new("_datas/_test_output_dir/logs/logs_15340159_15340160.csv"),
-        );
-
-        goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/token_transfers/token_transfers_15340159_15340160.csv"),
+            Path::new(format!("tests/it/testdata/receipts/receipts_{range_name}.csv").as_str()),
             Path::new(
-                "_datas/_test_output_dir/token_transfers/token_transfers_15340159_15340160.csv",
+                format!("_datas/_test_output_dir/receipts/receipts_{range_name}.csv").as_str(),
             ),
         );
 
         goldenfile::differs::text_diff(
-            Path::new("tests/it/testdata/ens/ens_15340159_15340160.csv"),
-            Path::new("_datas/_test_output_dir/ens/ens_15340159_15340160.csv"),
+            Path::new(format!("tests/it/testdata/logs/logs_{range_name}.csv").as_str()),
+            Path::new(format!("_datas/_test_output_dir/logs/logs_{range_name}.csv").as_str()),
+        );
+
+        goldenfile::differs::text_diff(
+            Path::new(
+                format!("tests/it/testdata/token_transfers/token_transfers_{range_name}.csv")
+                    .as_str(),
+            ),
+            Path::new(
+                format!("_datas/_test_output_dir/token_transfers/token_transfers_{range_name}.csv")
+                    .as_str(),
+            ),
+        );
+
+        goldenfile::differs::text_diff(
+            Path::new(format!("tests/it/testdata/ens/ens_{range_name}.csv").as_str()),
+            Path::new(format!("_datas/_test_output_dir/ens/ens_{range_name}.csv").as_str()),
         );
     }
     Ok(())

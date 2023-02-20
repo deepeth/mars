@@ -33,9 +33,9 @@ pub struct ExportConfig {
     #[clap(
         short = 'p',
         long,
+        env,
         value_parser,
         default_value_t,
-        default_value = "https://127.0.0.1:8845",
         help = "The URI of the web3 provider e.g. https://127.0.0.1:8845"
     )]
     pub provider_uri: String,

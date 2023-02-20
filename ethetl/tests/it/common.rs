@@ -18,13 +18,14 @@ use ethetl::contexts::Context;
 use ethetl::contexts::ContextRef;
 
 pub fn create_config() -> EthConfig {
-    let provider_uri = "https://mainnet.infura.io/v3/6e83aaa316ef4a8c947b949364f81619".to_string();
+    // export PROVIDER_URI='<your-provider-uri>'
+    let provider_uri = std::env::var("PROVIDER_URI").unwrap();
 
     EthConfig {
         export: ExportConfig {
             provider_uri,
-            start_block: 50010,
-            end_block: 50010,
+            start_block: 16600001,
+            end_block: 16600002,
             batch_size: 100,
             max_worker: 4,
             web3_batch_size: 50,
