@@ -16,6 +16,7 @@ use std::sync::Arc;
 
 use common_exceptions::Result;
 use deadqueue::unlimited::Queue;
+use log::error;
 
 use crate::contexts::ContextRef;
 use crate::exporters::Pipeline;
@@ -56,11 +57,7 @@ impl Worker {
                         match res {
                             Ok(_) => {}
                             Err(e) => {
-                                log::error!(
-                                    "Pipeline execute error will remove {:?}, error: {:?}",
-                                    range_path,
-                                    e
-                                );
+                                error!("pipeline: {:?} execute error: {:?}", range_path, e);
                             }
                         }
                     }
@@ -71,6 +68,7 @@ impl Worker {
         for future in futures {
             future.await?;
         }
+
         Ok(())
     }
 }

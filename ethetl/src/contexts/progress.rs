@@ -13,11 +13,13 @@
 // limitations under the License.
 
 use std::fmt::Debug;
+use std::sync::atomic::AtomicBool;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
 use std::sync::Arc;
 use std::time::Duration;
 
+use log::info;
 use percentage_rs::Percent;
 use ticker::Ticker;
 
@@ -40,6 +42,7 @@ pub struct Progress {
     logs: AtomicUsize,
     token_transfers: AtomicUsize,
     ens: AtomicUsize,
+    stopped: AtomicBool,
 }
 
 impl Progress {
@@ -52,6 +55,7 @@ impl Progress {
             logs: AtomicUsize::new(0),
             token_transfers: AtomicUsize::new(0),
             ens: AtomicUsize::new(0),
+            stopped: Default::default(),
         })
     }
 
@@ -94,13 +98,21 @@ impl Progress {
         })
     }
 
-    pub fn start(self: Arc<Self>) {
+    pub fn start(self: &Arc<Self>) {
+        let clone = self.clone();
         tokio::spawn(async move {
             let ticker = Ticker::new(0.., Duration::from_secs(2));
             for _i in ticker {
-                self.print_progress();
+                if clone.stopped.load(Ordering::Relaxed) {
+                    return;
+                }
+                clone.print_progress();
             }
         });
+    }
+
+    pub fn stop(self: &Arc<Self>) {
+        self.stopped.store(true, Ordering::Relaxed);
     }
 
     fn print_progress(&self) {
@@ -109,7 +121,7 @@ impl Progress {
 
         if value.blocks > 0 {
             let percent = ((value.blocks as f32 / all as f32) * 100_f32) as usize;
-            log::info!(
+            info!(
                 "block {:?} processed/{}, {:?} transactions processed, {:?} receipts processed, {:?} logs processed, {:?} token_transfers processed, {:?} ens processed. Progress is {:.2}",
                 value.blocks,
                 all,

@@ -18,6 +18,7 @@ use env_logger::Builder;
 use env_logger::Env;
 use ethetl::contexts::Context;
 use ethetl::exporters::Worker;
+use log::info;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -25,7 +26,7 @@ async fn main() -> Result<()> {
     Builder::from_env(env).format_target(false).init();
 
     let conf = EthConfig::load()?;
-    log::info!("Config: {:?}", conf);
+    info!("Config: {:?}", conf);
 
     // Create data dir.
     let ctx = Context::create(&conf).await;
@@ -44,6 +45,7 @@ async fn main() -> Result<()> {
     // Worker.
     let worker = Worker::create(&ctx, range);
     worker.start().await?;
+    progress.stop();
 
     Ok(())
 }
