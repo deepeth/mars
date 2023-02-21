@@ -37,6 +37,7 @@ pub struct ProgressValue {
 pub struct Progress {
     all: AtomicUsize,
     blocks: AtomicUsize,
+    max_block_number: AtomicUsize,
     txs: AtomicUsize,
     receipts: AtomicUsize,
     logs: AtomicUsize,
@@ -50,6 +51,7 @@ impl Progress {
         Arc::new(Progress {
             all: AtomicUsize::new(0),
             blocks: AtomicUsize::new(0),
+            max_block_number: AtomicUsize::new(0),
             txs: AtomicUsize::new(0),
             receipts: AtomicUsize::new(0),
             logs: AtomicUsize::new(0),
@@ -65,6 +67,12 @@ impl Progress {
 
     pub fn incr_blocks(&self, v: usize) {
         self.blocks.fetch_add(v, Ordering::Relaxed);
+    }
+
+    pub fn set_max_blocks(&self, v: usize) {
+        if self.max_block_number.load(Ordering::Relaxed) < v {
+            self.max_block_number.store(v, Ordering::Relaxed);
+        }
     }
 
     pub fn incr_txs(&self, v: usize) {
@@ -117,14 +125,16 @@ impl Progress {
 
     fn print_progress(&self) {
         let all = self.all.load(Ordering::Relaxed);
+        let latest_block = self.max_block_number.load(Ordering::Relaxed);
         let value = self.value();
 
         if value.blocks > 0 {
             let percent = ((value.blocks as f32 / all as f32) * 100_f32) as usize;
             info!(
-                "block {:?} processed/{}, {:?} transactions processed, {:?} receipts processed, {:?} logs processed, {:?} token_transfers processed, {:?} ens processed. Progress is {:.2}",
+                "block {:?} processed/{}, latest block {}, {:?} transactions processed, {:?} receipts processed, {:?} logs processed, {:?} token_transfers processed, {:?} ens processed. Progress is {:.2}",
                 value.blocks,
                 all,
+                latest_block,
                 value.txs,
                 value.receipts,
                 value.logs,

@@ -82,7 +82,7 @@ pub struct ExportConfig {
     #[clap(
         long,
         value_parser,
-        default_value_t = 1,
+        default_value_t = 60,
         help = "Syncing with eth node every N seconds"
     )]
     pub syncing_interval_secs: usize,
