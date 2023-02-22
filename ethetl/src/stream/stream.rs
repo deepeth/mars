@@ -15,13 +15,11 @@
 use std::time::Duration;
 
 use common_exceptions::Result;
-use log::error;
 use log::info;
 use ticker::Ticker;
-use web3::types::SyncState;
 
 use crate::contexts::ContextRef;
-use crate::eth::Syncing;
+use crate::eth::BlockNumber;
 use crate::exporters::Worker;
 
 static SYNCING_STATUS_FILE: &str = "mars_syncing_status.json";
@@ -64,22 +62,9 @@ impl Stream {
         for _i in ticker {
             // Fetch syncing state.
             let end = {
-                let syncing_state = Syncing::create(&self.ctx).fetch().await?;
-                match syncing_state {
-                    SyncState::Syncing(v) => {
-                        let syncing_current_block = v.current_block.as_usize();
-                        let syncing_highest_block = v.highest_block.as_usize();
-                        info!(
-                            "eth.syncing, currentBlock={:}, highestBlock={:}",
-                            syncing_current_block, syncing_highest_block
-                        );
-                        syncing_current_block
-                    }
-                    SyncState::NotSyncing => {
-                        error!("eth.syncing stopped, please check your eth node is working fine");
-                        0usize
-                    }
-                }
+                let latest_block = BlockNumber::create(&self.ctx).fetch().await?;
+                info!("Eth node last block number :{}", latest_block);
+                latest_block.as_usize()
             };
             if start <= end {
                 self.syncing_batch(start, end).await?;
@@ -92,7 +77,7 @@ impl Stream {
 
     async fn syncing_batch(&self, start: usize, end: usize) -> Result<()> {
         // Incr progress.
-        self.ctx.get_progress().inc_all(end - start);
+        self.ctx.get_progress().inc_all(end - start + 1);
 
         let op = self.ctx.get_storage();
         let range: Vec<usize> = (start..=end).collect();

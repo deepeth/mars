@@ -36,6 +36,7 @@ async fn main() -> Result<()> {
 
     let stream = Stream::create(ctx);
     stream.start().await?;
+    progress.stop();
 
     Ok(())
 }

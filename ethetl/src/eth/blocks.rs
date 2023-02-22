@@ -91,10 +91,14 @@ impl BlockFetcher {
                         ));
                     }
                     Some(blk) => {
+                        let num = blk.number;
                         let len = blk.transactions.len();
                         blocks.push(blk);
 
                         self.ctx.get_progress().incr_blocks(1);
+                        self.ctx
+                            .get_progress()
+                            .set_max_blocks(num.unwrap().as_usize());
                         self.ctx.get_progress().incr_txs(len);
                     }
                 }
