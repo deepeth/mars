@@ -95,15 +95,6 @@ pub struct ExportConfig {
         help = "Exporter directory"
     )]
     pub output_dir: String,
-
-    #[clap(
-        short = 'f',
-        long,
-        value_parser,
-        default_value = "parquet",
-        help = "Exporter Format(csv|parquet)"
-    )]
-    pub output_format: String,
 }
 
 impl Default for ExportConfig {
@@ -117,7 +108,6 @@ impl Default for ExportConfig {
             web3_batch_size: 1000,
             syncing_interval_secs: 2,
             output_dir: "_datas".to_string(),
-            output_format: "parquet".to_string(),
         }
     }
 }

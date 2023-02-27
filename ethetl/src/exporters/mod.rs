@@ -25,7 +25,6 @@ use arrow2::array::Array;
 use arrow2::chunk::Chunk;
 use arrow2::datatypes::Schema;
 pub use blocks::BlockExporter;
-use common_exceptions::Error;
 use common_exceptions::Result;
 pub use ens::EnsExporter;
 pub use logs::LogsExporter;
@@ -44,20 +43,7 @@ pub async fn write_file(
     columns: Chunk<Box<dyn Array>>,
     msg: &str,
 ) -> Result<()> {
-    match ctx.get_output_format().to_lowercase().as_str() {
-        "csv" => {
-            let path = format!("{}.csv", path);
-            log::info!("Write {} to {}", msg, path);
-            common_storages::write_csv(ctx.get_storage(), &path, schema, columns).await
-        }
-        "parquet" => {
-            let path = format!("{}.parquet", path);
-            log::info!("Write {} to {}", msg, path);
-            common_storages::write_parquet(ctx.get_storage(), &path, schema, columns).await
-        }
-        v => Err(Error::msg(format!(
-            "Unsupported format, must be one of [csv, parquet], got: {}",
-            v
-        ))),
-    }
+    let path = format!("{}.parquet", path);
+    log::info!("Write {} to {}", msg, path);
+    common_storages::write_parquet(ctx.get_storage(), &path, schema, columns).await
 }

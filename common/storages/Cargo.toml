@@ -12,7 +12,7 @@ test = false
 common-configs = { path = "../configs" }
 common-exceptions = { path = "../exceptions" }
 
-arrow2 = { version = "0.16.0", features = ["io_csv", "io_parquet", "io_parquet_compression"]}
+arrow2 = { version = "0.16.0", features = ["io_parquet", "io_parquet_compression"]}
 opendal = { version = "0.28.0"}
 
 

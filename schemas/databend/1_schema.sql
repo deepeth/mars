@@ -33,7 +33,7 @@ CREATE TABLE transactions
     transaction_index        BIGINT UNSIGNED,
     from_address             VARCHAR,
     to_address               VARCHAR,
-    value                    DOUBLE,
+    value                    DECIMAL(36, 18),
     gas                      BIGINT UNSIGNED,
     gas_price                BIGINT UNSIGNED,
     method_id                VARCHAR,
@@ -79,7 +79,7 @@ CREATE TABLE token_transfers
     from_address     VARCHAR,
     to_address       VARCHAR,
     token_id         VARCHAR,
-    value            VARCHAR,
+    value            DECIMAL(36, 18),
     erc_standard     VARCHAR,
     transaction_hash VARCHAR,
     log_index        BIGINT UNSIGNED,
@@ -89,7 +89,7 @@ CREATE TABLE token_transfers
 CREATE TABLE ens
 (
     name             VARCHAR,
-    cost             DOUBLE,
+    cost             DECIMAL(36, 18),
     expires          BIGINT UNSIGNED,
     owner            VARCHAR,
     transaction_hash VARCHAR,

@@ -29,7 +29,6 @@ pub struct Context {
     max_worker: usize,
     web3_batch_size: usize,
     output_dir: String,
-    output_format: String,
     storage: Arc<Operator>,
 }
 pub type ContextRef = Arc<Context>;
@@ -46,7 +45,6 @@ impl Context {
             max_worker: conf.export.max_worker,
             web3_batch_size: conf.export.web3_batch_size,
             output_dir: conf.export.output_dir.clone(),
-            output_format: conf.export.output_format.clone(),
             storage,
         })
     }
@@ -81,9 +79,5 @@ impl Context {
 
     pub fn get_storage(&self) -> Arc<Operator> {
         self.storage.clone()
-    }
-
-    pub fn get_output_format(&self) -> &str {
-        &self.output_format
     }
 }

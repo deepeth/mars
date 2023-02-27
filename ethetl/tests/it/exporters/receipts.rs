@@ -66,8 +66,10 @@ async fn test_receipts_exporters() -> Result<()> {
                     .as_str(),
             ),
             Path::new(
-                format!("_datas/_test_output_dir/token_transfers/token_transfers_{range_name}.parquet")
-                    .as_str(),
+                format!(
+                    "_datas/_test_output_dir/token_transfers/token_transfers_{range_name}.parquet"
+                )
+                .as_str(),
             ),
         );
 

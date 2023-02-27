@@ -37,12 +37,15 @@ async fn test_blocks_exporters() -> Result<()> {
 
         goldenfile::differs::binary_diff(
             Path::new(format!("tests/it/testdata/blocks/blocks_{range_name}.parquet").as_str()),
-            Path::new(format!("_datas/_test_output_dir/blocks/blocks_{range_name}.parquet").as_str()),
+            Path::new(
+                format!("_datas/_test_output_dir/blocks/blocks_{range_name}.parquet").as_str(),
+            ),
         );
 
         goldenfile::differs::binary_diff(
             Path::new(
-                format!("tests/it/testdata/transactions/transactions_{range_name}.parquet").as_str(),
+                format!("tests/it/testdata/transactions/transactions_{range_name}.parquet")
+                    .as_str(),
             ),
             Path::new(
                 format!("_datas/_test_output_dir/transactions/transactions_{range_name}.parquet")
