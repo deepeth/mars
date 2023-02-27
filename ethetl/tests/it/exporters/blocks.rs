@@ -35,22 +35,22 @@ async fn test_blocks_exporters() -> Result<()> {
             BlockExporter::create(&ctx, ctx.get_output_dir(), &range_path, range.to_vec());
         exporter.export().await?;
 
-        goldenfile::differs::text_diff(
-            Path::new(format!("tests/it/testdata/blocks/blocks_{range_name}.csv").as_str()),
-            Path::new(format!("_datas/_test_output_dir/blocks/blocks_{range_name}.csv").as_str()),
+        goldenfile::differs::binary_diff(
+            Path::new(format!("tests/it/testdata/blocks/blocks_{range_name}.parquet").as_str()),
+            Path::new(format!("_datas/_test_output_dir/blocks/blocks_{range_name}.parquet").as_str()),
         );
 
-        goldenfile::differs::text_diff(
+        goldenfile::differs::binary_diff(
             Path::new(
-                format!("tests/it/testdata/transactions/transactions_{range_name}.csv").as_str(),
+                format!("tests/it/testdata/transactions/transactions_{range_name}.parquet").as_str(),
             ),
             Path::new(
-                format!("_datas/_test_output_dir/transactions/transactions_{range_name}.csv")
+                format!("_datas/_test_output_dir/transactions/transactions_{range_name}.parquet")
                     .as_str(),
             ),
         );
 
-        goldenfile::differs::text_diff(
+        goldenfile::differs::binary_diff(
             Path::new(
                 format!("tests/it/testdata/transactions/_transactions_hash_{range_name}.txt")
                     .as_str(),

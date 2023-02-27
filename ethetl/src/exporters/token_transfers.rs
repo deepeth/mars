@@ -12,14 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use arrow2::array::Int128Array;
 use arrow2::array::UInt64Array;
 use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
+use arrow2::datatypes::DataType;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
-use common_eth::bytes_to_hex;
 use common_eth::decode_transfer_batch_data;
 use common_eth::decode_transfer_single_data;
+use common_eth::decode_u256_data;
 use common_eth::h160_to_hex;
 use common_eth::h256_to_hex;
 use common_eth::u256_to_hex;
@@ -40,7 +42,7 @@ struct Transfer {
     from: String,
     to: String,
     token_id: String,
-    value: String,
+    value: U256,
     erc: String,
 }
 
@@ -81,7 +83,7 @@ impl TokenTransferExporter {
                     from: h256_to_hex(&topics[1]),
                     to: h256_to_hex(&topics[2]),
                     token_id: "".to_string(),
-                    value: bytes_to_hex(&log.data),
+                    value: decode_u256_data(&log.data).unwrap(),
                     erc: "ERC20".to_string(),
                 };
                 Ok(Some(vec![transfer]))
@@ -91,7 +93,7 @@ impl TokenTransferExporter {
                     from: h256_to_hex(&topics[1]),
                     to: h256_to_hex(&topics[2]),
                     token_id: h256_to_hex(&topics[3]),
-                    value: "".to_string(),
+                    value: U256::zero(),
                     erc: "ERC721".to_string(),
                 };
                 Ok(Some(vec![transfer]))
@@ -110,7 +112,7 @@ impl TokenTransferExporter {
                 from: h256_to_hex(&topics[1]),
                 to: h256_to_hex(&topics[2]),
                 token_id: u256_to_hex(&u1),
-                value: u256_to_hex(&u2),
+                value: u2,
                 erc: "ERC1155".to_string(),
             };
             Ok(Some(vec![transfer]))
@@ -128,7 +130,7 @@ impl TokenTransferExporter {
                     from: h256_to_hex(&topics[1]),
                     to: h256_to_hex(&topics[2]),
                     token_id: u256_to_hex(&u1[i]),
-                    value: u256_to_hex(&u2[i]),
+                    value: u2[i],
                     erc: "ERC1155".to_string(),
                 };
                 results.push(transfer);
@@ -157,7 +159,7 @@ impl TokenTransferExporter {
                         from_address_vec.push(transfer.from);
                         to_address_vec.push(transfer.to);
                         token_id_vec.push(transfer.token_id);
-                        value_vec.push(transfer.value);
+                        value_vec.push(transfer.value.as_u128() as i128);
                         erc_standard_vec.push(transfer.erc);
                         token_address_vec.push(h160_to_hex(&logs.address));
                         transaction_hash_vec.push(h256_to_hex(
@@ -176,7 +178,7 @@ impl TokenTransferExporter {
         let from_address_array = Utf8Array::<i32>::from_slice(from_address_vec);
         let to_address_array = Utf8Array::<i32>::from_slice(to_address_vec);
         let token_id_array = Utf8Array::<i32>::from_slice(token_id_vec);
-        let value_array = Utf8Array::<i32>::from_slice(value_vec);
+        let value_array = Int128Array::from_slice(value_vec).to(DataType::Decimal(36, 18));
         let erc_standard_array = Utf8Array::<i32>::from_slice(erc_standard_vec);
         let transaction_hash_array = Utf8Array::<i32>::from_slice(transaction_hash_vec);
         let log_index_array = UInt64Array::from_slice(log_index_vec);

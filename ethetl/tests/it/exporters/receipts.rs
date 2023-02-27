@@ -48,32 +48,32 @@ async fn test_receipts_exporters() -> Result<()> {
             ReceiptExporter::create(&ctx, ctx.get_output_dir(), &range_path, tx_hashes.to_vec());
         exporter.export().await?;
 
-        goldenfile::differs::text_diff(
-            Path::new(format!("tests/it/testdata/receipts/receipts_{range_name}.csv").as_str()),
+        goldenfile::differs::binary_diff(
+            Path::new(format!("tests/it/testdata/receipts/receipts_{range_name}.parquet").as_str()),
             Path::new(
-                format!("_datas/_test_output_dir/receipts/receipts_{range_name}.csv").as_str(),
+                format!("_datas/_test_output_dir/receipts/receipts_{range_name}.parquet").as_str(),
             ),
         );
 
-        goldenfile::differs::text_diff(
-            Path::new(format!("tests/it/testdata/logs/logs_{range_name}.csv").as_str()),
-            Path::new(format!("_datas/_test_output_dir/logs/logs_{range_name}.csv").as_str()),
+        goldenfile::differs::binary_diff(
+            Path::new(format!("tests/it/testdata/logs/logs_{range_name}.parquet").as_str()),
+            Path::new(format!("_datas/_test_output_dir/logs/logs_{range_name}.parquet").as_str()),
         );
 
-        goldenfile::differs::text_diff(
+        goldenfile::differs::binary_diff(
             Path::new(
-                format!("tests/it/testdata/token_transfers/token_transfers_{range_name}.csv")
+                format!("tests/it/testdata/token_transfers/token_transfers_{range_name}.parquet")
                     .as_str(),
             ),
             Path::new(
-                format!("_datas/_test_output_dir/token_transfers/token_transfers_{range_name}.csv")
+                format!("_datas/_test_output_dir/token_transfers/token_transfers_{range_name}.parquet")
                     .as_str(),
             ),
         );
 
-        goldenfile::differs::text_diff(
-            Path::new(format!("tests/it/testdata/ens/ens_{range_name}.csv").as_str()),
-            Path::new(format!("_datas/_test_output_dir/ens/ens_{range_name}.csv").as_str()),
+        goldenfile::differs::binary_diff(
+            Path::new(format!("tests/it/testdata/ens/ens_{range_name}.parquet").as_str()),
+            Path::new(format!("_datas/_test_output_dir/ens/ens_{range_name}.parquet").as_str()),
         );
     }
     Ok(())

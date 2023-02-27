@@ -31,7 +31,7 @@ pub fn create_config() -> EthConfig {
             web3_batch_size: 50,
             syncing_interval_secs: 1,
             output_dir: "_test_output_dir".to_string(),
-            output_format: "csv".to_string(),
+            output_format: "parquet".to_string(),
         },
         ..Default::default()
     }

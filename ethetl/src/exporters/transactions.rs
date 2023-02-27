@@ -15,16 +15,16 @@
 use std::io::Cursor;
 use std::io::Write;
 
-use arrow2::array::Float64Array;
+use arrow2::array::Int128Array;
 use arrow2::array::UInt64Array;
 use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
+use arrow2::datatypes::DataType;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
 use common_eth::bytes_to_hex;
 use common_eth::h160_to_hex;
 use common_eth::h256_to_hex;
-use common_eth::u256_to_f64;
 use common_eth::u256_to_hex;
 use common_exceptions::Result;
 use web3::ethabi::Address;
@@ -86,8 +86,7 @@ impl TransactionExporter {
                 transaction_index_vec.push(tx.transaction_index.unwrap_or_else(U64::zero).as_u64());
                 from_address_vec.push(h160_to_hex(&tx.from.unwrap_or_else(Address::zero)));
                 to_address_vec.push(h160_to_hex(&tx.to.unwrap_or_else(Address::zero)));
-                // divide 100000000, to make double work.
-                value_vec.push(u256_to_f64(&tx.value));
+                value_vec.push(tx.value.as_u128() as i128);
                 gas_vec.push(tx.gas.as_u64());
                 gas_price_vec.push(tx.gas_price.unwrap_or_else(U256::zero).as_u64());
                 // Prefix with 0x
@@ -117,7 +116,9 @@ impl TransactionExporter {
         let transaction_index_array = UInt64Array::from_slice(transaction_index_vec);
         let from_address_array = Utf8Array::<i32>::from_slice(from_address_vec);
         let to_address_array = Utf8Array::<i32>::from_slice(to_address_vec);
-        let value_array = Float64Array::from_slice(value_vec);
+
+        let value_array = Int128Array::from_slice(value_vec).to(DataType::Decimal(36, 18));
+
         let gas_array = UInt64Array::from_slice(gas_vec);
         let gas_price_array = UInt64Array::from_slice(gas_price_vec);
         let method_id_array = Utf8Array::<i32>::from_slice(method_id_vec);
