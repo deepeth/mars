@@ -14,12 +14,10 @@
 
 #![deny(unused_crate_dependencies)]
 
-mod csv;
 mod parquet;
 mod storage;
 mod txt;
 
-pub use csv::write_csv;
 pub use parquet::write_parquet;
 pub use storage::*;
 pub use txt::write_txt;

@@ -247,7 +247,7 @@ impl BlockExporter {
             self.output_dir, self.range_path
         );
 
-        let meta = self.ctx.get_storage().object(&path).metadata().await?;
+        let meta = self.ctx.get_storage().object(&path).stat().await?;
         if meta.content_length() > 0 {
             let content = self.ctx.get_storage().object(&path).read().await?;
             let cursor = Cursor::new(content);

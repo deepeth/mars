@@ -26,11 +26,11 @@ common-eth = { path = "../common/eth" }
 common-exceptions = { path = "../common/exceptions" }
 common-storages = { path = "../common/storages" }
 
-arrow2 = { version = "0.12.0", features = ["io_csv"]}
+arrow2 = { version = "0.16.0", features = ["io_csv"]}
 deadqueue = "0.2.3"
 env_logger = "0.9.0"
 log = "0.4.0"
-opendal = { version = "0.26.2", features = ["compress"] }
+opendal = { version = "0.28.0", features = ["compress"] }
 percentage-rs = "0.1.6"
 serde = { version = "1.0.137", features = ["derive"] }
 serde_json = "1.0.82"

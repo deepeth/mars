@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use arrow2::array::Float64Array;
+use arrow2::array::Int128Array;
 use arrow2::array::UInt64Array;
 use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
+use arrow2::datatypes::DataType;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
 use common_eth::decode_name_registered_data;
 use common_eth::h256_to_hex;
-use common_eth::u256_to_f64;
 use common_eth::ENS_NAME_REGISTERED_SIG;
 use common_exceptions::Result;
 use web3::types::Log;
 use web3::types::TransactionReceipt;
 use web3::types::H256;
+use web3::types::U256;
 use web3::types::U64;
 
 use crate::contexts::ContextRef;
@@ -33,7 +34,7 @@ use crate::exporters::write_file;
 
 struct Ens {
     name: String,
-    cost: f64,
+    cost: U256,
     expires: u64,
     owner: String,
 }
@@ -72,7 +73,7 @@ impl EnsExporter {
                 let owner = h256_to_hex(&topics[2]);
                 return Ok(Some(Ens {
                     name,
-                    cost: u256_to_f64(&cost),
+                    cost,
                     expires: expires.as_u64(),
                     owner,
                 }));
@@ -94,7 +95,7 @@ impl EnsExporter {
             for logs in &receipt.logs {
                 if let Some(ens) = Self::parse_log(logs)? {
                     name_vec.push(ens.name);
-                    cost_vec.push(ens.cost);
+                    cost_vec.push(ens.cost.as_u128() as i128);
                     expires_vec.push(ens.expires);
                     owner_vec.push(ens.owner);
                     transaction_hash_vec.push(h256_to_hex(
@@ -108,7 +109,7 @@ impl EnsExporter {
         }
 
         let name_array = Utf8Array::<i32>::from_slice(name_vec);
-        let cost_array = Float64Array::from_slice(cost_vec);
+        let cost_array = Int128Array::from_slice(cost_vec).to(DataType::Decimal(36, 18));
         let expires_array = UInt64Array::from_slice(expires_vec);
         let owner_array = Utf8Array::<i32>::from_slice(owner_vec);
         let transaction_hash_array = Utf8Array::<i32>::from_slice(transaction_hash_vec);
