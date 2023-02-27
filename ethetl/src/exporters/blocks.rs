@@ -17,11 +17,14 @@ use std::io::BufReader;
 use std::io::Cursor;
 use std::str::FromStr;
 
+use arrow2::array::Int64Array;
 use arrow2::array::UInt64Array;
 use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
+use arrow2::datatypes::DataType;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
+use arrow2::datatypes::TimeUnit::Second;
 use common_eth::bytes_to_hex;
 use common_eth::h2048_to_hex;
 use common_eth::h256_to_hex;
@@ -118,7 +121,7 @@ impl BlockExporter {
             extra_data_vec.push(bytes_to_hex(&block.extra_data));
             gas_limit_vec.push(block.gas_limit.as_u64());
             gas_used_vec.push(block.gas_used.as_u64());
-            timestamp_vec.push(block.timestamp.as_u64());
+            timestamp_vec.push(block.timestamp.as_u64() as i64);
             transaction_count_vec.push(block.transactions.len() as u64);
             base_fee_per_gas_vec.push(block.base_fee_per_gas.unwrap_or_else(U256::zero).as_u64());
         }
@@ -138,7 +141,8 @@ impl BlockExporter {
         let extra_data_array = Utf8Array::<i32>::from_slice(extra_data_vec);
         let gas_limit_array = UInt64Array::from_slice(gas_limit_vec);
         let gas_used_array = UInt64Array::from_slice(gas_used_vec);
-        let timestamp_array = UInt64Array::from_slice(timestamp_vec);
+        let timestamp_array =
+            Int64Array::from_slice(timestamp_vec).to(DataType::Timestamp(Second, None));
         let transaction_count_array = UInt64Array::from_slice(transaction_count_vec);
         let base_fee_per_gas_array = UInt64Array::from_slice(base_fee_per_gas_vec);
 

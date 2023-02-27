@@ -12,7 +12,7 @@ latest
         FROM   blocks
         WHERE  timestamp >
     (
-    SELECT   subtract_hours(to_datetime(timestamp), 6)
+    SELECT   subtract_hours(timestamp, 6)
     FROM     blocks
     ORDER BY timestamp DESC
     LIMIT    1 ))
@@ -42,7 +42,7 @@ latest
         FROM   blocks
         WHERE  timestamp >
     (
-    SELECT   subtract_hours(to_datetime(timestamp), 6)
+    SELECT   subtract_hours(timestamp, 6)
     FROM     blocks
     ORDER BY timestamp DESC
     LIMIT    1 ))
@@ -50,8 +50,8 @@ latest
 SELECT    concat(e.name, '.eth'),
           e.cost,
           e.owner,
-          to_datetime(b.timestamp) AS date,
-            to_datetime(e.expires)   AS expires,
+          b.timestamp AS date,
+            e.expires,
             transaction_hash
 FROM      ens    AS e
     LEFT JOIN blocks AS b

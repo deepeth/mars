@@ -13,12 +13,14 @@
 // limitations under the License.
 
 use arrow2::array::Int128Array;
+use arrow2::array::Int64Array;
 use arrow2::array::UInt64Array;
 use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
 use arrow2::datatypes::DataType;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
+use arrow2::datatypes::TimeUnit::Second;
 use common_eth::decode_name_registered_data;
 use common_eth::h256_to_hex;
 use common_eth::ENS_NAME_REGISTERED_SIG;
@@ -96,7 +98,7 @@ impl EnsExporter {
                 if let Some(ens) = Self::parse_log(logs)? {
                     name_vec.push(ens.name);
                     cost_vec.push(ens.cost.as_u128() as i128);
-                    expires_vec.push(ens.expires);
+                    expires_vec.push(ens.expires as i64);
                     owner_vec.push(ens.owner);
                     transaction_hash_vec.push(h256_to_hex(
                         &logs.transaction_hash.unwrap_or_else(H256::zero),
@@ -110,7 +112,8 @@ impl EnsExporter {
 
         let name_array = Utf8Array::<i32>::from_slice(name_vec);
         let cost_array = Int128Array::from_slice(cost_vec).to(DataType::Decimal(36, 18));
-        let expires_array = UInt64Array::from_slice(expires_vec);
+        let expires_array =
+            Int64Array::from_slice(expires_vec).to(DataType::Timestamp(Second, None));
         let owner_array = Utf8Array::<i32>::from_slice(owner_vec);
         let transaction_hash_array = Utf8Array::<i32>::from_slice(transaction_hash_vec);
         let block_number_array = UInt64Array::from_slice(block_number_vec);

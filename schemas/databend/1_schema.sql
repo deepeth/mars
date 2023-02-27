@@ -21,7 +21,7 @@ CREATE TABLE blocks
     extra_data        VARCHAR,
     gas_limit         BIGINT UNSIGNED,
     gas_used          BIGINT UNSIGNED,
-    timestamp         BIGINT UNSIGNED,
+    timestamp         TIMESTAMP,
     transaction_count BIGINT UNSIGNED,
     base_fee_per_gas  BIGINT UNSIGNED
 );
@@ -43,7 +43,7 @@ CREATE TABLE transactions
     transaction_type         BIGINT UNSIGNED,
     block_hash               VARCHAR,
     block_number             BIGINT UNSIGNED,
-    block_timestamp          BIGINT UNSIGNED
+    block_timestamp          TIMESTAMP
 );
 
 CREATE TABLE logs
@@ -90,7 +90,7 @@ CREATE TABLE ens
 (
     name             VARCHAR,
     cost             DECIMAL(36, 18),
-    expires          BIGINT UNSIGNED,
+    expires          TIMESTAMP,
     owner            VARCHAR,
     transaction_hash VARCHAR,
     block_number     BIGINT UNSIGNED
