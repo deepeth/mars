@@ -27,7 +27,7 @@ Cloud: https://app.databend.com/
 | extra_data        | VARCHAR         |
 | gas_limit         | BIGINT UNSIGNED |
 | gas_used          | BIGINT UNSIGNED |
-| timestamp         | BIGINT UNSIGNED |
+| timestamp         | TIMESTAMP       |
 | transaction_count | BIGINT UNSIGNED |
 | base_fee_per_gas  | BIGINT UNSIGNED |
 
@@ -41,7 +41,7 @@ Cloud: https://app.databend.com/
 | transaction_index        | BIGINT UNSIGNED |
 | from_address             | VARCHAR         |
 | to_address               | VARCHAR         |
-| value                    | DOUBLE          |
+| value                    | DECIMAL(36, 18) |
 | gas                      | BIGINT UNSIGNED |
 | method_id                | VARCHAR         |
 | input                    | VARCHAR         |
@@ -50,7 +50,7 @@ Cloud: https://app.databend.com/
 | transaction_type         | BIGINT UNSIGNED |
 | block_hash               | VARCHAR         |
 | block_number             | BIGINT UNSIGNED |
-| block_timestamp          | BIGINT UNSIGNED |
+| block_timestamp          | TIMESTAMP       |
 
 ## logs.parquet
 
@@ -84,25 +84,25 @@ Cloud: https://app.databend.com/
 
 ## token_transfers.parquet
 
-| Column             | Type              |
-|--------------------|-------------------|
-| token_address      | VARCHAR           |
-| from_address       | VARCHAR           |
-| to_address         | VARCHAR           |
-| token_id           | VARCHAR           |
-| value              | VARCHAR           |
-| erc_standard       | VARCHAR           |
-| transaction_hash   | VARCHAR           |
-| log_index          | BIGINT UNSIGNED   |
-| block_number       | BIGINT UNSIGNED   |
+| Column             | Type            |
+|--------------------|-----------------|
+| token_address      | VARCHAR         |
+| from_address       | VARCHAR         |
+| to_address         | VARCHAR         |
+| token_id           | VARCHAR         |
+| value              | DECIMAL(36, 18) |
+| erc_standard       | VARCHAR         |
+| transaction_hash   | VARCHAR         |
+| log_index          | BIGINT UNSIGNED |
+| block_number       | BIGINT UNSIGNED |
 
 ## ens.parquet
 
 | Column             | Type            |
 |--------------------|-----------------|
 | name               | VARCHAR         |
-| cost               | DOUBLE          |
-| expires            | BIGINT UNSIGNED |
+| cost               | DECIMAL(36, 18) |
+| expires            | TIMESTAMP       |
 | owner              | VARCHAR         |
 | transaction_hash   | VARCHAR         |
 | block_number       | BIGINT UNSIGNED |
