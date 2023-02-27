@@ -16,12 +16,14 @@ use std::io::Cursor;
 use std::io::Write;
 
 use arrow2::array::Int128Array;
+use arrow2::array::Int64Array;
 use arrow2::array::UInt64Array;
 use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
 use arrow2::datatypes::DataType;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
+use arrow2::datatypes::TimeUnit::Second;
 use common_eth::bytes_to_hex;
 use common_eth::h160_to_hex;
 use common_eth::h256_to_hex;
@@ -106,7 +108,7 @@ impl TransactionExporter {
                 transaction_type_vec.push(tx.transaction_type.unwrap_or_else(U64::zero).as_u64());
                 block_hash_vec.push(h256_to_hex(&block.hash.unwrap_or_else(H256::zero)));
                 block_number_vec.push(block.number.unwrap_or_else(U64::zero).as_u64());
-                block_timestamp_vec.push(block.timestamp.as_u64());
+                block_timestamp_vec.push(block.timestamp.as_u64() as i64);
             }
         }
 
@@ -128,7 +130,8 @@ impl TransactionExporter {
         let transaction_type_array = UInt64Array::from_slice(transaction_type_vec);
         let block_hash_array = Utf8Array::<i32>::from_slice(block_hash_vec);
         let block_number_array = UInt64Array::from_slice(block_number_vec);
-        let block_timestamp_array = UInt64Array::from_slice(block_timestamp_vec);
+        let block_timestamp_array =
+            Int64Array::from_slice(block_timestamp_vec).to(DataType::Timestamp(Second, None));
 
         // Field.
         let hash_field = Field::new("hash", hash_array.data_type().clone(), true);
