@@ -90,7 +90,7 @@ CREATE TABLE ens
 (
     name             VARCHAR,
     cost             DECIMAL(36, 18),
-    expires          BIGINT UNSIGNED,
+    expires          TIMESTAMP,
     owner            VARCHAR,
     transaction_hash VARCHAR,
     block_number     BIGINT UNSIGNED
