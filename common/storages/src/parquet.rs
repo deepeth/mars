@@ -39,6 +39,7 @@ pub async fn write_parquet(
         write_statistics: false,
         compression: CompressionOptions::Snappy,
         version: Version::V2,
+        data_pagesize_limit: None,
     };
 
     let iter = vec![Ok(columns)];
