@@ -19,7 +19,7 @@ use clap::Parser;
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(clap::ArgEnum, Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StorageType {
     Fs,
     S3,
