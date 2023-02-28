@@ -1,44 +1,95 @@
-<p align="center"><b>Mars: The powerful analysis platform to explore and visualize data from Web3</b></p>
+<p align="center">
+ <b>Mars: The powerful analysis platform to explore and visualize data from Web3</b>
+</p>
+
+# Mars: Explore and Visualize Data from Web3
 
 ## Features
 
-- __Blazing Fast__ Create from scratch with Rust.
+- **Blazing Fast:** Mars is built with Rust, which makes it incredibly fast and efficient, ensuring that you can work with your data in real-time.
 
-- __Pipeline Processor__ Export Ethereum chain-data to structured-data in hours.
+- **Pipeline Processor:** Mars offers a powerful pipeline processor that allows you to export Ethereum chain data to structured data quickly and easily.
 
-- __Low Cost__ Store structured-data to AWS S3, Azure Blob.
+- **Low Cost:** You can store structured data to AWS S3, Azure Blob, ensuring low cost and high availability.
 
-- __Easy to Use__ Web3 visualization and analysis at your fingertips.
-
-## ethetl
-
-- __ethetl__ Lets you export Ethereum data into Parquet file format and ingest into cloud warehouse [Databend](https://github.com/datafuselabs/databend), blazing fast.
-
-### Schema
-
-Databend:
-https://github.com/deepeth/mars/tree/main/schemas/databend
+- **Easy to Use:** Web3 visualization and analysis at your fingertips.
 
 
-### How to Use
+## How to Use
 
-#### ethetl
+### Download the `ethetl` binary
 
+Download the `ethetl` binary from [GitHub releases](https://github.com/deepeth/mars/tags).
+
+### Configuration
+
+Copy the [sample config](https://github.com/deepeth/mars/blob/main/scripts/deploy/ethetl_config_spec.toml) to `mars.toml`:
+
+```toml
+[log]
+level = "ERROR"
+dir = "_logs"
+
+[export]
+# Exporter directory.
+output_dir = "pub"
+
+# Storage config.
+[storage]
+# Fs| S3 | Azblob
+type = "S3"
+
+# To use S3-compatible object storage, uncomment this block and set your values.
+[storage.s3]
+ bucket = "<your-bucket-name>"
+ access_key_id = "<your-key-id>"
+ secret_access_key = "<your-account-key>"
+```
+Note that the data will be stored to /<your-bucket-name>/pub in your S3 location.
+
+### Export Data from the Ethereum Chain by Mars
+
+Once you have configured Mars, you can start exporting data from the Ethereum chain. Use the following command:
 ```shell
-$ make build
+./ethetl  -p <your-eth-node-endpoint-url> -s 16600001 -e 16600002 -c ./mars.toml
 
-./target/release/ethetl  -p <your-eth-node-endpoint-url> -s 16600001 -e 16600002
-[2023-02-27T08:53:57Z WARN ] collect: No such file or directory (os error 2)
-[2023-02-27T08:54:02Z INFO ] Write blocks to _datas/blocks/blocks_16600001_16600002.parquet
-[2023-02-27T08:54:02Z INFO ] Write transactions to _datas/transactions/transactions_16600001_16600002.parquet
-[2023-02-27T08:54:02Z INFO ] Write _datas/transactions/_transactions_hash_16600001_16600002.txt
-[2023-02-27T08:54:03Z INFO ] block 2 processed/2, latest block 16600002, 292 transactions processed, 0 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 100%
-[2023-02-27T08:54:05Z INFO ] block 2 processed/2, latest block 16600002, 292 transactions processed, 100 receipts processed, 0 logs processed, 0 token_transfers processed, 0 ens processed. Progress is 100%
-[2023-02-27T08:54:07Z INFO ] Write receipts to _datas/receipts/receipts_16600001_16600002.parquet
-[2023-02-27T08:54:07Z INFO ] Write logs to _datas/logs/logs_16600001_16600002.parquet
-[2023-02-27T08:54:07Z INFO ] Write token_transfer to _datas/token_transfers/token_transfers_16600001_16600002.parquet
-[2023-02-27T08:54:07Z INFO ] Write ens to _datas/ens/ens_16600001_16600002.parquet
+... ...
+
 [2023-02-27T08:54:07Z INFO ] block 2 processed/2, latest block 16600002, 292 transactions processed, 292 receipts processed, 658 logs processed, 329 token_transfers processed, 1 ens processed. Progress is 100%
+```
+
+Here, we recommend you use a SaaS like [GetBlock](https://getblock.io/) for your `your-eth-node-endpoint-url`.
+
+### Deploy Databend
+
+Databend is the only warehouse supported by Mars, which has blazing performance and stores data to cloud-based object storage. You have two choices:
+
+Databend is the only warehouse support by mars which has the blazing perfomance and storage the datas to cloud-based object storage.
+There are two choice for you:
+* Self-Deploy. See [How to deploy Databend](https://databend.rs/doc/deploy/deploying-databend)
+* Cloud. Use https://app.databend.com
+
+### Create Table
+
+You can find the schema files for Databend in the [schemas/databend](schemas/databend/1_schema.sql).
+
+### Ingest Data into Databend
+
+Ingesting data from S3 into Databend is straightforward. You can use the Databend, you can use Databend [COPY INTO](https://databend.rs/doc/sql-commands/dml/dml-copy-into-table) command to do that:
+
+```sql
+-- Create a external stage
+-- https://databend.rs/doc/sql-commands/ddl/stage/ddl-create-stage#externalstageparams
+CREATE STAGE eth_stage URL='s3://<your-s3-bucket>/pub' CONNECTION = (ACCESS_KEY_ID = '<your-access-key-ID>' SECRET_ACCESS_KEY = '<your-secret-access-key>');
+
+-- Databend provides idempotency by keeping track of files that have already been processed for a default period of 7 days
+-- https://databend.rs/doc/sql-commands/dml/dml-copy-into-table#externalstage
+COPY INTO blocks FROM @eth_stage/blocks/ PATTERN = '*.*parquet' FILE_FORMAT = (type = 'PARQUET');
+COPY INTO transactions FROM @eth_stage/transactions/ PATTERN = '*.*parquet' FILE_FORMAT = (type = 'PARQUET');
+COPY INTO receipts FROM @eth_stage/receipts/ PATTERN = '*.*parquet' FILE_FORMAT = (type = 'PARQUET');
+COPY INTO token_transfers FROM @eth_stage/token_transfers/ PATTERN = '*.*parquet' FILE_FORMAT = (type = 'PARQUET');
+COPY INTO logs FROM @eth_stage/logs/ PATTERN = '*.*parquet' FILE_FORMAT = (type = 'PARQUET');
+COPY INTO ens FROM @eth_stage/ens/ PATTERN = '*.*parquet' FILE_FORMAT = (type = 'PARQUET');
 ```
 
 ## License

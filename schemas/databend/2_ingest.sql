@@ -1,7 +1,7 @@
 
 -- Create a external stage with your ETH files.
 -- https://databend.rs/doc/sql-commands/ddl/stage/ddl-create-stage#externalstageparams
-CREATE STAGE eth_stage URL='s3://<your-s3-bucket>/<eth-root>' CONNECTION = (ACCESS_KEY_ID = '<your-access-key-ID>' SECRET_ACCESS_KEY = '<your-secret-access-key>');
+CREATE STAGE eth_stage URL='s3://<your-s3-bucket>/pub' CONNECTION = (ACCESS_KEY_ID = '<your-access-key-ID>' SECRET_ACCESS_KEY = '<your-secret-access-key>');
 
 -- Databend provides idempotency by keeping track of files that have already been processed for a default period of 7 days.
 -- https://databend.rs/doc/sql-commands/dml/dml-copy-into-table#externalstage
