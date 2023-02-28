@@ -17,11 +17,11 @@
 
 ## How to Use
 
-### Download the `ethetl` binary
+### 1. Download the `ethetl` binary
 
 Download the `ethetl` binary from [GitHub releases](https://github.com/deepeth/mars/tags).
 
-### Configuration
+### 2. Configuration
 
 Copy the [sample config](https://github.com/deepeth/mars/blob/main/scripts/deploy/ethetl_config_spec.toml) to `mars.toml`:
 
@@ -45,7 +45,7 @@ type = "S3"
  access_key_id = "<your-key-id>"
  secret_access_key = "<your-account-key>"
 ```
-Note that the data will be stored to /<your-bucket-name>/pub in your S3 location.
+Note that the data will be stored to `/<your-bucket-name>/pub` in your S3 location.
 
 ### Export Data from the Ethereum Chain by Mars
 
@@ -64,7 +64,6 @@ Here, we recommend you use a SaaS like [GetBlock](https://getblock.io/) for your
 
 Databend is the only warehouse supported by Mars, which has blazing performance and stores data to cloud-based object storage. You have two choices:
 
-Databend is the only warehouse support by mars which has the blazing perfomance and storage the datas to cloud-based object storage.
 There are two choice for you:
 * Self-Deploy. See [How to deploy Databend](https://databend.rs/doc/deploy/deploying-databend)
 * Cloud. Use https://app.databend.com
@@ -75,7 +74,7 @@ You can find the schema files for Databend in the [schemas/databend](schemas/dat
 
 ### Ingest Data into Databend
 
-Ingesting data from S3 into Databend is straightforward. You can use the Databend, you can use Databend [COPY INTO](https://databend.rs/doc/sql-commands/dml/dml-copy-into-table) command to do that:
+Ingesting data from S3 into Databend is straightforward. You can use Databend [COPY INTO](https://databend.rs/doc/sql-commands/dml/dml-copy-into-table) command to do that:
 
 ```sql
 -- Create a external stage
