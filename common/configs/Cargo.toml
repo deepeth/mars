@@ -11,8 +11,8 @@ test = false
 # Workspace dependencies
 common-exceptions = { path = "../exceptions" }
 
-clap = { version = "3.2.5", features = ["derive", "env"] }
+clap = { version = "4.1.7", features = ["derive", "env"] }
 serde = { version = "1.0.137", features = ["derive"] }
-serfig = "0.0.2"
+serfig = "0.0.3"
 
 [dev-dependencies]
