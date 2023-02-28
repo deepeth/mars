@@ -1,4 +1,4 @@
-// Copyright 2022 BohuTANG.
+// Copyright 2023 BohuTANG.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,74 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::time::Duration;
-
 use common_exceptions::Result;
 use log::info;
-use ticker::Ticker;
 
 use crate::contexts::ContextRef;
-use crate::eth::BlockNumber;
+use crate::etl::SyncingStatus;
 use crate::exporters::Worker;
 
-static SYNCING_STATUS_FILE: &str = "mars_syncing_status.json";
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-struct SyncingStatus {
-    start: usize,
-    end: usize,
-}
-
-pub struct Stream {
+pub struct Batch {
     ctx: ContextRef,
 }
 
-impl Stream {
+impl Batch {
     pub fn create(ctx: ContextRef) -> Self {
-        Stream { ctx }
+        Batch { ctx }
     }
 
-    pub async fn start(&self) -> Result<()> {
-        let mut start = self.ctx.get_config().export.start_block;
-
-        // Fetch syncing file.
-        {
-            let op = self.ctx.get_storage();
-            if let Ok(data) = op.object(SYNCING_STATUS_FILE).read().await {
-                let prev_syncing_status: SyncingStatus = serde_json::from_slice(&data)?;
-                start = prev_syncing_status.end + 1;
-                info!(
-                    "Found syncing status file={}, status={:?}",
-                    SYNCING_STATUS_FILE, prev_syncing_status
-                );
-            }
-        }
-
-        let ticker = Ticker::new(
-            0..,
-            Duration::from_secs(self.ctx.get_config().export.syncing_interval_secs as u64),
-        );
-        for _i in ticker {
-            // Fetch syncing state.
-            let end = {
-                let latest_block = BlockNumber::create(&self.ctx).fetch().await?;
-                info!("Eth node last block number :{}", latest_block);
-                latest_block.as_usize()
-            };
-            if start <= end {
-                self.syncing_batch(start, end).await?;
-                start = end + 1;
-            }
-        }
-
-        Ok(())
-    }
-
-    async fn syncing_batch(&self, start: usize, end: usize) -> Result<()> {
+    pub async fn syncing(&self, start: usize, end: usize, sync_status_file: &str) -> Result<()> {
         // Incr progress.
         self.ctx.get_progress().inc_all(end - start + 1);
 
         let op = self.ctx.get_storage();
+
         let range: Vec<usize> = (start..=end).collect();
         // Fits each chunk to max worker.
         let chunk_size = self.ctx.get_batch_size() * self.ctx.get_max_worker();
@@ -108,10 +62,10 @@ impl Stream {
             // Write syncing file.
             {
                 let syncing_json = serde_json::to_vec(&syncing_status)?;
-                op.object(SYNCING_STATUS_FILE).write(syncing_json).await?;
+                op.object(sync_status_file).write(syncing_json).await?;
                 info!(
                     "Syncing batch[{}], write file={}, status={:?}",
-                    i, SYNCING_STATUS_FILE, syncing_status
+                    i, sync_status_file, syncing_status
                 );
             }
         }

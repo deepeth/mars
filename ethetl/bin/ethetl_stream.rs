@@ -17,7 +17,7 @@ use common_exceptions::Result;
 use env_logger::Builder;
 use env_logger::Env;
 use ethetl::contexts::Context;
-use ethetl::stream::Stream;
+use ethetl::etl::StreamEtl;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -34,7 +34,7 @@ async fn main() -> Result<()> {
     let progress = ctx.get_progress();
     progress.start();
 
-    let stream = Stream::create(ctx);
+    let stream = StreamEtl::create(ctx);
     stream.start().await?;
     progress.stop();
 
