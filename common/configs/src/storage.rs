@@ -19,7 +19,7 @@ use clap::Parser;
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum StorageType {
     Fs,
     S3,
@@ -49,7 +49,7 @@ impl FromStr for StorageType {
     }
 }
 
-#[derive(Parser, Debug, Clone, Serialize, Deserialize)]
+#[derive(Parser, Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(default, deny_unknown_fields)]
 pub struct StorageConfig {
     #[clap(long, default_value_t = StorageType::Fs)]
@@ -79,7 +79,7 @@ impl Default for StorageConfig {
     }
 }
 
-#[derive(Parser, Debug, Clone, Serialize, Deserialize)]
+#[derive(Parser, Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(default)]
 pub struct FsStorageConfig {
     /// Region for S3 storage
@@ -95,7 +95,7 @@ impl Default for FsStorageConfig {
     }
 }
 
-#[derive(Parser, Clone, Serialize, Deserialize)]
+#[derive(Parser, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(default, deny_unknown_fields)]
 pub struct S3StorageConfig {
     /// Region for S3 storage
@@ -160,7 +160,7 @@ impl fmt::Debug for S3StorageConfig {
     }
 }
 
-#[derive(Parser, Clone, Serialize, Deserialize)]
+#[derive(Parser, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(default, deny_unknown_fields)]
 pub struct AzblobStorageConfig {
     /// Account for Azblob

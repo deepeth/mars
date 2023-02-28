@@ -1,4 +1,4 @@
-// Copyright 2022 BohuTANG.
+// Copyright 2023 BohuTANG.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,11 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod eth;
-mod log;
-mod storage;
+use std::ffi::OsString;
 
-pub use eth::EthConfig;
-pub use eth::ExportConfig;
-pub use log::LogConfig;
-pub use storage::*;
+use clap::Parser;
+use common_configs::EthConfig;
+
+#[test]
+fn test_config_default() {
+    let setting_default = EthConfig::default();
+    let config_default = EthConfig::parse_from(Vec::<OsString>::new());
+
+    pretty_assertions::assert_eq!(
+        setting_default,
+        config_default,
+        "default setting is different from default config, please check again"
+    )
+}
