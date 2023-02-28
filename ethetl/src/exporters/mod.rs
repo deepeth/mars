@@ -15,11 +15,9 @@
 mod blocks;
 mod ens;
 mod logs;
-mod pipeline;
 mod receipts;
 mod token_transfers;
 mod transactions;
-mod worker;
 
 use arrow2::array::Array;
 use arrow2::chunk::Chunk;
@@ -28,11 +26,9 @@ pub use blocks::BlockExporter;
 use common_exceptions::Result;
 pub use ens::EnsExporter;
 pub use logs::LogsExporter;
-pub use pipeline::Pipeline;
 pub use receipts::ReceiptExporter;
 pub use token_transfers::TokenTransferExporter;
 pub use transactions::TransactionExporter;
-pub use worker::Worker;
 
 use crate::contexts::ContextRef;
 

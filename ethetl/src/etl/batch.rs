@@ -17,7 +17,7 @@ use log::info;
 
 use crate::contexts::ContextRef;
 use crate::etl::SyncingStatus;
-use crate::exporters::Worker;
+use crate::etl::Worker;
 
 pub struct Batch {
     ctx: ContextRef,

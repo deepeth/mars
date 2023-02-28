@@ -19,7 +19,7 @@ use deadqueue::unlimited::Queue;
 use log::error;
 
 use crate::contexts::ContextRef;
-use crate::exporters::Pipeline;
+use crate::etl::Pipeline;
 
 pub struct Worker {
     ctx: ContextRef,

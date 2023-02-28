@@ -14,12 +14,16 @@
 
 mod batch;
 mod normal;
+mod pipeline;
 #[allow(clippy::module_inception)]
 mod stream;
+mod worker;
 
 pub use batch::Batch;
 pub use normal::NormalEtl;
+pub use pipeline::Pipeline;
 pub use stream::StreamEtl;
+pub use worker::Worker;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct SyncingStatus {

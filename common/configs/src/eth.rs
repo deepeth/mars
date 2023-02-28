@@ -62,7 +62,7 @@ pub struct ExportConfig {
         short = 'b',
         long,
         value_parser,
-        default_value_t = 1000,
+        default_value_t = 100,
         help = "The number of items to export at a time"
     )]
     pub batch_size: usize,
@@ -71,7 +71,7 @@ pub struct ExportConfig {
         short = 'w',
         long,
         value_parser,
-        default_value_t = 8,
+        default_value_t = 4,
         help = "The maximum number of workers"
     )]
     pub max_worker: usize,
@@ -103,8 +103,8 @@ impl Default for ExportConfig {
             provider_uri: "".to_string(),
             start_block: 0,
             end_block: 0,
-            batch_size: 1000,
-            max_worker: 8,
+            batch_size: 100,
+            max_worker: 4,
             web3_batch_size: 100,
             syncing_interval_secs: 60,
             output_dir: "_datas".to_string(),
