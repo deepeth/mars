@@ -18,7 +18,6 @@ provider_uri = "http://192.168.191.66:8848"
 
 # Exporter directory.
 output_dir = "/tmp/eth"
-web3_batch_size = 1999
 
 # Storage config.
 [storage]
