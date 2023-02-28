@@ -1,6 +1,4 @@
-<p align="center">
- <b>Mars: The powerful analysis platform to explore and visualize data from Web3</b>
-</p>
+<h1 align="center">Mars: The Powerful Analysis Platform to Explore and Visualize Data From Web3</h1>
 
 ## Features
 
