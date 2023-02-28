@@ -1,4 +1,4 @@
-// Copyright 2022 BohuTANG.
+// Copyright 2023 BohuTANG.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,11 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod eth;
-mod log;
-mod storage;
-
-pub use eth::EthConfig;
-pub use eth::ExportConfig;
-pub use log::LogConfig;
-pub use storage::*;
+mod config;
