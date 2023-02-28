@@ -24,7 +24,7 @@ use web3::types::H256;
 use web3::types::U256;
 use web3::types::U64;
 
-use crate::chain::ReceiptFetcher;
+use crate::chains::eth::ReceiptFetcher;
 use crate::contexts::ContextRef;
 use crate::exporters::write_file;
 use crate::exporters::EnsExporter;

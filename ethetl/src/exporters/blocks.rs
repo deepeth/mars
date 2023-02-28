@@ -39,7 +39,7 @@ use web3::types::H64;
 use web3::types::U256;
 use web3::types::U64;
 
-use crate::chain::BlockFetcher;
+use crate::chains::eth::BlockFetcher;
 use crate::contexts::ContextRef;
 use crate::exporters::write_file;
 use crate::exporters::ReceiptExporter;
