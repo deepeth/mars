@@ -2,8 +2,6 @@
  <b>Mars: The powerful analysis platform to explore and visualize data from Web3</b>
 </p>
 
-# Mars: Explore and Visualize Data from Web3
-
 ## Features
 
 - **Blazing Fast:** Mars is built with Rust, which makes it incredibly fast and efficient, ensuring that you can work with your data in real-time.
