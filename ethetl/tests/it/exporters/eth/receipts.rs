@@ -19,7 +19,7 @@ use std::path::Path;
 use std::str::FromStr;
 
 use common_exceptions::Result;
-use ethetl::exporters::ReceiptExporter;
+use ethetl::exporters::eth::ReceiptExporter;
 use web3::types::H256;
 
 use crate::common::create_config;

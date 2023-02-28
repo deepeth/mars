@@ -15,7 +15,7 @@
 use std::path::Path;
 
 use common_exceptions::Result;
-use ethetl::exporters::BlockExporter;
+use ethetl::exporters::eth::BlockExporter;
 
 use crate::common::create_config;
 use crate::common::create_ctx;

@@ -41,9 +41,9 @@ use web3::types::U64;
 
 use crate::chains::eth::BlockFetcher;
 use crate::contexts::ContextRef;
-use crate::exporters::write_file;
-use crate::exporters::ReceiptExporter;
-use crate::exporters::TransactionExporter;
+use crate::exporters::eth::write_file;
+use crate::exporters::eth::ReceiptExporter;
+use crate::exporters::eth::TransactionExporter;
 
 pub struct BlockExporter {
     ctx: ContextRef,

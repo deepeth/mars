@@ -15,7 +15,7 @@
 use common_exceptions::Result;
 
 use crate::contexts::ContextRef;
-use crate::exporters::BlockExporter;
+use crate::exporters::eth::BlockExporter;
 
 pub struct Pipeline {
     ctx: ContextRef,
