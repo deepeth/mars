@@ -18,8 +18,8 @@ use common_exceptions::Result;
 use log::info;
 use ticker::Ticker;
 
+use crate::chain::BlockNumber;
 use crate::contexts::ContextRef;
-use crate::eth::BlockNumber;
 use crate::etl::Batch;
 use crate::etl::SyncingStatus;
 
