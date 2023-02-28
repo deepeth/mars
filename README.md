@@ -12,7 +12,7 @@
 
 ## ethetl
 
-- __ethetl__ Lets you export Ethereum data into CSV/Parquet/JSON file format and databases, blazing fast.
+- __ethetl__ Lets you export Ethereum data into Parquet file format and ingest into cloud warehouse [Databend](https://github.com/datafuselabs/databend), blazing fast.
 
 ### Schema
 
