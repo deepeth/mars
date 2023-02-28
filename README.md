@@ -47,7 +47,7 @@ type = "S3"
 ```
 Note that the data will be stored to `/<your-bucket-name>/pub` in your S3 location.
 
-### Export Data from the Ethereum Chain by Mars
+### 3. Export Data from the Ethereum Chain by Mars
 
 Once you have configured Mars, you can start exporting data from the Ethereum chain. Use the following command:
 ```shell
@@ -60,7 +60,7 @@ Once you have configured Mars, you can start exporting data from the Ethereum ch
 
 Here, we recommend you use a SaaS like [GetBlock](https://getblock.io/) for your `your-eth-node-endpoint-url`.
 
-### Deploy Databend
+### 4. Deploy Databend
 
 Databend is the only warehouse supported by Mars, which has blazing performance and stores data to cloud-based object storage. You have two choices:
 
@@ -68,11 +68,11 @@ There are two choice for you:
 * Self-Deploy. See [How to deploy Databend](https://databend.rs/doc/deploy/deploying-databend)
 * Cloud. Use https://app.databend.com
 
-### Create Table
+### 5. Create Table
 
 You can find the schema files for Databend in the [schemas/databend](schemas/databend/1_schema.sql).
 
-### Ingest Data into Databend
+### 6. Ingest Data into Databend
 
 Ingesting data from S3 into Databend is straightforward. You can use Databend [COPY INTO](https://databend.rs/doc/sql-commands/dml/dml-copy-into-table) command to do that:
 
