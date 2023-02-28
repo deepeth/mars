@@ -12,7 +12,7 @@ output_dir = "pub"
 # Storage config.
 [storage]
 # Fs| S3 | Azblob
-type = "S3"
+type = "Fs"
 
 # To use S3-compatible object storage, uncomment this block and set your values.
 [storage.s3]

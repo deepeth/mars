@@ -1,4 +1,4 @@
-// Copyright 2022 BohuTANG.
+// Copyright 2023 BohuTANG.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+mod batch;
+mod normal;
+mod pipeline;
 #[allow(clippy::module_inception)]
 mod stream;
+mod worker;
 
-pub use stream::Stream;
+pub use batch::Batch;
+pub use normal::NormalEtl;
+pub use pipeline::Pipeline;
+pub use stream::StreamEtl;
+pub use worker::Worker;
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+struct SyncingStatus {
+    start: usize,
+    end: usize,
+}

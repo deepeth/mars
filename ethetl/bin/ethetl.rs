@@ -17,8 +17,7 @@ use common_exceptions::Result;
 use env_logger::Builder;
 use env_logger::Env;
 use ethetl::contexts::Context;
-use ethetl::exporters::Worker;
-use log::info;
+use ethetl::etl::NormalEtl;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -26,25 +25,17 @@ async fn main() -> Result<()> {
     Builder::from_env(env).format_target(false).init();
 
     let conf = EthConfig::load()?;
-    info!("Config: {:?}", conf);
+    log::info!("Config: {:?}", conf);
 
     // Create data dir.
     let ctx = Context::create(&conf).await;
 
     // Interval progress.
     let progress = ctx.get_progress();
-    let all = conf.export.end_block - conf.export.start_block + 1;
-    progress.inc_all(all);
     progress.start();
 
-    // Exporter.
-    let start = conf.export.start_block;
-    let end = conf.export.end_block;
-    let range: Vec<usize> = (start..=end).collect();
-
-    // Worker.
-    let worker = Worker::create(&ctx, range);
-    worker.start().await?;
+    let normal = NormalEtl::create(ctx);
+    normal.start().await?;
     progress.stop();
 
     Ok(())

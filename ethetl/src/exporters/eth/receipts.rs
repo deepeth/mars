@@ -24,12 +24,12 @@ use web3::types::H256;
 use web3::types::U256;
 use web3::types::U64;
 
+use crate::chains::eth::ReceiptFetcher;
 use crate::contexts::ContextRef;
-use crate::eth::ReceiptFetcher;
-use crate::exporters::write_file;
-use crate::exporters::EnsExporter;
-use crate::exporters::LogsExporter;
-use crate::exporters::TokenTransferExporter;
+use crate::exporters::eth::write_file;
+use crate::exporters::eth::EnsExporter;
+use crate::exporters::eth::LogsExporter;
+use crate::exporters::eth::TokenTransferExporter;
 
 pub struct ReceiptExporter {
     ctx: ContextRef,
