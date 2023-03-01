@@ -160,7 +160,10 @@ impl TokenTransferExporter {
                     for transfer in transfers {
                         if transfer.value > U256::from(U128::max_value()) {
                             error!(
-                                "transfer[{:?}->{:?}] value is larger than u128: {}",
+                                "receipt[block:{:?}, tx.hash:{}, index:{}], transfer[{:?}->{:?}] value is larger than u128: {}",
+                                receipt.block_number,
+                                receipt.transaction_hash,
+                                receipt.transaction_index,
                                 transfer.from.clone(),
                                 transfer.to.clone(),
                                 transfer.value
