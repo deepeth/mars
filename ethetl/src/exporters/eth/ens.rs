@@ -25,9 +25,11 @@ use common_eth::decode_name_registered_data;
 use common_eth::h256_to_hex;
 use common_eth::ENS_NAME_REGISTERED_SIG;
 use common_exceptions::Result;
+use log::error;
 use web3::types::Log;
 use web3::types::TransactionReceipt;
 use web3::types::H256;
+use web3::types::U128;
 use web3::types::U256;
 use web3::types::U64;
 
@@ -96,6 +98,14 @@ impl EnsExporter {
         for receipt in &self.receipts {
             for logs in &receipt.logs {
                 if let Some(ens) = Self::parse_log(logs)? {
+                    if ens.cost > U256::from(U128::max_value()) {
+                        error!(
+                            "ens[{:?}] cost value is larger than u128: {}",
+                            ens.name.clone(),
+                            ens.cost
+                        );
+                    }
+
                     name_vec.push(ens.name);
                     cost_vec.push(ens.cost.as_u128() as i128);
                     expires_vec.push(ens.expires as i64);

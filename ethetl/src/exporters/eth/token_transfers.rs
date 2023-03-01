@@ -29,9 +29,11 @@ use common_eth::ERC1155_TRANSFER_BATCH_SIG;
 use common_eth::ERC1155_TRANSFER_SINGLE_SIG;
 use common_eth::ERC20_TOKEN_TRANSFER_SIG;
 use common_exceptions::Result;
+use log::error;
 use web3::types::Log;
 use web3::types::TransactionReceipt;
 use web3::types::H256;
+use web3::types::U128;
 use web3::types::U256;
 use web3::types::U64;
 
@@ -156,6 +158,15 @@ impl TokenTransferExporter {
             for logs in &receipt.logs {
                 if let Some(transfers) = Self::parse_log(logs)? {
                     for transfer in transfers {
+                        if transfer.value > U256::from(U128::max_value()) {
+                            error!(
+                                "transfer[{:?}->{:?}] value is larger than u128: {}",
+                                transfer.from.clone(),
+                                transfer.to.clone(),
+                                transfer.value
+                            );
+                        }
+
                         from_address_vec.push(transfer.from);
                         to_address_vec.push(transfer.to);
                         token_id_vec.push(transfer.token_id);

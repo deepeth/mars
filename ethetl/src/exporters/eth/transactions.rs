@@ -29,10 +29,12 @@ use common_eth::h160_to_hex;
 use common_eth::h256_to_hex;
 use common_eth::u256_to_hex;
 use common_exceptions::Result;
+use log::error;
 use web3::ethabi::Address;
 use web3::types::Block;
 use web3::types::Transaction;
 use web3::types::H256;
+use web3::types::U128;
 use web3::types::U256;
 use web3::types::U64;
 
@@ -88,6 +90,13 @@ impl TransactionExporter {
                 transaction_index_vec.push(tx.transaction_index.unwrap_or_else(U64::zero).as_u64());
                 from_address_vec.push(h160_to_hex(&tx.from.unwrap_or_else(Address::zero)));
                 to_address_vec.push(h160_to_hex(&tx.to.unwrap_or_else(Address::zero)));
+
+                if tx.value > U256::from(U128::max_value()) {
+                    error!(
+                        "block[{:?}] tx[{:?}] value is larger than u128: {}",
+                        block.number, tx.hash, tx.value
+                    );
+                }
                 value_vec.push(tx.value.as_u128() as i128);
                 gas_vec.push(tx.gas.as_u64());
                 gas_price_vec.push(tx.gas_price.unwrap_or_else(U256::zero).as_u64());
