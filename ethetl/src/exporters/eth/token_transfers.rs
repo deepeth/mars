@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use arrow2::array::Int128Array;
 use arrow2::array::UInt64Array;
 use arrow2::array::Utf8Array;
 use arrow2::chunk::Chunk;
-use arrow2::datatypes::DataType;
 use arrow2::datatypes::Field;
 use arrow2::datatypes::Schema;
 use common_eth::decode_transfer_batch_data;
@@ -159,7 +157,7 @@ impl TokenTransferExporter {
                         from_address_vec.push(transfer.from);
                         to_address_vec.push(transfer.to);
                         token_id_vec.push(transfer.token_id);
-                        value_vec.push(transfer.value.as_u128() as i128);
+                        value_vec.push(transfer.value.to_string());
                         erc_standard_vec.push(transfer.erc);
                         token_address_vec.push(h160_to_hex(&logs.address));
                         transaction_hash_vec.push(h256_to_hex(
@@ -178,7 +176,7 @@ impl TokenTransferExporter {
         let from_address_array = Utf8Array::<i32>::from_slice(from_address_vec);
         let to_address_array = Utf8Array::<i32>::from_slice(to_address_vec);
         let token_id_array = Utf8Array::<i32>::from_slice(token_id_vec);
-        let value_array = Int128Array::from_slice(value_vec).to(DataType::Decimal(36, 18));
+        let value_array = Utf8Array::<i32>::from_slice(value_vec);
         let erc_standard_array = Utf8Array::<i32>::from_slice(erc_standard_vec);
         let transaction_hash_array = Utf8Array::<i32>::from_slice(transaction_hash_vec);
         let log_index_array = UInt64Array::from_slice(log_index_vec);
