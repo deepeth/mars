@@ -90,7 +90,7 @@ Cloud: https://app.databend.com/
 | from_address       | VARCHAR         |
 | to_address         | VARCHAR         |
 | token_id           | VARCHAR         |
-| value              | DECIMAL(36, 18) |
+| value              | VARCHAR         |
 | erc_standard       | VARCHAR         |
 | transaction_hash   | VARCHAR         |
 | log_index          | BIGINT UNSIGNED |
