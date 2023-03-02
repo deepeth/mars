@@ -159,7 +159,9 @@ impl EthConfig {
                 "".to_string()
             };
 
-            builder = builder.collect(from_file(Toml, &config_file));
+            if !arg_conf.config_file.is_empty() {
+                builder = builder.collect(from_file(Toml, &config_file));
+            }
         }
 
         // Then, load from env.
