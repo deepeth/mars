@@ -17,6 +17,7 @@ use std::sync::atomic::AtomicBool;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
 use std::sync::Arc;
+use std::sync::RwLock;
 use std::time::Duration;
 
 use log::info;
@@ -44,6 +45,7 @@ pub struct Progress {
     token_transfers: AtomicUsize,
     ens: AtomicUsize,
     stopped: AtomicBool,
+    name: Arc<RwLock<String>>,
 }
 
 impl Progress {
@@ -58,7 +60,13 @@ impl Progress {
             token_transfers: AtomicUsize::new(0),
             ens: AtomicUsize::new(0),
             stopped: Default::default(),
+            name: Default::default(),
         })
+    }
+
+    pub fn set_name(&self, name: String) {
+        let mut lock = self.name.write().unwrap();
+        *lock = name;
     }
 
     pub fn inc_all(&self, v: usize) {
@@ -124,6 +132,7 @@ impl Progress {
     }
 
     fn print_progress(&self) {
+        let name = self.name.read().unwrap();
         let all = self.all.load(Ordering::Relaxed);
         let latest_block = self.max_block_number.load(Ordering::Relaxed);
         let value = self.value();
@@ -131,7 +140,7 @@ impl Progress {
         if value.blocks > 0 {
             let percent = ((value.blocks as f32 / all as f32) * 100_f32) as usize;
             info!(
-                "block {:?} processed/{}, latest block {}, {:?} transactions processed, {:?} receipts processed, {:?} logs processed, {:?} token_transfers processed, {:?} ens processed. Progress is {:.2}",
+                "block {:?} processed/{}, latest block {}, {:?} transactions processed, {:?} receipts processed, {:?} logs processed, {:?} token_transfers processed, {:?} ens processed. Progress is {:.2} - Mode [{}]",
                 value.blocks,
                 all,
                 latest_block,
@@ -141,6 +150,7 @@ impl Progress {
                 value.token_transfers,
                 value.ens,
                 percent.percent(),
+                name,
             );
         }
     }

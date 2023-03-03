@@ -32,6 +32,7 @@ async fn main() -> Result<()> {
 
     // Interval progress.
     let progress = ctx.get_progress();
+    progress.set_name("Stream".to_string());
     progress.start();
 
     let stream = StreamEtl::create(ctx);
