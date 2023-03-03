@@ -32,6 +32,7 @@ async fn main() -> Result<()> {
 
     // Interval progress.
     let progress = ctx.get_progress();
+    progress.set_name("Normal".to_string());
     progress.start();
 
     let normal = NormalEtl::create(ctx);
