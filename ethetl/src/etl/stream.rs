@@ -22,8 +22,7 @@ use crate::chains::eth::BlockNumber;
 use crate::contexts::ContextRef;
 use crate::etl::Batch;
 use crate::etl::SyncingStatus;
-
-static STREAM_SYNCING_STATUS_FILE: &str = "mars_stream_syncing_status.json";
+use crate::etl::SYNCING_STATUS_FILE;
 
 pub struct StreamEtl {
     ctx: ContextRef,
@@ -40,12 +39,12 @@ impl StreamEtl {
         // Fetch syncing file.
         {
             let op = self.ctx.get_storage();
-            if let Ok(data) = op.object(STREAM_SYNCING_STATUS_FILE).read().await {
+            if let Ok(data) = op.object(SYNCING_STATUS_FILE).read().await {
                 let prev_syncing_status: SyncingStatus = serde_json::from_slice(&data)?;
                 start = prev_syncing_status.end + 1;
                 info!(
                     "Found syncing status file={}, status={:?}",
-                    STREAM_SYNCING_STATUS_FILE, prev_syncing_status
+                    SYNCING_STATUS_FILE, prev_syncing_status
                 );
             }
         }
@@ -63,9 +62,7 @@ impl StreamEtl {
             };
             if start <= end {
                 let batch = Batch::create(self.ctx.clone());
-                batch
-                    .syncing(start, end, STREAM_SYNCING_STATUS_FILE)
-                    .await?;
+                batch.syncing(start, end, SYNCING_STATUS_FILE).await?;
                 start = end + 1;
             }
         }

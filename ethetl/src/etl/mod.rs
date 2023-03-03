@@ -25,6 +25,9 @@ pub use pipeline::Pipeline;
 pub use stream::StreamEtl;
 pub use worker::Worker;
 
+// The syncing status file.
+pub static SYNCING_STATUS_FILE: &str = "mars_syncing_status.json";
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct SyncingStatus {
     start: usize,
